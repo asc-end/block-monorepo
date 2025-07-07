@@ -1,0 +1,23 @@
+# Development files
+*.log
+.DS_Store
+node_modules/
+
+# Source control
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Tests
+__tests__/
+*.test.ts
+*.test.tsx
+
+# Config files we don't need in published package
+.eslintrc*
+.prettierrc*
+
+# Keep TypeScript sources - we're publishing them!

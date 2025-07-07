@@ -1,0 +1,67 @@
+{
+  "name": "@ascend/cross-ui-toolkit",
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/types.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "nativewind.d.ts"
+  ],
+  "scripts": {
+    "prepublishOnly": "echo 'Publishing TypeScript sources'"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/fullstack-monorepo.git",
+    "directory": "packages/cross-ui-toolkit"
+  },
+  "peerDependencies": {
+    "react": "19.0.0",
+    "react-native": "*",
+    "@react-native-community/slider": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-modalize": "*",
+    "react-native-reanimated": "*",
+    "react-native-svg": "*"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    },
+    "@react-native-community/slider": {
+      "optional": true
+    },
+    "react-native-gesture-handler": {
+      "optional": true
+    },
+    "react-native-modalize": {
+      "optional": true
+    },
+    "react-native-reanimated": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "~19.0.10",
+    "autoprefixer": "^10.4.17",
+    "file-loader": "^6.2.0",
+    "nativewind": "^4.1.23",
+    "postcss": "^8.4.35",
+    "postcss-cli": "^11.0.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.1.3"
+  }
+}

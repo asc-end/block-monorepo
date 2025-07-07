@@ -1,0 +1,16 @@
+{
+  "name": "fullstack-monorepo",
+  "private": true,
+  "packageManager": "pnpm@8.5.0",
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "scripts": {
+    "clean": "turbo run clean",
+    "lint": "turbo run lint",
+    "publish:toolkit": "pnpm --filter @ascend/cross-ui-toolkit publish",
+    "version:toolkit": "pnpm --filter @ascend/cross-ui-toolkit version"
+  },
+  "dependencies": {
+  }
+}
