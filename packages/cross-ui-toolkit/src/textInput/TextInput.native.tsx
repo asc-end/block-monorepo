@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput as RNTextInput, TextInputProps as RNTextInputProps, StyleSheet, View } from 'react-native';
-import { TextInputProps, textInputStyles, textInputSizeStyles } from '.';
+import { TextInputProps, textInputVariantConfig, textInputSizeStyles, getTextInputColors } from '.';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
 
@@ -23,29 +23,24 @@ export function TextInput(props: TextInputProps & RNTextInputProps): React.React
   const { currentColors } = useTheme();
 
   const sizeStyle = textInputSizeStyles[size];
+  const variantConfig = textInputVariantConfig[variant];
+  const colors = getTextInputColors(currentColors, variant, { error, disabled });
 
   const styles = StyleSheet.create({
     input: {
       ...sizeStyle,
-      borderWidth: 1,
-      borderColor: error 
-        ? currentColors.error.main 
-        : currentColors.neutral[300],
-      backgroundColor: disabled 
-        ? currentColors.neutral[100]
-        : currentColors.surface.card,
-      color: disabled 
-        ? currentColors.text.verySoft 
-        : currentColors.text.main,
+      borderWidth: variantConfig.borderWidth,
+      borderColor: colors.borderColor,
+      backgroundColor: colors.backgroundColor,
+      color: colors.textColor,
+      opacity: disabled ? 0.6 : 1,
     },
     label: {
       marginBottom: 4,
     },
     helperText: {
       marginTop: 4,
-      color: error 
-        ? textInputStyles[variant]['&:error'].borderColor 
-        : currentColors.text.soft,
+      color: colors.helperTextColor,
     },
   });
 
@@ -62,7 +57,7 @@ export function TextInput(props: TextInputProps & RNTextInputProps): React.React
         value={value}
         onChangeText={onChangeText}
         editable={!disabled}
-        placeholderTextColor={currentColors.text.verySoft}
+        placeholderTextColor={colors.placeholderColor}
         keyboardType={keyboardType}
         {...rest}
       />

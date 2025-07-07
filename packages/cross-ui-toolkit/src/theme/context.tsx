@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
 // Define the shape of the theme that ui-base expects
-// This matches the structure from @ascend/ui but doesn't import it
+// This matches the structure from @blockit/ui but doesn't import it
 export interface ThemeColors {
   primary: Record<string, string>;
   secondary: Record<string, string>;

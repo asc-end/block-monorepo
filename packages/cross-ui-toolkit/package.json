@@ -1,5 +1,5 @@
 {
-  "name": "@ascend/cross-ui-toolkit",
+  "name": "@blockit/cross-ui-toolkit",
   "version": "0.1.0",
   "main": "./src/index.ts",
   "type": "module",

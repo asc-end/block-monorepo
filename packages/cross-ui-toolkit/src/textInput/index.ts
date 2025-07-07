@@ -1,6 +1,5 @@
 import { BaseProps } from "../types";
-import { colors } from "@ascend/ui";
-
+import { ThemeColors } from "../theme/context";
 // TextInput variant types
 export type TextInputVariant = 'default' | 'outline' | 'filled';
 
@@ -20,58 +19,9 @@ export interface TextInputProps extends BaseProps {
   helperText?: string;
   multiline?: boolean;
   keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
+  onFocus?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
-
-export const textInputStyles: Record<TextInputVariant, any> = {
-  default: {
-    borderWidth: 1,
-    borderColor: colors.neutral[300],
-    color: colors.text.main,
-    '&:focus': {
-      borderColor: colors.primary[300],
-      outline: 'none',
-    },
-    '&:disabled': {
-      backgroundColor: colors.neutral[100],
-      borderColor: colors.neutral[200],
-      color: colors.text.verySoft,
-    },
-    '&:error': {
-      borderColor: colors.error.main,
-    },
-  },
-  outline: {
-    borderWidth: 1,
-    borderColor: colors.neutral[300],
-    color: colors.text.main,
-    '&:focus': {
-      borderColor: colors.primary[300],
-      outline: 'none',
-    },
-    '&:disabled': {
-      borderColor: colors.neutral[200],
-      color: colors.text.verySoft,
-    },
-    '&:error': {
-      borderColor: colors.error.main,
-    },
-  },
-  filled: {
-    borderWidth: 0,
-    color: colors.text.main,
-    '&:focus': {
-      backgroundColor: colors.neutral[200],
-      outline: 'none',
-    },
-    '&:disabled': {
-      backgroundColor: colors.neutral[50],
-      color: colors.text.verySoft,
-    },
-    '&:error': {
-      backgroundColor: colors.error.light,
-    },
-  },
-};
 
 export const textInputSizeStyles: Record<TextInputSize, any> = {
   sm: {
@@ -92,4 +42,54 @@ export const textInputSizeStyles: Record<TextInputSize, any> = {
     fontSize: 18,
     borderRadius: 10,
   },
+};
+
+// Variant-specific configuration
+export const textInputVariantConfig = {
+  default: {
+    borderWidth: 1,
+  },
+  outline: {
+    borderWidth: 2,
+  },
+  filled: {
+    borderWidth: 0,
+    useFilledBackground: true,
+  },
+} as const;
+
+// Shared function to get text input colors based on state
+export const getTextInputColors = (
+  theme: ThemeColors,
+  variant: TextInputVariant,
+  state: {
+    error?: boolean;
+    disabled?: boolean;
+    focused?: boolean;
+  }
+) => {
+  const variantConfig = textInputVariantConfig[variant];
+  
+  return {
+    borderColor: state.error 
+      ? theme.error.main 
+      : state.focused 
+        ? theme.primary[300]
+        : theme.neutral[300],
+    backgroundColor: state.disabled
+      ? theme.neutral[100]
+      : 'useFilledBackground' in variantConfig && variantConfig.useFilledBackground
+        ? theme.neutral[100]
+        : theme.surface.card,
+    textColor: state.disabled
+      ? theme.text.verySoft
+      : theme.text.main,
+    placeholderColor: theme.text.verySoft,
+    helperTextColor: state.error
+      ? theme.error.main
+      : theme.text.soft,
+    focusBoxShadow: state.focused && !state.disabled
+      ? `0 0 0 1px ${state.error ? theme.error.main : theme.primary[300]}`
+      : 'none',
+  };
 }; 

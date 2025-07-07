@@ -5,7 +5,7 @@ A cross-platform UI component library that works with both React Native and Reac
 ## Installation
 
 ```bash
-npm install @ascend/cross-ui-toolkit
+npm install @blockit/cross-ui-toolkit
 ```
 
 ## Platform-Specific Dependencies
@@ -53,7 +53,7 @@ Web projects only need React - no additional dependencies required!
 ## Usage
 
 ```tsx
-import { Button, Text, Box } from '@ascend/cross-ui-toolkit';
+import { Button, Text, Box } from '@blockit/cross-ui-toolkit';
 
 function MyComponent() {
   return (

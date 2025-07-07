@@ -5,6 +5,7 @@ import { useTheme } from '../theme/context';
 export function Text(props: TextProps) {
   const { children, variant = 'body', style, className, ...rest } = props;
   const { currentColors } = useTheme();
+  const variantStyle = textVariants[variant];
 
   // Get default text color based on variant
   const getDefaultTextColor = () => {
@@ -24,10 +25,10 @@ export function Text(props: TextProps) {
   return (
     <RNText
       style={defaultStyle}
-      className={className}
+      className={`${variantStyle} ${className || ''}`}
       {...rest}
     >
       {children}
     </RNText>
   );
-}; 
+};

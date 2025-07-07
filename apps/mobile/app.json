@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "blockit",
+    "slug": "blockit",
+    "version": "1.0.0",
+    "jsEngine": "hermes",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.ascendmarie.blockit"
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ascendmarie.blockit",
+      "permissions": [
+        "android.permission.PACKAGE_USAGE_STATS"
+      ],
+      "theme": {
+        "name": "Theme.EdgeToEdge",
+        "parent": "Theme.AppCompat.Light.NoActionBar"
+      }
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-asset",
+      "expo-secure-store",
+      "expo-web-browser"
+    ],
+    "scheme": "blockit",
+    "extra": {
+      "projectRoot": "../../"
+    }
+  }
+}

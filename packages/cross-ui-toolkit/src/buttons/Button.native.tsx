@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, ViewStyle, ActivityIndicator } from 'react-native';
-import { ButtonProps, buttonStyles, buttonSizeStyles } from '.';
+import { ButtonProps, getButtonStyles, buttonSizeStyles } from '.';
+import { useTheme } from '../theme/context';
 
 export function Button(props: ButtonProps): React.ReactElement {
     const {
@@ -22,7 +23,8 @@ export function Button(props: ButtonProps): React.ReactElement {
     } = props;
 
     const [isPressed, setIsPressed] = useState(false);
-    const variantStyle = buttonStyles[variant];
+    const { currentColors } = useTheme();
+    const variantStyle = getButtonStyles(currentColors, variant);
     const sizeStyle = buttonSizeStyles[size];
     const isPrimary = variant === 'primary';
 
@@ -36,7 +38,7 @@ export function Button(props: ButtonProps): React.ReactElement {
             backgroundColor: style?.backgroundColor ?? variantStyle.backgroundColor,
             borderWidth: variantStyle.borderWidth,
             borderColor: style?.borderColor ?? variantStyle.borderColor,
-            borderRadius: variantStyle.borderRadius ?? sizeStyle.borderRadius,
+            borderRadius: sizeStyle.borderRadius,
             paddingHorizontal: sizeStyle.paddingHorizontal,
             paddingVertical: sizeStyle.paddingVertical,
             alignItems: 'center' as const,
@@ -47,7 +49,7 @@ export function Button(props: ButtonProps): React.ReactElement {
         buttonPressed: {
             transform: isPrimary ? [{ translateY: 4 }] : [],
             opacity: isPrimary ? 1 : 0.8,
-            backgroundColor: style?.activeColor ?? variantStyle['&:active']?.backgroundColor,
+            backgroundColor: (variantStyle['&:active'] as any)?.backgroundColor || variantStyle.backgroundColor,
         },
         shadow: {
             position: 'absolute' as const,
@@ -56,7 +58,7 @@ export function Button(props: ButtonProps): React.ReactElement {
             right: 0,
             bottom: -4,
             backgroundColor: style?.shadowColor ?? variantStyle.shadowColor,
-            borderRadius: variantStyle.borderRadius || sizeStyle.borderRadius,
+            borderRadius: sizeStyle.borderRadius,
             zIndex: 1,
             opacity: isPrimary && !disabled ? 1 : 0,
         },

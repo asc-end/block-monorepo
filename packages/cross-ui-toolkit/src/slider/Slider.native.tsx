@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import RNSlider from '@react-native-community/slider';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
+import { getSliderColors } from '.';
 
 export interface SliderProps {
     value: number;
@@ -26,9 +27,9 @@ export function Slider({
     min = 0,
     max = 100,
     step = 0.1,
-    minTrackTintColor = currentColors.primary[300],
-    maxTrackTintColor = currentColors.neutral[200],
-    thumbTintColor = currentColors.primary[300],
+    minTrackTintColor,
+    maxTrackTintColor,
+    thumbTintColor,
     showLabels = true,
     minLabel = 'Min',
     maxLabel = 'Max',
@@ -36,6 +37,11 @@ export function Slider({
     style,
 }: SliderProps) {
     const { currentColors } = useTheme();
+    const sliderColors = getSliderColors(currentColors);
+    
+    const finalMinTrackColor = minTrackTintColor || sliderColors.minTrackTintColor;
+    const finalMaxTrackColor = maxTrackTintColor || sliderColors.maxTrackTintColor;
+    const finalThumbColor = thumbTintColor || sliderColors.thumbTintColor;
     return (
         <View className={className}>
             <RNSlider
@@ -45,9 +51,9 @@ export function Slider({
                 step={step}
                 value={value}
                 onValueChange={onValueChange}
-                minimumTrackTintColor={minTrackTintColor}
-                maximumTrackTintColor={maxTrackTintColor}
-                thumbTintColor={thumbTintColor}
+                minimumTrackTintColor={finalMinTrackColor}
+                maximumTrackTintColor={finalMaxTrackColor}
+                thumbTintColor={finalThumbColor}
             />
             {showLabels && (
                 <View className="flex flex-row justify-between mt-1">

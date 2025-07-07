@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box } from '../box/Box';
 import { Text } from '../text/Text';
-import { colors } from '@ascend/ui';
+import { useTheme } from '../theme/context';
+import { getSliderColors } from '.';
 
 export interface SliderProps {
     value: number;
@@ -25,15 +26,21 @@ export const Slider: React.FC<SliderProps> = ({
     min = 0,
     max = 100,
     step = 0.1,
-    minTrackTintColor = colors.primary[300],
-    maxTrackTintColor = colors.neutral[200],
-    thumbTintColor = colors.primary[300],
+    minTrackTintColor,
+    maxTrackTintColor,
+    thumbTintColor,
     showLabels = true,
     minLabel = 'Min',
     maxLabel = 'Max',
     className = '',
     style,
 }) => {
+    const { currentColors } = useTheme();
+    const sliderColors = getSliderColors(currentColors);
+    
+    const finalMinTrackColor = minTrackTintColor || sliderColors.minTrackTintColor;
+    const finalMaxTrackColor = maxTrackTintColor || sliderColors.maxTrackTintColor;
+    const finalThumbColor = thumbTintColor || sliderColors.thumbTintColor;
     const [value, setValue] = useState(initialValue);
     const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -62,8 +69,8 @@ export const Slider: React.FC<SliderProps> = ({
                     onChange={handleChange}
                     className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                     style={{
-                        background: `linear-gradient(to right, ${minTrackTintColor} ${percentage}%, ${maxTrackTintColor} ${percentage}%)`,
-                        accentColor: thumbTintColor,
+                        background: `linear-gradient(to right, ${finalMinTrackColor} ${percentage}%, ${finalMaxTrackColor} ${percentage}%)`,
+                        accentColor: finalThumbColor,
                     }}
                 />
                 {showLabels && (

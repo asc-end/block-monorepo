@@ -8,8 +8,8 @@
   "scripts": {
     "clean": "turbo run clean",
     "lint": "turbo run lint",
-    "publish:toolkit": "pnpm --filter @ascend/cross-ui-toolkit publish",
-    "version:toolkit": "pnpm --filter @ascend/cross-ui-toolkit version"
+    "publish:toolkit": "pnpm --filter @blockit/cross-ui-toolkit publish",
+    "version:toolkit": "pnpm --filter @blockit/cross-ui-toolkit version"
   },
   "dependencies": {
   }

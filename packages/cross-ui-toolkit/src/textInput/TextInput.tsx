@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { TextInputProps, textInputStyles, textInputSizeStyles } from '.';
+import { TextInputProps, textInputVariantConfig, textInputSizeStyles, getTextInputColors } from '.';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
 
@@ -17,12 +17,17 @@ export function TextInput(props: TextInputProps): React.ReactElement {
     style,
     className = '',
     multiline = false,
+    onFocus,
+    onBlur,
     ...rest
   } = props;
   const { currentColors } = useTheme();
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const [isFocused, setIsFocused] = React.useState(false);
 
   const sizeStyle = textInputSizeStyles[size];
+  const variantConfig = textInputVariantConfig[variant];
+  const colors = getTextInputColors(currentColors, variant, { error, disabled, focused: isFocused });
 
   // Remove outline and boxShadow by default, add custom focus style
   const baseFocusStyle = {
@@ -36,36 +41,24 @@ export function TextInput(props: TextInputProps): React.ReactElement {
     boxSizing: 'border-box' as const,
     transition: 'all 0.2s ease-in-out',
     ...baseFocusStyle,
-    backgroundColor: currentColors.surface.card,
+    borderWidth: variantConfig.borderWidth,
+    borderStyle: 'solid',
+    borderColor: colors.borderColor,
+    backgroundColor: colors.backgroundColor,
+    color: colors.textColor,
+    opacity: disabled ? 0.6 : 1,
+    cursor: disabled ? 'not-allowed' : 'text',
   };
-
-  if (error) {
-    inputStyle.borderColor = textInputStyles[variant]['&:error'].borderColor;
-  }
-
-  if (disabled) {
-    Object.assign(inputStyle, textInputStyles[variant]['&:disabled']);
-  }
 
   // Custom focus handler to add border color on focus (more subtle)
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!disabled) {
-      e.currentTarget.style.outline = 'none';
-      // Subtle focus: lighter border color, no boxShadow or a very faint one
-      e.currentTarget.style.boxShadow = '0 0 0 1px ' + (error
-        ? textInputStyles[variant]['&:error'].borderColor
-        : currentColors.primary[200]);
-      e.currentTarget.style.borderColor = error
-        ? textInputStyles[variant]['&:error'].borderColor
-        : currentColors.primary[200];
-    }
+    setIsFocused(true);
+    onFocus?.(e);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    e.currentTarget.style.boxShadow = 'none';
-    e.currentTarget.style.borderColor = error
-      ? textInputStyles[variant]['&:error'].borderColor
-      : currentColors.primary[200];
+    setIsFocused(false);
+    onBlur?.(e);
   };
 
   return (
@@ -78,7 +71,7 @@ export function TextInput(props: TextInputProps): React.ReactElement {
       {multiline ? (
         <textarea
           ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-          style={{ ...inputStyle, minHeight: '100px', resize: 'vertical', backgroundColor: currentColors.neutral[100] }}
+          style={{ ...inputStyle, minHeight: '100px', resize: 'vertical', boxShadow: colors.focusBoxShadow }}
           className={className + " p-2 focus:outline-none"}
           placeholder={placeholder}
           value={value}
@@ -92,7 +85,7 @@ export function TextInput(props: TextInputProps): React.ReactElement {
         <input
           ref={inputRef as React.RefObject<HTMLInputElement>}
           type="text"
-          style={inputStyle}
+          style={{ ...inputStyle, boxShadow: colors.focusBoxShadow }}
           className={className + " p-2 focus:outline-none"}
           placeholder={placeholder}
           value={value}
@@ -108,7 +101,7 @@ export function TextInput(props: TextInputProps): React.ReactElement {
           variant="caption"
           style={{
             marginTop: 4,
-            color: error ? textInputStyles[variant]['&:error'].borderColor : currentColors.text.soft,
+            color: colors.helperTextColor,
           }}
         >
           {helperText}
