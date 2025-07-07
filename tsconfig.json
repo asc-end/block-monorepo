@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@blockit/cross-ui-toolkit": ["packages/cross-ui-toolkit/*"]
+    }
+  }
+}

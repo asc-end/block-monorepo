@@ -10,7 +10,7 @@ export interface TextProps extends BaseProps {
 
 export const textVariants = {
   // Headings - use currentColors for dynamic theming
-  h1: 'text-3xl font-bold',
+  h1: 'text-6xl font-bold',
   h2: 'text-2xl font-bold',
   h3: 'text-xl font-bold',
   h4: 'text-lg font-bold',

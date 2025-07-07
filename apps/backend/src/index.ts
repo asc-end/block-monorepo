@@ -5,6 +5,7 @@ import { IncomingMessage } from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { wsManager } from './services/init';
+import Users from './routes/users';
 
 dotenv.config();
 
@@ -24,12 +25,12 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   ws.close(1008, 'Invalid or missing userId');
 });
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-});
+
+// ROUTES
+app.use('/users', Users);
+app.get('/', (req, res) => { res.send('Hello World!')});
 
 const PORT = parseInt(process.env.PORT ?? "3001");
-
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 }); 
