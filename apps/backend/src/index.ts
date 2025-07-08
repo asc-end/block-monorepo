@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { wsManager } from './services/init';
 import Users from './routes/users';
+import FocusSessions from './routes/focus-sessions';
 
 dotenv.config();
 
@@ -28,7 +29,16 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 
 // ROUTES
 app.use('/users', Users);
+app.use('/focus-session', FocusSessions);
+
 app.get('/', (req, res) => { res.send('Hello World!')});
+// Log every route being fetched
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+
 
 const PORT = parseInt(process.env.PORT ?? "3001");
 server.listen(PORT, '0.0.0.0', () => {

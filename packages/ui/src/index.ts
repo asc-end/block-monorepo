@@ -3,6 +3,7 @@ export * from './stores/authStore';
 export * from './contexts/AuthContext';
 export * from './lib/time';
 export * from './app/icons';
+export { appConfig } from './lib/config';
 
 // App components
 export * from './app/Home';
@@ -12,3 +13,6 @@ export * from './app/components/create-routine/Apps';
 export * from './app/components/create-routine/Time';
 export * from './app/components/create-routine/Calendar';
 export * from './app/components/create-routine/Money';
+
+// Hooks
+export * from './hooks';

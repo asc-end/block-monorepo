@@ -1,10 +1,11 @@
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Box, Button, Text } from "@blockit/cross-ui-toolkit";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useEffect } from "react";
 import Home from "./Home";
 import Error from "./Error";
 import { sendMessageToExtension } from "../lib/sendMessageToExtension";
+import { useUserCreation } from "@blockit/ui";
 
 const router = createBrowserRouter([
   {
@@ -16,6 +17,15 @@ const router = createBrowserRouter([
 
 export function App() {
   const { ready, authenticated, login, user, getAccessToken } = usePrivy();
+  const { wallets } = useWallets();
+  const walletAddress = wallets?.[0]?.address;
+  
+  const { isCreating, isCreated, error } = useUserCreation({
+    user,
+    isReady: ready,
+    getAccessToken,
+    walletAddress
+  });
 
   useEffect(() => {
     const sendTokenToExtension = async () => {

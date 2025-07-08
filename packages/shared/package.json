@@ -1,0 +1,20 @@
+{
+  "name": "@blockit/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities and types for Blockit monorepo",
+  "main": "src/index.ts",
+  "types": "types/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./types/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

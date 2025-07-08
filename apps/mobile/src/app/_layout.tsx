@@ -5,16 +5,29 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTheme, ThemeProvider, Pressable, Text } from '@blockit/cross-ui-toolkit';
-import { PrivyProvider, usePrivy } from "@privy-io/expo";
+import { PrivyProvider, useEmbeddedSolanaWallet, usePrivy, usePrivyClient } from "@privy-io/expo";
 import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
-import { colors, darkColors } from '@blockit/ui';
+import { colors, darkColors, useUserCreation } from '@blockit/ui';
 import { useColorScheme, View } from 'react-native';
 
 function AppContent() {
   const { currentColors, isDarkMode } = useTheme();
   const { isReady, user } = usePrivy();
+  const privyClient = usePrivyClient();
+  const { wallets } = useEmbeddedSolanaWallet();
+  
+  const getAccessToken = async () => {
+    if (!privyClient) return null;
+    return privyClient.getAccessToken();
+  };
 
+  useUserCreation({
+    user,
+    isReady,
+    getAccessToken,
+    walletAddress: wallets?.[0]?.address
+  });
   if (isReady && !user) return <Connect />
 
   return (
