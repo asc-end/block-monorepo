@@ -1,4 +1,4 @@
-const CHROME_EXTENSION_ID = "eggfpkebkimalbfjgpnfiajbegeoacfb";
+const CHROME_EXTENSION_ID = "ekakamaigbogpbnomncmniejedopjjnn";
 // TODO set up firefox addon id
 const FIREFOX_EXTENSION_ID = "ekakamaigbogpbnomncmniejedopjjnn";
 
@@ -19,6 +19,7 @@ export async function sendMessageToExtension(
 
   const message = { type, ...payload };
 
+  console.log("Sending message to extension", message);
   const response = await runtime.sendMessage(extensionId, message);
 
   if (runtime.lastError) throw new Error(runtime.lastError.message);
