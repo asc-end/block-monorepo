@@ -4,7 +4,7 @@ export * from './text/Text';
 export * from './buttons/Button';
 export * from './buttons/Pressable';
 export * from './textInput';
-export * from './slider';
+export * from './slider/Slider';
 export * from './alert';
 export * from './theme/context';
 export * from './image/Image';

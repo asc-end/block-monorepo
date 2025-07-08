@@ -82,7 +82,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       react-native-modalize:
         specifier: ^2.1.1
-        version: 2.1.1(react-native-gesture-handler@2.24.0)(react-native@0.79.3)(react@19.1.0)
+        version: 2.1.1(react-native-gesture-handler@2.27.1)(react-native@0.79.3)(react@19.1.0)
       react-router-dom:
         specifier: ^6.22.3
         version: 6.22.3(react-dom@19.1.0)(react@19.1.0)
@@ -211,14 +211,14 @@ importers:
         specifier: 0.79.3
         version: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
       react-native-gesture-handler:
-        specifier: ~2.24.0
-        version: 2.24.0(react-native@0.79.3)(react@19.0.0)
+        specifier: ~2.27.1
+        version: 2.27.1(react-native@0.79.3)(react@19.0.0)
       react-native-get-random-values:
         specifier: ^1.11.0
         version: 1.11.0(react-native@0.79.3)
       react-native-modalize:
         specifier: ^2.1.1
-        version: 2.1.1(react-native-gesture-handler@2.24.0)(react-native@0.79.3)(react@19.0.0)
+        version: 2.1.1(react-native-gesture-handler@2.27.1)(react-native@0.79.3)(react@19.0.0)
       react-native-passkeys:
         specifier: ^0.3.3
         version: 0.3.3(expo@53.0.11)(react-native@0.79.3)(react@19.0.0)
@@ -351,11 +351,11 @@ importers:
         specifier: '*'
         version: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
       react-native-gesture-handler:
-        specifier: '*'
-        version: 2.24.0(react-native@0.79.3)(react@19.0.0)
+        specifier: ~2.27.1
+        version: 2.27.1(react-native@0.79.3)(react@19.0.0)
       react-native-modalize:
         specifier: '*'
-        version: 2.1.1(react-native-gesture-handler@2.24.0)(react-native@0.79.3)(react@19.0.0)
+        version: 2.1.1(react-native-gesture-handler@2.27.1)(react-native@0.79.3)(react@19.0.0)
       react-native-reanimated:
         specifier: '*'
         version: 3.17.4(@babel/core@7.27.4)(react-native@0.79.3)(react@19.0.0)
@@ -13212,8 +13212,8 @@ packages:
       react: 19.0.0
       react-native: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
 
-  /react-native-gesture-handler@2.24.0(react-native@0.79.3)(react@19.0.0):
-    resolution: {integrity: sha512-ZdWyOd1C8axKJHIfYxjJKCcxjWEpUtUWgTOVY2wynbiveSQDm8X/PDyAKXSer/GOtIpjudUbACOndZXCN3vHsw==}
+  /react-native-gesture-handler@2.27.1(react-native@0.79.3)(react@19.0.0):
+    resolution: {integrity: sha512-57TUWerhdz589OcDD21e/YlL923Ma4OIpyWsP0hy7gItBCPm5d7qIUW7Yo/cS2wo1qDdOhJaNlvlBD1lDou1fA==}
     peerDependencies:
       react: '*'
       react-native: '*'
@@ -13225,8 +13225,8 @@ packages:
       react-native: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
     dev: false
 
-  /react-native-gesture-handler@2.24.0(react-native@0.79.3)(react@19.1.0):
-    resolution: {integrity: sha512-ZdWyOd1C8axKJHIfYxjJKCcxjWEpUtUWgTOVY2wynbiveSQDm8X/PDyAKXSer/GOtIpjudUbACOndZXCN3vHsw==}
+  /react-native-gesture-handler@2.27.1(react-native@0.79.3)(react@19.1.0):
+    resolution: {integrity: sha512-57TUWerhdz589OcDD21e/YlL923Ma4OIpyWsP0hy7gItBCPm5d7qIUW7Yo/cS2wo1qDdOhJaNlvlBD1lDou1fA==}
     peerDependencies:
       react: '*'
       react-native: '*'
@@ -13266,7 +13266,7 @@ packages:
       react-native: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
     dev: false
 
-  /react-native-modalize@2.1.1(react-native-gesture-handler@2.24.0)(react-native@0.79.3)(react@19.0.0):
+  /react-native-modalize@2.1.1(react-native-gesture-handler@2.27.1)(react-native@0.79.3)(react@19.0.0):
     resolution: {integrity: sha512-4/7EZWsrUqAAkkAVEnOsSdpAPQaEBewX7TvwFuzgvGDzxKpq3O58I9SnSeU8QtG/r91XYHJNaU5dAuDrcLjUaQ==}
     peerDependencies:
       react: '> 15.0.0'
@@ -13275,10 +13275,10 @@ packages:
     dependencies:
       react: 19.0.0
       react-native: 0.79.3(@babel/core@7.27.4)(@types/react@19.0.10)(react@19.0.0)
-      react-native-gesture-handler: 2.24.0(react-native@0.79.3)(react@19.0.0)
+      react-native-gesture-handler: 2.27.1(react-native@0.79.3)(react@19.0.0)
     dev: false
 
-  /react-native-modalize@2.1.1(react-native-gesture-handler@2.24.0)(react-native@0.79.3)(react@19.1.0):
+  /react-native-modalize@2.1.1(react-native-gesture-handler@2.27.1)(react-native@0.79.3)(react@19.1.0):
     resolution: {integrity: sha512-4/7EZWsrUqAAkkAVEnOsSdpAPQaEBewX7TvwFuzgvGDzxKpq3O58I9SnSeU8QtG/r91XYHJNaU5dAuDrcLjUaQ==}
     peerDependencies:
       react: '> 15.0.0'
@@ -13287,7 +13287,7 @@ packages:
     dependencies:
       react: 19.1.0
       react-native: 0.79.3(@babel/core@7.27.4)(@types/react@19.1.2)(react@19.1.0)
-      react-native-gesture-handler: 2.24.0(react-native@0.79.3)(react@19.1.0)
+      react-native-gesture-handler: 2.27.1(react-native@0.79.3)(react@19.1.0)
     dev: false
 
   /react-native-passkeys@0.3.3(expo@53.0.11)(react-native@0.79.3)(react@19.0.0):

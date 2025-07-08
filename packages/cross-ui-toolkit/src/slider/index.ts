@@ -1,4 +1,3 @@
-export * from './Slider';
 
 import { ThemeColors } from '../theme/context';
 
