@@ -1,16 +1,19 @@
-import { Box, Text } from "@blockit/cross-ui-toolkit";
+import { useTheme } from '@blockit/cross-ui-toolkit';
+import { Home } from '@blockit/ui';
+import { Link, useNavigate } from 'react-router-dom';
 
-export function Home() {
+export function HomeScreen() {
+  const { currentColors } = useTheme();
+  const navigate = useNavigate();
+
   return (
-    <Box className="min-h-screen p-4 flex items-center justify-center">
-      <Box className="p-8">
-        <Text variant="h2" className="text-2xl font-bold text-center mb-4">
-          Blokit Extension
-        </Text>
-        <Text variant="body" className="text-gray-600 text-center">
-          You are successfully authenticated.
-        </Text>
-      </Box>
-    </Box>
-  );
+    <div>
+      <header className="flex justify-end items-center p-4 border-b" style={{ borderColor: currentColors.neutral[200] }}>
+        <nav className="flex gap-4">
+          <Link to="/stats" className="hover:opacity-70" style={{ color: currentColors.text.main }}>Stats</Link>
+        </nav>
+      </header>
+      <Home onCreateRoutine={() => navigate('/create-routine')} />
+    </div>
+  )
 }

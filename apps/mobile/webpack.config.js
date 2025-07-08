@@ -8,6 +8,7 @@ module.exports = async function (env, argv) {
   config.resolve.alias = {
     ...config.resolve.alias,
     '@blockit/cross-ui-toolkit': path.resolve(__dirname, '../../packages/cross-ui-toolkit'),
+    '@blockit/ui': path.resolve(__dirname, '../../packages/ui'),
   };
 
   // Add workspace packages to the modules

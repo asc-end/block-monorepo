@@ -15,10 +15,9 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
     },
     "jsx": "react-jsx",
   },
-  "include": ["../cross-ui-toolkit/src/index.ts", "../cross-ui-toolkit/src/types.ts", "src/**/*"],
+  "include": ["../cross-ui-toolkit/src/index.ts", "../cross-ui-toolkit/src/types.ts", "src/**/*", "nativewind-env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

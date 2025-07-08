@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthProvider>
       <ThemeProvider value={{ currentColors: darkColors, isDarkMode: true }}>
-        <div className='w-full flex-1 flex flex-col' style={{ backgroundColor: darkColors.background, height: '700px' }}>
+        <div className='w-full flex-1 flex flex-col'>
           <App />
         </div>
       </ThemeProvider>

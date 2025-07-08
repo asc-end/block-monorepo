@@ -1,25 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
-
-type DrawerProps = React.HTMLAttributes<HTMLDivElement> & {
-  isOpen?: boolean;
-  onClose?: () => void;
-  children: React.ReactNode;
-  overlayClassName?: string;
-  drawerClassName?: string;
-  placement?: 'bottom' | 'right' | 'left' | 'top';
-  closeOnOverlayClick?: boolean;
-  adjustToContentHeight?: boolean;
-  closeOnOverlayTap?: boolean;
-  openAnimationConfig?: {
-    spring?: { speed?: number; bounciness?: number };
-    timing?: { duration?: number };
-  };
-};
-
-export type DrawerHandle = {
-  open: () => void;
-  close: () => void;
-};
+import type { DrawerProps, DrawerHandle } from './index';
 
 export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
   (

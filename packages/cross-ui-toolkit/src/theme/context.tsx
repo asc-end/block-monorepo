@@ -19,6 +19,8 @@ export interface ThemeColors {
     card: string;
     [key: string]: string;
   };
+  white: string,
+  black: string,
 }
 
 export interface ThemeContext {

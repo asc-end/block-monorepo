@@ -1,17 +1,61 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useBrowserMessages } from './hooks/useBrowserMessages';
 import { Box, Button, Text, useTheme } from '@blockit/cross-ui-toolkit';
 import { browser } from 'wxt/browser';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { Home } from './routes';
+import { HomeScreen, StatsScreen, CreateRoutineScreen, AppsScreen, TimeScreen, CalendarScreen, MoneyScreen } from './routes';
 import { useAuth } from '@blockit/ui';
+import { BackHeader } from './components/BackHeader';
 
 const router = createHashRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <HomeScreen />,
   },
+  {
+    path: "/stats",
+    element:
+      <Fragment>
+        <BackHeader />
+        <StatsScreen />
+      </Fragment>
+  },
+  {
+    path: "/create-routine",
+    element: <Fragment>
+      <BackHeader />
+      <CreateRoutineScreen />
+    </Fragment>
+  },
+  {
+    path: "/create-routine/apps",
+    element: <Fragment>
+      <BackHeader />
+      <AppsScreen />
+    </Fragment>
+  },
+  {
+    path: "/create-routine/time",
+    element: <Fragment>
+      <BackHeader />
+      <TimeScreen />
+    </Fragment>
+  },
+  {
+    path: "/create-routine/calendar",
+    element: <Fragment>
+      <BackHeader />
+      <CalendarScreen />
+    </Fragment>
+  },
+  {
+    path: "/create-routine/money",
+    element: <Fragment>
+      <BackHeader />
+      <MoneyScreen />
+    </Fragment>
+  }
 ]);
 
 export const App = () => {
@@ -22,6 +66,12 @@ export const App = () => {
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [hasVerifiedToken, setHasVerifiedToken] = useState(false);
   const { currentColors } = useTheme();
+
+  useEffect(() => {
+    if (currentColors?.background) {
+      document.documentElement.style.backgroundColor = currentColors.background;
+    }
+  }, [currentColors?.background]);
 
   const handleConnectWallet = () => {
     setIsOpeningAuthWindow(true);
@@ -166,8 +216,8 @@ export const App = () => {
           Connect your wallet to get started
         </Text>
         {verificationError && (
-          <Box className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <Text className="text-red-600 text-sm text-center">{verificationError}</Text>
+          <Box className="mb-4 p-3 rounded-lg" style={{ background: currentColors?.error?.background, border: `1px solid ${currentColors?.error?.border}` }}>
+            <Text className="text-sm text-center" style={{ color: currentColors?.error?.text }}>{verificationError}</Text>
           </Box>
         )}
         <Button

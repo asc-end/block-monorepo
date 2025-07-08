@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box } from '../box/Box';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
-import { getSliderColors } from '.';
+import { getSliderColors } from './';
 
 export interface SliderProps {
     value: number;

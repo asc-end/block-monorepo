@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import RNSlider from '@react-native-community/slider';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
-import { getSliderColors } from '.';
+import { getSliderColors } from './';
 
 export interface SliderProps {
     value: number;

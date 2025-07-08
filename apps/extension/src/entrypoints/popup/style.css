@@ -18,12 +18,10 @@
 body {
   margin: 0;
   width: 400px;
-  height: 700px;
+  height: 600px;
   padding: 0;
-  @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-white;
-}
-
-#root {
-  @apply bg-white dark:bg-gray-900 min-h-full;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 

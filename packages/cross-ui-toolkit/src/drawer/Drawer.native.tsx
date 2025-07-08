@@ -1,16 +1,25 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { Modalize } from 'react-native-modalize';
+import type { DrawerProps } from './index';
 
-type ModalProps = React.ComponentProps<typeof Modalize> & {
-  children: React.ReactNode;
-};
 
-export const Drawer = forwardRef<Modalize, ModalProps>(({ children, ...props }, ref) => {
+export const Drawer = forwardRef<Modalize, DrawerProps>(({
+  children,
+  isOpen,
+  onClose,
+  overlayClassName,
+  drawerClassName,
+  placement,
+  closeOnOverlayClick,
+  closeOnOverlayTap,
+  openAnimationConfig,
+  ...modalizeProps
+}, ref) => {
   return (
-    <Modalize ref={ref} {...props} adjustToContentHeight>
+    <Modalize ref={ref} adjustToContentHeight {...modalizeProps}>
       {children}
     </Modalize>
   );
 });
 
-Drawer.displayName = 'Modal';
+Drawer.displayName = 'Drawer';

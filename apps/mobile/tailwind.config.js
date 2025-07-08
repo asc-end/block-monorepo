@@ -2,20 +2,19 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
-    "../../packages/cross-ui-toolkit/**/*.{js,jsx,ts,tsx}",
+    "../../packages/cross-ui-toolkit/src/**/*.{js,jsx,ts,tsx}",
+    "../../packages/ui/src/**/*.{js,jsx,ts,tsx}",
   ],
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
+        // Add your custom colors here
       },
       fontFamily: {
         // Add your custom fonts here
-      }
-    }
+      },
+    },
   },
-  future: {
-    hoverOnlyWhenSupported: true,
-  },
-  presets: [require("nativewind/preset")],
   plugins: [],
 };

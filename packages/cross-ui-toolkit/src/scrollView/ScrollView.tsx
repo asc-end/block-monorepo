@@ -25,7 +25,6 @@ export function ScrollView(props: ScrollViewProps) {
     ...rest
   } = props;
 
-  console.log(style)
   return (
     <div
       style={{

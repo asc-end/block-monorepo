@@ -82,7 +82,7 @@ export function Pressable({
         <button
             onClick={onPress}
             disabled={disabled}
-            className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className}`}
+            className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className} disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none`}
             style={style}
             {...props}
         >

@@ -1,6 +1,6 @@
-import { ThemeColors } from '../theme/context';
-
 export * from './Slider';
+
+import { ThemeColors } from '../theme/context';
 
 // Shared function to get slider colors based on theme
 export const getSliderColors = (theme: ThemeColors) => {

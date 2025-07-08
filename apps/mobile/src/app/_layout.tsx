@@ -1,22 +1,21 @@
-import "../global.css";
 import 'react-native-svg'
-import { Stack } from "expo-router";
+import '../global.css'
+import { router, Stack } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useTheme, ThemeProvider } from '@blockit/cross-ui-toolkit';
+import { useTheme, ThemeProvider, Pressable, Text } from '@blockit/cross-ui-toolkit';
 import { PrivyProvider, usePrivy } from "@privy-io/expo";
 import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
 import { colors, darkColors } from '@blockit/ui';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 
 function AppContent() {
   const { currentColors, isDarkMode } = useTheme();
   const { isReady, user } = usePrivy();
 
-  if (isReady && !user)
-    return <Connect />
+  if (isReady && !user) return <Connect />
 
   return (
     <>
@@ -39,6 +38,52 @@ function AppContent() {
           options={{
             headerShown: true,
             headerTitle: "Blokit",
+            headerRight: () => (
+              <View className="flex flex-row">
+                <Pressable
+                  onPress={() => router.push("/stats")}
+                  className="mr-4"
+                >
+                  <Text style={{ color: currentColors?.primary[500] }}>Stats</Text>
+                </Pressable>
+              </View>
+            )
+          }}
+        />
+        {/* Create Routine */}
+        <Stack.Screen
+          name="create-routine"
+          options={{
+            headerShown: true,
+            headerTitle: "Create Routine",
+          }}
+        />
+        <Stack.Screen
+          name="create-routine/apps"
+          options={{
+            headerShown: true,
+            headerTitle: "Apps",
+          }}
+        />
+        <Stack.Screen
+          name="create-routine/calendar"
+          options={{
+            headerShown: true,
+            headerTitle: "Calendar",
+          }}
+        />
+        <Stack.Screen
+          name="create-routine/money"
+          options={{
+            headerShown: true,
+            headerTitle: "Money",
+          }}
+        />
+        <Stack.Screen
+          name="create-routine/time"
+          options={{
+            headerShown: true,
+            headerTitle: "Routine Time",
           }}
         />
       </Stack>
@@ -46,7 +91,7 @@ function AppContent() {
   );
 }
 
-export default function Layout() {
+export default function RootLayout() {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
   const currentColors = isDarkMode ? darkColors : colors;

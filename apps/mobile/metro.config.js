@@ -9,36 +9,16 @@ const workspaceRoot = path.resolve(__dirname, "../..");
 const config = getDefaultConfig(projectRoot);
 
 // Add monorepo support
-config.watchFolders = [workspaceRoot];
-
-// config.resolver = {
-//   ...config.resolver,
-//   unstable_enableSymlinks: true,
-//   nodeModulesPaths: ,
-// };
+config.watchFolders = [
+  workspaceRoot,
+  path.resolve(workspaceRoot, "packages/ui"),
+  path.resolve(workspaceRoot, "packages/cross-ui-toolkit")
+];
 
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"), 
   path.resolve(workspaceRoot, "node_modules")
 ];
-// config.re 
-
-// // Add support for the src directory
-// config.resolver.sourceExts = ['jsx', 'js', 'ts', 'tsx', 'json', 'css'];
-// config.resolver.assetExts = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
-
-// // Add workspace packages to the watch folders
-// config.watchFolders = [
-//   path.resolve(workspaceRoot, 'node_modules'),
-//   path.resolve(projectRoot, 'node_modules'),
-//   path.resolve(workspaceRoot, 'packages/ui'),
-// ];
-
-// // Add workspace packages to the resolver
-// config.resolver.nodeModulesPaths = [
-//   path.resolve(projectRoot, 'node_modules'),
-//   path.resolve(workspaceRoot, 'node_modules'),
-// ];
 
 config.resolver.unstable_enableSymlinks = true;
 config.resolver.unstable_enablePackageExports = true; // Important for newer packages
@@ -80,6 +60,7 @@ config.resolver.extraNodeModules = {
   'crypto': require.resolve('expo-crypto'), // <--- THIS IS KEY FOR JOSE
   'stream': require.resolve('readable-stream'), // Often needed with crypto stuff
   'buffer': require.resolve('buffer/'), // Ensure buffer is correctly polyfilled
+  'react-dom': require.resolve('react-native'), // Alias react-dom to react-native
   // If other Node.js modules are requested by jose or its dependencies, add them here
   // e.g., 'util': require.resolve('util/'),
   // 'assert': require.resolve('assert/'),
@@ -87,20 +68,7 @@ config.resolver.extraNodeModules = {
 };
 
 // Export the config with NativeWind
-module.exports = withNativeWind(config, { input: "./src/global.css" });
-
-// Add CSS transformer
-// config.transformer.babelTransformerPath = require.resolve('nativewind/dist/babel');
-
-// Optional: Disable require cycle warnings if they become problematic
-// config.resolver.extraNodeModules = {
-//   ...config.resolver.extraNodeModules,
-// };
-// config.reporter.update = (event) => {
-//   if (event.type === 'bundling_error' && event.errors && event.errors.some(e => e.type === 'TransformError' && e.message.includes('Require cycle'))) {
-//     return; // Suppress require cycle warnings
-//   }
-//   require('metro/src/lib/TerminalReporter').prototype.update.call(config.reporter, event);
-// };
-
-// module.exports = config;
+module.exports = withNativeWind(config, {
+  input: "./src/global.css",
+  configPath: "./tailwind.config.js",
+});

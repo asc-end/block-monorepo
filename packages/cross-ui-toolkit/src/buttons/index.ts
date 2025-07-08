@@ -4,7 +4,7 @@ import { ThemeColors } from "../theme/context";
 
 // Button variant types
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 // Button component props
 export interface ButtonProps extends BaseProps {
@@ -135,6 +135,14 @@ export const getButtonStyles = (theme: ThemeColors, variant: ButtonVariant) => {
 };
 
 export const buttonSizeStyles: Record<ButtonSize, any> = {
+  xs: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    fontSize: 12,
+    borderRadius: 4,
+    fontWeight: '500',
+    letterSpacing: 0.5,
+  },
   sm: {
     paddingVertical: 6,
     paddingHorizontal: 12,

@@ -1,6 +1,7 @@
 import { defineConfig } from 'wxt';
 const EXTENSION_PUBLIC_KEY = process.env.WXT_PUBLIC_KEY;
-const WEB_URL = process.env.WXT_PUBLIC_WEB_URL;
+const WEB_URL = process.env.WXT_PUBLIC_WEB_URL || "http://localhost:5173" + "/*";
+
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
