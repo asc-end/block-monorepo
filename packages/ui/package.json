@@ -11,6 +11,8 @@
   "scripts": {},
   "dependencies": {
     "@blockit/cross-ui-toolkit": "workspace:*",
+    "@blockit/shared": "workspace:*",
+    "axios": "^1.9.0",
     "@privy-io/react-auth": "^2.14.2",
     "react": "19.0.0",
     "zustand": "^5.0.5"
