@@ -31,7 +31,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 app.use('/users', Users);
 app.use('/focus-session', FocusSessions);
 
-app.get('/', (req, res) => { res.send('Hello World!')});
+app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
