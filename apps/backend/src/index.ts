@@ -1,14 +1,16 @@
+
+
+if (process.env.NODE_ENV == "dev") {
+  require('dotenv').config();
+}
 import express from 'express';
 import { createServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { wsManager } from './services/init';
 import Users from './routes/users';
 import FocusSessions from './routes/focus-sessions';
-
-dotenv.config();
 
 const app = express();
 
