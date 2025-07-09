@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import { authMiddleware } from '../middleware/auth';
 import { AuthTokenClaims } from '@privy-io/server-auth';
 import { prisma } from '../config';
-import { Prisma } from '../generated/prisma';
 
 const router = express.Router();
 
@@ -97,7 +96,7 @@ router.put('/profile', authMiddleware, async (req: Request & { verifiedClaims?: 
       res.status(200).json(user);
   } catch (error) {
       console.error('Error updating user profile:', error);
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2025') {
           return res.status(404).json({ error: 'User not found' });
       }
       res.status(500).json({ error: 'Failed to update user profile' });

@@ -1,5 +1,5 @@
 import { PrivyClient } from '@privy-io/server-auth';
-import { PrismaClient } from './generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 
 dotenv.config();
