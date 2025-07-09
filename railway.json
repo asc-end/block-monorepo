@@ -1,9 +1,0 @@
-{
-    "plugins": {
-      "static": {
-        "buildCommand": "pnpm run build:web",
-        "staticPath": "apps/web/dist"
-      }
-    }
-  }
-  
