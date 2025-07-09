@@ -9,7 +9,25 @@
     "clean": "turbo run clean",
     "lint": "turbo run lint",
     "publish:toolkit": "pnpm --filter @blockit/cross-ui-toolkit publish",
-    "version:toolkit": "pnpm --filter @blockit/cross-ui-toolkit version"
+    "version:toolkit": "pnpm --filter @blockit/cross-ui-toolkit version",
+
+    "build:mobile": "turbo run build --filter=@blockit/mobile",
+    "build:web": "turbo run build --filter=@blockit/web",
+    "build:backend": "turbo run build --filter=@blockit/backend",
+    "build:extension": "turbo run build --filter=@blockit/extension",
+    "build:all": "turbo run build --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension",
+
+    "start:mobile": "turbo run start --filter=@blockit/mobile",
+    "start:web": "turbo run start --filter=@blockit/web --no-cache",
+    "start:backend": "turbo run start --filter=@blockit/backend",
+    "start:extension": "turbo run start --filter=@blockit/extension",
+    "start:all": "turbo run start --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension",
+
+    "dev:mobile": "turbo run dev --filter=@blockit/mobile",
+    "dev:web": "turbo run dev --filter=@blockit/web",
+    "dev:backend": "turbo run dev --filter=@blockit/backend",
+    "dev:extension": "turbo run dev --filter=@blockit/extension",
+    "dev:all": "turbo run dev --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension"
   },
   "dependencies": {
   }

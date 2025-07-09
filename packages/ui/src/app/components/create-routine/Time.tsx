@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Text, Button, useTheme, ScrollView, Pressable, Slider } from '@blockit/cross-ui-toolkit';
 import { ClockIcon } from '../../icons/ClockIcon';
 import { TimerIcon } from '../../icons/TimerIcon';
@@ -27,15 +27,14 @@ function DayPills({ selectedDays, onSelectDay }: { selectedDays: string[]; onSel
     );
 }
 
-import { FC } from 'react';
-
 type TimeModeSelectorProps = {
     mode: TimeMode;
     onModeChange: (mode: TimeMode) => void;
 };
+
 type TimeModePillProps = {
     active: boolean;
-    icon: React.ReactNode;
+    icon: React.JSX.Element;
     label: string;
     onPress: () => void;
 };

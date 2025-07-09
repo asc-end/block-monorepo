@@ -2,7 +2,6 @@ import { BaseProps } from "../types";
 
 // Drawer component props for cross-platform compatibility
 export interface DrawerProps extends BaseProps {
-  children: React.ReactNode;
   isOpen?: boolean;
   onClose?: () => void;
   overlayClassName?: string;
