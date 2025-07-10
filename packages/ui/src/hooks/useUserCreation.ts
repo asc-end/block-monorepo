@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
 
 interface UseUserCreationParams {
@@ -8,41 +8,59 @@ interface UseUserCreationParams {
   walletAddress?: string;
 }
 
-export const useUserCreation = ({ user, isReady, getAccessToken, walletAddress }: UseUserCreationParams) => {
+export const useUserCreation = ({
+  user,
+  isReady,
+  getAccessToken,
+  walletAddress,
+}: UseUserCreationParams) => {
   const { setToken, apiClient } = useAuthStore();
   const [isCreating, setIsCreating] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const createUser = async () => {
-      if (!isReady || !user || !walletAddress || isCreated) return;
+  // Prevent duplicate user creation attempts
+  const hasAttemptedRef = useRef(false);
 
-      setIsCreating(true);
-      try {
-        // Get and set access token first
-        const token = await getAccessToken();
-        if (!token) {
-          throw new Error('No access token available');
-        }
-        
-        setToken(token);
+  const createUser = useCallback(async () => {
+    if (!isReady || !user || !walletAddress || isCreated || isCreating) return;
 
-        // Create user
-        await apiClient.post('/users/create', { walletAddress });
-        
-        setIsCreated(true);
-        setError(null);
-      } catch (err) {
-        console.error('Error creating user:', err);
-        setError('Failed to create user');
-      } finally {
-        setIsCreating(false);
+    setIsCreating(true);
+    setError(null);
+
+    try {
+      // Always ensure token is set before creating user
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('No access token available');
       }
-    };
+      setToken(token);
 
-    createUser();
-  }, [isReady, user, walletAddress]);
+      await apiClient.post('/users/create', { walletAddress });
+      setIsCreated(true);
+    } catch (err: any) {
+      // Try to extract a more specific error message if available
+      let message = 'Failed to create user';
+      if (err?.response?.data?.error) {
+        message = err.response.data.error;
+      } else if (err?.message) {
+        message = err.message;
+      }
+      setError(message);
+      console.error('Error creating user:', err);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [isReady, user, walletAddress, isCreated, isCreating, getAccessToken, setToken, apiClient]);
 
-  return { isCreating, isCreated, error };
+  useEffect(() => {
+    if (isReady && user && walletAddress && !isCreated && !isCreating && !hasAttemptedRef.current) {
+      hasAttemptedRef.current = true;
+      createUser();
+    } else if (!isReady || !user || !walletAddress) {
+      hasAttemptedRef.current = false;
+    }
+  }, [isReady, user, walletAddress, isCreated, isCreating, createUser]);
+
+  return { isCreating, isCreated, error, createUser };
 };

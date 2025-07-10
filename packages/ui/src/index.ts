@@ -2,11 +2,13 @@ export * from './constants/colors';
 export * from './stores/authStore';
 export * from './contexts/AuthContext';
 export * from './lib/time';
+export * from './lib/users';
 export * from './app/icons';
 export { appConfig } from './lib/config';
 
 // App components
 export * from './app/Home';
+export * from './app/Login';
 export * from './app/Stats';
 export * from './app/CreateRoutine';
 export * from './app/components/create-routine/Apps';

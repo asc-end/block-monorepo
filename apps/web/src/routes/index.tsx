@@ -1,11 +1,11 @@
-import { useLogin, useLoginWithEmail, useLoginWithFarcasterV2, useLoginWithOAuth, usePrivy, useWallets } from "@privy-io/react-auth";
-import { Box, Button, Pressable, Text } from "@blockit/cross-ui-toolkit";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { Box, Button, Pressable, Text, useTheme } from "@blockit/cross-ui-toolkit";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./Home";
 import Error from "./Error";
 import { sendMessageToExtension } from "../lib/sendMessageToExtension";
-import { useUserCreation } from "@blockit/ui";
+import { createUser, useAuthStore } from "@blockit/ui";
 
 const router = createBrowserRouter([
   {
@@ -18,16 +18,11 @@ const router = createBrowserRouter([
 export function App() {
   const { ready, authenticated, user, getAccessToken, login } = usePrivy();
   const { wallets } = useWallets();
+  const { currentColors } = useTheme();
+  const { setToken } = useAuthStore();
   const walletAddress = wallets?.[0]?.address;
   const [isPressed, setIsPressed] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
-
-  const { isCreating, isCreated, error } = useUserCreation({
-    user,
-    isReady: ready,
-    getAccessToken,
-    walletAddress
-  });
 
   const features = [
     {
@@ -35,8 +30,8 @@ export function App() {
       description: "Block distracting websites and apps during dedicated work sessions",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10"/>
-          <polyline points="12,6 12,12 16,14"/>
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12,6 12,12 16,14" />
         </svg>
       )
     },
@@ -45,10 +40,10 @@ export function App() {
       description: "Track your productivity patterns and optimize your workflow",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M3 3v18h18"/>
-          <path d="M18 17V9"/>
-          <path d="M13 17V5"/>
-          <path d="M8 17v-3"/>
+          <path d="M3 3v18h18" />
+          <path d="M18 17V9" />
+          <path d="M13 17V5" />
+          <path d="M8 17v-3" />
         </svg>
       )
     },
@@ -57,9 +52,9 @@ export function App() {
       description: "Seamlessly sync across web, mobile, and browser extension",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
         </svg>
       )
     }
@@ -68,12 +63,28 @@ export function App() {
   useEffect(() => {
     const sendTokenToExtension = async () => {
       const accessToken = await getAccessToken();
+      setToken(accessToken);
+      console.log("accessToken", accessToken)
       if (accessToken) {
-        await sendMessageToExtension({ type: "AUTH_TOKEN", token: accessToken }, window);
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          createUser(user?.wallet?.address || "");
 
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get("source") === "extension") {
-          setTimeout(() => { window.close() }, 1000);
+          await sendMessageToExtension(
+            { type: "AUTH_TOKEN", token: accessToken, extensionId: urlParams.get("extensionId") || "" },
+            window
+          );
+
+          if (urlParams.get("source") === "extension") {
+            console.log("creating user");
+            console.log("closing window");
+            setTimeout(() => {
+              window.close();
+              console.log("window closed");
+            }, 1000);
+          }
+        } catch (error) {
+          console.error("Error sending token to extension or creating user:", error);
         }
       }
     };
@@ -81,7 +92,7 @@ export function App() {
     if (ready && authenticated && user?.wallet?.address) {
       sendTokenToExtension();
     }
-  }, [ready, authenticated, user, getAccessToken]);
+  }, [ready, authenticated, user]);
 
   // Auto-rotate features
   useEffect(() => {
@@ -99,126 +110,158 @@ export function App() {
 
   if (!ready) {
     return (
-      <Box className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
-        <div className="text-center">
-          <div className="w-12 h-12 border-3 border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto mb-6"></div>
-          <Text className="text-slate-300 text-xl">Initializing Blockit...</Text>
-        </div>
+      <Box className="min-h-screen flex items-center justify-center" style={{ backgroundColor: currentColors.background }}>
+        <Box className="text-center">
+          <Box 
+            className="w-12 h-12 border-3 rounded-full animate-spin mx-auto mb-6"
+            style={{ 
+              borderColor: currentColors.neutral[400],
+              borderTopColor: currentColors.primary[300]
+            }}
+          />
+          <Text variant="h4" style={{ color: currentColors.text.main }}>
+            Initializing Blockit...
+          </Text>
+        </Box>
       </Box>
     );
   }
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen flex flex-row w-full">
+      <Box className="min-h-screen flex flex-row w-full">
         {/* Left Panel - Content */}
-        <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-12 flex-col justify-center relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.3),transparent_70%)]"></div>
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full blur-3xl opacity-10"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-10"></div>
-          </div>
+        <Box className="hidden lg:flex lg:flex-1 p-12 flex-col justify-center relative overflow-hidden"
+          style={{ backgroundColor: currentColors.neutral[200] }}>
           
-          <div className="relative z-10 max-w-lg">
+          {/* Background Pattern */}
+          <Box className="absolute inset-0 opacity-10">
+            <Box 
+              className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
+              style={{ backgroundColor: currentColors.primary[300] + '40' }}
+            />
+            <Box 
+              className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl"
+              style={{ backgroundColor: currentColors.secondary[300] + '40' }}
+            />
+          </Box>
+
+          <Box className="relative z-10 max-w-lg">
             {/* Logo */}
-            <div className="flex items-center mb-12">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-4">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-white">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <path d="M9 9h6v6H9z"/>
+            <Box className="flex items-center mb-12">
+              <Box 
+                className="w-12 h-12 rounded-xl flex items-center justify-center mr-4"
+                style={{ backgroundColor: currentColors.primary[300] }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: currentColors.white }}>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <path d="M9 9h6v6H9z" />
                 </svg>
-              </div>
-              <Text className="text-white text-2xl font-bold">Blockit</Text>
-            </div>
+              </Box>
+              <Text variant="h2" style={{ color: currentColors.text.main }}>
+                Blockit
+              </Text>
+            </Box>
 
             {/* Main Heading */}
-            <div className="mb-12">
-              <Text className="text-white text-5xl font-bold leading-tight mb-6">
+            <Box className="mb-12">
+              <Text variant="h1" className="leading-tight mb-6" style={{ color: currentColors.text.main }}>
                 Reclaim Your
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                <span style={{ 
+                  background: `linear-gradient(to right, ${currentColors.primary[300]}, ${currentColors.secondary[300]})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
                   Digital Focus
                 </span>
               </Text>
-              <Text className="text-slate-300 text-xl leading-relaxed">
+              <Text variant="h4" className="leading-relaxed" style={{ color: currentColors.text.soft }}>
                 Transform distractions into deep work sessions. Block websites, track productivity, and build better digital habits across all your devices.
               </Text>
-            </div>
+            </Box>
 
             {/* Rotating Features */}
-            <div className="space-y-6">
+            <Box className="space-y-6">
               {features.map((feature, index) => (
-                <div
+                <Box
                   key={index}
-                  className={`transition-all duration-500 ${
-                    index === currentFeature 
-                      ? 'opacity-100 transform translate-x-0' 
+                  className={`transition-all duration-500 ${index === currentFeature
+                      ? 'opacity-100 transform translate-x-0'
                       : 'opacity-40 transform translate-x-4'
-                  }`}
+                    }`}
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${
-                      index === currentFeature 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-slate-800 text-slate-400'
-                    }`}>
+                  <Box className="flex items-start space-x-4">
+                    <Box 
+                      className="w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500"
+                      style={{ 
+                        backgroundColor: index === currentFeature ? currentColors.primary[300] : currentColors.neutral[400],
+                        color: index === currentFeature ? currentColors.white : currentColors.text.soft
+                      }}
+                    >
                       {feature.icon}
-                    </div>
-                    <div>
-                      <Text className="text-white text-lg font-semibold mb-1">
+                    </Box>
+                    <Box>
+                      <Text variant="h5" className="mb-1" style={{ color: currentColors.text.main }}>
                         {feature.title}
                       </Text>
-                      <Text className="text-slate-400">
+                      <Text variant="body" style={{ color: currentColors.text.soft }}>
                         {feature.description}
                       </Text>
-                    </div>
-                  </div>
-                </div>
+                    </Box>
+                  </Box>
+                </Box>
               ))}
-            </div>
+            </Box>
 
             {/* Feature Indicators */}
-            <div className="flex space-x-2 mt-8">
+            <Box className="flex space-x-2 mt-8">
               {features.map((_, index) => (
-                <button
+                <Pressable
                   key={index}
-                  onClick={() => setCurrentFeature(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentFeature 
-                      ? 'bg-blue-500 w-6' 
-                      : 'bg-slate-600 hover:bg-slate-500'
-                  }`}
+                  onPress={() => setCurrentFeature(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${index === currentFeature ? 'w-6' : 'w-2'}`}
+                  style={{ 
+                    backgroundColor: index === currentFeature ? currentColors.primary[300] : currentColors.neutral[400]
+                  }}
                 />
               ))}
-            </div>
-          </div>
-        </div>
+            </Box>
+          </Box>
+        </Box>
 
         {/* Right Panel - Login */}
-        <div className="w-full lg:flex-1 flex items-center justify-center p-8">
-          <div className="w-full max-w-lg">
+        <Box className="w-full lg:flex-1 flex items-center justify-center p-8" style={{ backgroundColor: currentColors.surface.card }}>
+          <Box className="w-full max-w-lg">
             {/* Mobile Header (hidden on desktop) */}
-            <div className="lg:hidden text-center mb-8">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <path d="M9 9h6v6H9z"/>
+            <Box className="lg:hidden text-center mb-8">
+              <Box 
+                className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: currentColors.primary[300] }}
+              >
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: currentColors.white }}>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <path d="M9 9h6v6H9z" />
                 </svg>
-              </div>
-              <Text className="text-2xl font-bold text-gray-900 mb-2">Blockit</Text>
-              <Text className="text-gray-600">Reclaim your digital focus</Text>
-            </div>
+              </Box>
+              <Text variant="h2" className="mb-2" style={{ color: currentColors.text.main }}>
+                Blockit
+              </Text>
+              <Text variant="body" style={{ color: currentColors.text.soft }}>
+                Reclaim your digital focus
+              </Text>
+            </Box>
 
             {/* Login Form */}
-            <div className="text-center mb-8">
-              <Text className="text-3xl font-bold text-gray-900 mb-3">
+            <Box className="text-center mb-8">
+              <Text variant="h2" className="mb-3" style={{ color: currentColors.text.main }}>
                 Ready to focus?
               </Text>
-              <Text className="text-gray-600 text-lg">
+              <Text variant="h5" style={{ color: currentColors.text.soft }}>
                 Sign in to start blocking distractions and tracking your productivity
               </Text>
-            </div>
+            </Box>
 
             {/* Login Button */}
             <Pressable
@@ -230,38 +273,40 @@ export function App() {
                 transition: "all 0.2s ease",
               }}
             >
-              <div 
-                className="w-full p-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group-hover:scale-[1.02]"
+              <Box
+                className="w-full p-6 rounded-xl shadow-lg transition-all duration-200 group-hover:scale-[1.02]"
+                style={{ backgroundColor: currentColors.primary[300] }}
               >
-                <div className="flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white mr-4">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                    <polyline points="10,17 15,12 10,7"/>
-                    <line x1="15" y1="12" x2="3" y2="12"/>
+                <Box className="flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-4" style={{ color: currentColors.white }}>
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10,17 15,12 10,7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
                   </svg>
-                  <Text className="text-white text-xl font-semibold">
+                  <Text variant="h4" style={{ color: currentColors.white }}>
                     Sign In
                   </Text>
-                </div>
-              </div>
+                </Box>
+              </Box>
             </Pressable>
 
             {/* Simple note */}
-            <div className="mt-12 text-center">
-              <Text className="text-sm text-gray-500 mb-2">
+            <Box className="mt-12 text-center">
+              <Text variant="caption" className="mb-2" style={{ color: currentColors.text.soft }}>
                 No credit card required. Works on all your devices.
               </Text>
-            </div>
+            </Box>
 
             {/* Footer */}
-            <div className="mt-8 text-center">
-              <Text className="text-sm text-gray-500">
+            <Box className="mt-8 text-center">
+              <Text variant="caption" style={{ color: currentColors.text.soft }}>
                 By signing in, you agree to our{" "}
                 <a
                   href="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 underline"
+                  style={{ color: currentColors.primary[300], textDecoration: 'underline' }}
+                  className="hover:opacity-80"
                 >
                   Terms of Service
                 </a>{" "}
@@ -270,15 +315,16 @@ export function App() {
                   href="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 underline"
+                  style={{ color: currentColors.primary[300], textDecoration: 'underline' }}
+                  className="hover:opacity-80"
                 >
                   Privacy Policy
                 </a>
               </Text>
-            </div>
-          </div>
-        </div>
-      </div>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
     );
   }
 
