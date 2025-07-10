@@ -1,0 +1,23 @@
+{
+  "name": "expo-app-blocker",
+  "version": "1.0.0",
+  "description": "Native module for app blocking features",
+  "main": "src/index.ts",
+  "scripts": {},
+  "keywords": [
+    "react-native",
+    "expo",
+    "app-blocker"
+  ],
+  "author": "Blockit",
+  "license": "MIT",
+  "peerDependencies": {
+    "expo": "*"
+  },
+  "devDependencies": {
+    "expo-module-scripts": "^3.0.0"
+  },
+  "dependencies": {
+    "expo-modules-core": "~2.4.2"
+  }
+} 

@@ -7,7 +7,27 @@ import { Timer } from '../Timer';
 import { useWebSocket } from '../../../hooks/useWebsocket';
 import type { FocusSession } from '@blockit/shared';
 
-export default function FocusSession() {
+interface PermissionStatus {
+    usageStatsGranted: boolean;
+    overlayGranted: boolean;
+    notificationListenerGranted?: boolean;
+    notificationBlockingEnabled?: boolean;
+}
+
+interface NativeAppBlocking {
+    hasPermissions: boolean;
+    permissionsStatus: PermissionStatus;
+    requestPermissions: () => Promise<boolean>;
+    startBlocking: () => Promise<void>;
+    stopBlocking: () => Promise<void>;
+    refreshPermissions?: () => Promise<void>;
+}
+
+interface FocusSessionProps {
+    nativeAppBlocking?: NativeAppBlocking;
+}
+
+export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
     const { currentColors } = useTheme();
     const [duration, setDuration] = useState(30);
     const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
@@ -16,12 +36,20 @@ export default function FocusSession() {
     const { visible, options, show, hide } = useAlert();
     const { token } = useAuthStore();
 
-    api().get('/focus-session').then(res => {
-        console.log("activeSession", res.data)
-    })
-
     useWebSocket({
-        onFocusSessionUpdate: (session, action) => setActiveSession(action === 'created' ? session : null)
+        onFocusSessionUpdate: async (session, action) => {
+            console.log('Focus session update:', action, session);
+            
+            if (action === 'created') {
+                setActiveSession(session);
+                // Start native blocking if available
+                await nativeAppBlocking?.startBlocking();
+            } else if (action === 'disabled' || action === 'completed') {
+                setActiveSession(null);
+                // Stop native blocking if available
+                await nativeAppBlocking?.stopBlocking();
+            }
+        }
     });
 
     useEffect(() => {
@@ -36,6 +64,11 @@ export default function FocusSession() {
         try {
             const { data } = await api().get('/focus-session/active');
             setActiveSession(data);
+            
+            // If there's an active session, start native blocking
+            if (data) {
+                await nativeAppBlocking?.startBlocking();
+            }
         } catch {
             setActiveSession(null);
         } finally {
@@ -46,6 +79,8 @@ export default function FocusSession() {
     const handleSession = async (action: 'start' | 'end' | 'complete') => {
         if (!token) return showError("You must be logged in.");
 
+        const apiURl = await api().getUri()
+        console.log("action", action, apiURl)
         try {
             if (action === 'start') {
                 const { data } = await api().post('/focus-session', { duration, notes: 'Focus session started' });
@@ -71,6 +106,85 @@ export default function FocusSession() {
             { text: "Stop", style: "destructive", onPress: () => handleSession('end') }
         ]
     });
+
+    // Show permission request UI if needed (when native blocking is available but permissions not granted)
+    if (activeSession && nativeAppBlocking && !nativeAppBlocking.hasPermissions) {
+        return (
+            <Fragment>
+                <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
+                    <Text variant='h5' className='text-start w-full'>Focus Session</Text>
+                    
+                    <Box style={{ backgroundColor: currentColors.warning?.light || '#fff3cd' }} className='p-4 rounded-xl'>
+                        <Text variant='h6' className='mb-2'>🔒 Permissions Required</Text>
+                        <Text variant='body' className='mb-3'>
+                            To block distracting apps during your focus session, we need:
+                        </Text>
+                        <Box className='mb-4'>
+                            <Text variant='caption' className='mb-1'>
+                                • Usage Stats Access: {nativeAppBlocking.permissionsStatus.usageStatsGranted ? '✅' : '❌'}
+                            </Text>
+                            <Text variant='caption' className='mb-1'>
+                                • Display Over Apps: {nativeAppBlocking.permissionsStatus.overlayGranted ? '✅' : '❌'}
+                            </Text>
+                        </Box>
+                        <Box className="flex flex-row gap-2">
+                            <Button 
+                                title="Grant Permissions" 
+                                variant="primary"
+                                style={{ flex: 1 }}
+                                onPress={async () => {
+                                    const granted = await nativeAppBlocking.requestPermissions();
+                                    if (!granted) {
+                                        show({
+                                            title: 'Permissions Required',
+                                            message: 'Please grant all permissions to enable app blocking during focus sessions.',
+                                            buttons: [{ text: 'OK' }]
+                                        });
+                                    }
+                                }}
+                            />
+                            {nativeAppBlocking.refreshPermissions && (
+                                <Button 
+                                    title="🔄" 
+                                    variant="outline"
+                                    style={{ width: 50 }}
+                                    onPress={nativeAppBlocking.refreshPermissions}
+                                />
+                            )}
+                        </Box>
+                    </Box>
+
+                    {!isLoading && activeSession && (
+                        <Timer
+                            duration={activeSession.duration}
+                            isActive={!!activeSession}
+                            onComplete={() => handleSession('complete')}
+                            startTime={new Date(activeSession.startTime).toISOString()}
+                        />
+                    )}
+
+                    {!isLoading && (
+                        <Button
+                            title={activeSession ? 'Give up' : 'Start'}
+                            leftIcon={activeSession ? 
+                                <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
+                                <PlayIcon size={18} color="white" />
+                            }
+                            onPress={activeSession ? confirmEnd : () => handleSession('start')}
+                            variant="primary"
+                            style={activeSession ? {
+                                backgroundColor: currentColors.error.main,
+                                borderColor: currentColors.error.dark,
+                                shadowColor: currentColors.error.dark,
+                            } : undefined}
+                        />
+                    )}
+                </Box>
+
+                <Alert visible={visible} title={options.title} message={options.message} buttons={options.buttons} onDismiss={hide} />
+            </Fragment>
+        );
+    }
 
     return (
         <Fragment>
@@ -132,6 +246,8 @@ export default function FocusSession() {
                         } : undefined}
                     />
                 )}
+
+
             </Box>
 
             <Alert visible={visible} title={options.title} message={options.message} buttons={options.buttons} onDismiss={hide} />

@@ -40,7 +40,8 @@
       "expo-router",
       "expo-asset",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-app-blocker"
     ],
     "scheme": "blockit",
     "extra": {

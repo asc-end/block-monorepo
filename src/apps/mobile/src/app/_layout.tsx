@@ -10,6 +10,8 @@ import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
 import { colors, darkColors, useUserCreation, initializeConfig } from '@blockit/ui';
 import { useColorScheme, View } from 'react-native';
+import { useEffect } from 'react';
+import { AppBlockerProvider } from '../context/AppBlockerContext';
 
 type EnvVar = {
   key: string;
@@ -62,7 +64,13 @@ function AppContent() {
     return privyClient.getAccessToken();
   };
 
-  useUserCreation({
+  useEffect(() => {
+    if (user) {
+      createUser();
+    }
+  }, [user]);
+
+  const { createUser } = useUserCreation({
     user,
     isReady,
     getAccessToken,
@@ -93,6 +101,12 @@ function AppContent() {
             headerTitle: "Blokit",
             headerRight: () => (
               <View className="flex flex-row">
+                <Pressable
+                  onPress={() => router.push("/settings")}
+                  className="mr-4"
+                >
+                  <Text style={{ color: currentColors?.primary[500] }}>Settings</Text>
+                </Pressable>
                 <Pressable
                   onPress={() => router.push("/stats")}
                   className="mr-4"
@@ -158,7 +172,9 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider value={{ currentColors, isDarkMode }}>
-            <AppContent />
+            <AppBlockerProvider>
+              <AppContent />
+            </AppBlockerProvider>
           </ThemeProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>

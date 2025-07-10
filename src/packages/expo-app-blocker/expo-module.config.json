@@ -1,0 +1,12 @@
+{
+  "name": "expo-app-blocker",
+  "description": "Native module for app blocking features",
+  "version": "1.0.0",
+  "platforms": ["android", "ios"],
+  "android": {
+    "modules": ["expo.modules.appblocker.AppBlockerModule"]
+  },
+  "ios": {
+    "modules": ["AppBlockerModule"]
+  }
+}

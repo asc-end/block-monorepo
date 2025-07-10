@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { formatTime } from '../lib/time';
 import { Image, Pressable, Box, Text, Button, useTheme } from '@blockit/cross-ui-toolkit';
-import FocusSession from './components/focus-sesion/FocusSession';
+import { FocusSession } from './components/focus-sesion/FocusSession';
 import { AppUsageToday } from './components/usage/Today';
 
 // Generate current date for demo data
@@ -55,12 +55,28 @@ const appUsage = {
     }
 }
 
+interface PermissionStatus {
+  usageStatsGranted: boolean;
+  overlayGranted: boolean;
+  notificationListenerGranted?: boolean;
+  notificationBlockingEnabled?: boolean;
+}
+
+interface NativeAppBlocking {
+  hasPermissions: boolean;
+  permissionsStatus: PermissionStatus;
+  requestPermissions: () => Promise<boolean>;
+  startBlocking: () => Promise<void>;
+  stopBlocking: () => Promise<void>;
+}
+
 type HomeProps = {
   onCreateRoutine: () => void;
+  nativeAppBlocking?: NativeAppBlocking;
 }
 
 export function Home(props: HomeProps) {
-  const { onCreateRoutine } = props;
+  const { onCreateRoutine, nativeAppBlocking } = props;
   const { currentColors } = useTheme();
   const [showDetails, setShowDetails] = useState(false);
 
@@ -112,7 +128,7 @@ export function Home(props: HomeProps) {
           style={{ width: '100%', height: '100%', objectFit: 'contain' }}
         />
       </Box>
-      <FocusSession/>
+      <FocusSession nativeAppBlocking={nativeAppBlocking} />
 
       <Box className='flex flex-col w-full'>
         <Box className='w-full flex flex-row justify-between items-center'>

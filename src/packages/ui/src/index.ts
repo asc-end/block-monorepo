@@ -16,6 +16,7 @@ export * from './app/components/create-routine/Apps';
 export * from './app/components/create-routine/Time';
 export * from './app/components/create-routine/Calendar';
 export * from './app/components/create-routine/Money';
+export * from './app/components/focus-sesion/FocusSession';
 
 // Hooks
 export * from './hooks';

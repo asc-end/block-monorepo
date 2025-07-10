@@ -75,7 +75,7 @@ export function Login(props: LoginProps) {
                 backgroundColor: currentColors.primary[200],
               }}
             >
-              {provider.icon}
+              <Text >{provider.label}</Text>
             </Pressable>
           ))}
         </Box>
