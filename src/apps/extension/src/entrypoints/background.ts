@@ -4,7 +4,7 @@ let websocket: WebSocket | undefined;
 
 const extractUserIdFromToken = async (token: string): Promise<string | null> => {
   try {
-      const response = await fetch(`${import.meta.env.WXT_PUBLIC_BACKEND_URL}/users/verify`, {
+      const response = await fetch(`${import.meta.env.WXT_PUBLIC_API_URL}/users/verify`, {
           headers: {
               'Authorization': `Bearer ${token}`
           }
@@ -33,7 +33,7 @@ async function makeWebsocket() {
   console.log("token", token)
   const id = await extractUserIdFromToken(token)
   console.log(id)
-  websocket = new WebSocket(`${import.meta.env.WXT_PUBLIC_WS_BACKEND_URL}/api/ws?userId=${id}`)
+  websocket = new WebSocket(`${import.meta.env.WXT_PUBLIC_WS_URL}/api/ws?userId=${id}`)
   makeListeners()
 }
 

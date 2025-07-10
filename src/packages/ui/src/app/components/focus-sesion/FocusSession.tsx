@@ -6,15 +6,19 @@ import { useAuthStore, api } from '../../../stores/authStore';
 import { Timer } from '../Timer';
 import { useWebSocket } from '../../../hooks/useWebsocket';
 import type { FocusSession } from '@blockit/shared';
-import { useUser } from '../../../hooks/useUser';
 
 export default function FocusSession() {
     const { currentColors } = useTheme();
     const [duration, setDuration] = useState(30);
     const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const durationModalRef = useRef<any>(null);
     const { visible, options, show, hide } = useAlert();
     const { token } = useAuthStore();
+
+    api().get('/focus-session').then(res => {
+        console.log("activeSession", res.data)
+    })
 
     useWebSocket({
         onFocusSessionUpdate: (session, action) => setActiveSession(action === 'created' ? session : null)
@@ -28,11 +32,14 @@ export default function FocusSession() {
 
     const loadSession = async () => {
         if (!token) return;
+        setIsLoading(true);
         try {
             const { data } = await api().get('/focus-session/active');
             setActiveSession(data);
         } catch {
             setActiveSession(null);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -51,6 +58,7 @@ export default function FocusSession() {
                 }
             }
         } catch (error) {
+            console.log(error)
             showError(`Failed to ${action} focus session.`);
         }
     };
@@ -67,9 +75,25 @@ export default function FocusSession() {
     return (
         <Fragment>
             <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
-                <Text variant='h5'>Focus Session</Text>
+                <Text variant='h5' className='text-start w-full'>Focus Session</Text>
 
-                {!activeSession && (
+                {isLoading ? (
+                    <>
+                        <Box 
+                            style={{ backgroundColor: currentColors.neutral[300], opacity: 0.5 }}
+                            className='w-full p-4 rounded-xl flex flex-row justify-between items-center animate-pulse'
+                        >
+                            <Box style={{ backgroundColor: currentColors.neutral[400] }} className='h-5 w-16 rounded' />
+                            <Box className='flex flex-row items-center gap-1'>
+                                <Box style={{ backgroundColor: currentColors.neutral[400] }} className='h-5 w-12 rounded' />
+                            </Box>
+                        </Box>
+                        <Box 
+                            style={{ backgroundColor: currentColors.neutral[300], opacity: 0.5 }}
+                            className='w-full h-12 rounded-xl animate-pulse'
+                        />
+                    </>
+                ) : !activeSession ? (
                     <Pressable
                         style={{ backgroundColor: currentColors.neutral[300] }}
                         className='w-full p-4 rounded-xl flex flex-row justify-between items-center'
@@ -81,9 +105,9 @@ export default function FocusSession() {
                             <ChevronIcon color={currentColors.text.soft} />
                         </Box>
                     </Pressable>
-                )}
+                ) : null}
 
-                {activeSession && (
+                {!isLoading && activeSession && (
                     <Timer
                         duration={activeSession.duration}
                         isActive={!!activeSession}
@@ -92,20 +116,22 @@ export default function FocusSession() {
                     />
                 )}
 
-                <Button
-                    title={activeSession ? 'Give up' : 'Start'}
-                    leftIcon={activeSession ? 
-                        <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
-                        <PlayIcon size={18} color="white" />
-                    }
-                    onPress={activeSession ? confirmEnd : () => handleSession('start')}
-                    variant="primary"
-                    style={activeSession ? {
-                        backgroundColor: currentColors.error.main,
-                        borderColor: currentColors.error.dark,
-                        shadowColor: currentColors.error.dark,
-                    } : undefined}
-                />
+                {!isLoading && (
+                    <Button
+                        title={activeSession ? 'Give up' : 'Start'}
+                        leftIcon={activeSession ? 
+                            <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
+                            <PlayIcon size={18} color="white" />
+                        }
+                        onPress={activeSession ? confirmEnd : () => handleSession('start')}
+                        variant="primary"
+                        style={activeSession ? {
+                            backgroundColor: currentColors.error.main,
+                            borderColor: currentColors.error.dark,
+                            shadowColor: currentColors.error.dark,
+                        } : undefined}
+                    />
+                )}
             </Box>
 
             <Alert visible={visible} title={options.title} message={options.message} buttons={options.buttons} onDismiss={hide} />

@@ -12,8 +12,17 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
         const { duration } = req.body;
         const userId = req.verifiedClaims?.userId;
         if (!userId) return res.status(401).json({ error: 'User not authenticated' });
-        
-        console.log(userId)
+
+        // Check if user already has an in-progress focus session
+        const existingSession = await prisma.focusSession.findFirst({
+            where: {
+                userId,
+                status: 'in_progress',
+            },
+        });
+
+        if (existingSession) return res.status(400).json({ error: 'You already have an active focus session.' });
+
         const session = await prisma.focusSession.create({
             data: {
                 userId,
@@ -22,13 +31,14 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
                 status: 'in_progress',
             },
         });
-        
+
         // Emit WebSocket message to notify clients about the new focus session
         wsManager.sendMessageToUser(userId, {
             type: 'FOCUS_SESSION_UPDATED',
             payload: { session, action: 'created' }
         });
-        
+
+        res.json(session);
     } catch (error) {
         console.error('Error creating focus session:', error);
         res.status(500).json({ error: 'Failed to create focus session' });
