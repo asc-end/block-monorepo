@@ -14,19 +14,21 @@
     "build:mobile": "turbo run build --filter=@blockit/mobile",
     "build:web": "turbo run build --filter=@blockit/web",
     "build:backend": "turbo run build --filter=@blockit/backend",
-    "build:extension": "turbo run build --filter=@blockit/extension",
+    "build:extension": "turbo run build --filter=Blockit",
     "build:all": "turbo run build --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension",
+
+    "zip:extension": "turbo run zip --filter=Blockit",
 
     "start:mobile": "turbo run start --filter=@blockit/mobile",
     "start:web": "turbo run start --filter=@blockit/web --no-cache",
     "start:backend": "turbo run start --filter=@blockit/backend",
-    "start:extension": "turbo run start --filter=@blockit/extension",
+    "start:extension": "turbo run start --filter=Blockit",
     "start:all": "turbo run start --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension",
 
     "dev:mobile": "turbo run dev --filter=@blockit/mobile",
     "dev:web": "turbo run dev --filter=@blockit/web",
     "dev:backend": "turbo run dev --filter=@blockit/backend",
-    "dev:extension": "turbo run dev --filter=@blockit/extension",
+    "dev:extension": "turbo run dev --filter=blockit",
     "dev:all": "turbo run dev --filter=@blockit/mobile @blockit/web @blockit/backend @blockit/extension"
   },
   "dependencies": {
