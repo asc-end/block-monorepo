@@ -70,18 +70,15 @@ export function App() {
           const urlParams = new URLSearchParams(window.location.search);
           createUser(user?.wallet?.address || "");
 
+          const extensionId = urlParams.get("extensionId") || "ialoopcgpppijlhebflkpfedjapfmoch";
+          console.log("extensionId", extensionId)
           await sendMessageToExtension(
-            { type: "AUTH_TOKEN", token: accessToken, extensionId: urlParams.get("extensionId") || "" },
+            { type: "AUTH_TOKEN", token: accessToken, extensionId },
             window
           );
 
-          if (urlParams.get("source") === "extension") {
-            console.log("creating user");
-            console.log("closing window");
-            setTimeout(() => {
-              window.close();
-              console.log("window closed");
-            }, 1000);
+          if (urlParams.get("source") === "extension" && !urlParams.get("extensionId")) {
+            setTimeout(() => { window.close()}, 1000);
           }
         } catch (error) {
           console.error("Error sending token to extension or creating user:", error);
