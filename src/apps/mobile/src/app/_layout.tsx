@@ -12,6 +12,7 @@ import { colors, darkColors, useUserCreation, initializeConfig } from '@blockit/
 import { useColorScheme, View } from 'react-native';
 import { useEffect } from 'react';
 import { AppBlockerProvider } from '../context/AppBlockerContext';
+import { useAppUsageSync } from '@/hooks/useAppUsageSync';
 
 type EnvVar = {
   key: string;
@@ -58,6 +59,7 @@ function AppContent() {
   const { isReady, user } = usePrivy();
   const privyClient = usePrivyClient();
   const { wallets } = useEmbeddedSolanaWallet();
+  const { syncNow } = useAppUsageSync();
   
   const getAccessToken = async () => {
     if (!privyClient) return null;
@@ -67,6 +69,7 @@ function AppContent() {
   useEffect(() => {
     if (user) {
       createUser();
+      syncNow();
     }
   }, [user]);
 

@@ -7,11 +7,27 @@ import { useAppUsage } from "../hooks/useAppUsage";
 
 export type TimeRange = 'today' | 'week' | 'month';
 
-export function Stats() {
+interface StatsProps {
+  onDayChange?: () => Promise<void>;
+}
+
+export function Stats({ onDayChange }: StatsProps = {}) {
   const { currentColors } = useTheme();
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
+
+  // Helper function to change date with sync
+  const handleDateChange = async (newDate: string) => {
+    if (onDayChange && newDate !== selectedDate) {
+      try {
+        await onDayChange();
+      } catch (error) {
+        console.error('Error syncing usage data:', error);
+      }
+    }
+    setSelectedDate(newDate);
+  };
   
   // Ensure we don't start with a future date selected
   useEffect(() => {
@@ -20,9 +36,9 @@ export function Stats() {
     const selected = new Date(selectedDate);
 
     if (selected > today) {
-      setSelectedDate(todayStr);
+      handleDateChange(todayStr);
     }
-  }, [selectedDate]);
+  }, [selectedDate, handleDateChange]);
 
   // Calculate the start and end dates for the current month view
   const { startDate, endDate } = React.useMemo(() => {
@@ -119,7 +135,7 @@ export function Stats() {
     return days;
   };
 
-  const changeMonth = (delta: number) => {
+  const changeMonth = async (delta: number) => {
     const newMonth = new Date(currentMonth);
     newMonth.setMonth(newMonth.getMonth() + delta);
 
@@ -139,7 +155,8 @@ export function Stats() {
     const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
     const day = isCurrentMonth ? today.getDate() : 1;
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    setSelectedDate(dateStr);
+    
+    await handleDateChange(dateStr);
   };
 
   // Check if next month navigation should be disabled
@@ -230,7 +247,19 @@ export function Stats() {
                 return (
                   <Pressable
                     key={index}
-                    onPress={() => isClickable && setSelectedDate(date)}
+                    onPress={async () => {
+                      if (isClickable) {
+                        // Sync usage data when day changes, then update selected date
+                        if (onDayChange && date !== selectedDate) {
+                          try {
+                            await onDayChange();
+                          } catch (error) {
+                            console.error('Error syncing usage data:', error);
+                          }
+                        }
+                        setSelectedDate(date);
+                      }
+                    }}
                     style={{
                       height: 32,
                       borderRadius: 8,

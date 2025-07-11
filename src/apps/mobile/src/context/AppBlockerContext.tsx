@@ -14,6 +14,7 @@ interface AppBlockerContextType {
     installedApps: InstalledApp[];
     loading: boolean;
     hasPermissions: boolean;
+    isUsageTrackingEnabled: boolean;
     permissionsStatus: {
         usageStatsGranted: boolean;
         overlayGranted: boolean;
@@ -22,6 +23,7 @@ interface AppBlockerContextType {
     };
     requestPermissions: () => Promise<boolean>;
     toggleAppBlock: (app: InstalledApp) => Promise<void>;
+    toggleUsageTracking: () => Promise<boolean>;
     refreshApps: () => Promise<void>;
     checkPermissions: () => Promise<void>;
     uninstallEvents: string[];
@@ -37,6 +39,7 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const [installedApps, setInstalledApps] = useState<InstalledApp[]>([]);
     const [loading, setLoading] = useState(true);
     const [hasPermissions, setHasPermissions] = useState(false);
+    const [isUsageTrackingEnabled, setIsUsageTrackingEnabled] = useState(false);
     const [permissionsStatus, setPermissionsStatus] = useState({
         usageStatsGranted: false,
         overlayGranted: false,
@@ -55,7 +58,7 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     useEffect(() => {
         checkPermissionsAndLoadApps();
-        
+
         // Listen for app state changes to re-check permissions when returning from settings
         const handleAppStateChange = (nextAppState: string) => {
             if (nextAppState === 'active') {
@@ -64,7 +67,7 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         };
 
         const subscription = AppState.addEventListener('change', handleAppStateChange);
-        
+
         return () => {
             subscription?.remove();
         };
@@ -87,9 +90,12 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 notificationListenerGranted: permissionsResult.notificationListenerGranted || false,
                 notificationBlockingEnabled: permissionsResult.notificationBlockingEnabled || false,
             });
+            // Update usage tracking status based on actual usage stats permission
+            setIsUsageTrackingEnabled(permissionsResult.usageStatsGranted || false);
             return permissionsResult;
         } catch (error) {
             console.error('Failed to check permissions:', error);
+            setIsUsageTrackingEnabled(false);
             throw error;
         }
     };
@@ -204,15 +210,28 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         }
     };
 
+    const toggleUsageTracking = async (): Promise<boolean> => {
+        try {
+            // Always open usage stats settings when toggled
+            await AppBlockerModule.openUsageStatsSettings();
+            return true;
+        } catch (error) {
+            console.error('Error opening usage stats settings:', error);
+            return false;
+        }
+    };
+
     return (
         <AppBlockerContext.Provider
             value={{
                 installedApps,
                 loading,
                 hasPermissions,
+                isUsageTrackingEnabled,
                 permissionsStatus,
                 requestPermissions,
                 toggleAppBlock,
+                toggleUsageTracking,
                 refreshApps,
                 checkPermissions: async () => { await checkPermissionsOnly(); },
                 uninstallEvents,

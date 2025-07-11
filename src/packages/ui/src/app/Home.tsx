@@ -52,7 +52,10 @@ export function Home(props: HomeProps) {
   const totalTime = Object.entries(todaysApps)
     .reduce((sum, [appName, platforms]) => {
       const typedPlatforms = platforms as { web: number; mobile: number };
-      return sum + typedPlatforms.web + typedPlatforms.mobile;
+      // Filter out usage less than 1 second (same as Stats.tsx)
+      const mobileTime = typedPlatforms.mobile >= 1000 ? typedPlatforms.mobile : 0;
+      const webTime = typedPlatforms.web >= 1000 ? typedPlatforms.web : 0;
+      return sum + mobileTime + webTime;
     }, 0);
 
   return (

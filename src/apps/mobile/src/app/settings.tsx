@@ -87,7 +87,19 @@ const SettingsSection = ({
 const SettingsScreen = () => {
   const { currentColors } = useTheme();
   const [isBlockingNotifications, setIsBlockingNotifications] = useState(false);
-  const { hasPermissions, permissionsStatus, requestPermissions, checkPermissions } = useAppBlocker();
+  const { 
+    hasPermissions, 
+    permissionsStatus, 
+    requestPermissions, 
+    checkPermissions,
+    installedApps,
+    refreshApps,
+    uninstallEvents,
+    installationHistory,
+    loading,
+    isUsageTrackingEnabled,
+    toggleUsageTracking
+  } = useAppBlocker();
 
   return (
     <ScrollView 
@@ -133,6 +145,27 @@ const SettingsScreen = () => {
             }
           }}
         />
+      </SettingsSection>
+
+      <SettingsSection title="App Usage Settings">
+        <SettingItem
+          title="Enable Usage Tracking"
+          description="Monitor app usage and screen time"
+          icon="analytics-outline"
+          value={isUsageTrackingEnabled}
+          showToggle
+          onPress={async () => {
+            const success = await toggleUsageTracking();
+            if (!success) {
+              Alert.alert(
+                "Error",
+                "Unable to open settings. Please navigate to Settings > Privacy & Security > Analytics & Improvements manually.",
+                [{ text: "OK" }]
+              );
+            }
+          }}
+        />
+
       </SettingsSection>
 
       <SettingsSection title="About">

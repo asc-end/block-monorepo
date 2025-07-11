@@ -26,9 +26,13 @@ export function AppUsageToday(props: AppUsageTodayProps) {
         </Text>
         {Object.entries(todaysApps)
           .map(([appName, platforms]) => {
-            const totalTime = Number(platforms.web) + Number(platforms.mobile);
+            // Filter out usage less than 1 second (same as Stats.tsx)
+            const mobileTime = platforms.mobile >= 1000 ? platforms.mobile : 0;
+            const webTime = platforms.web >= 1000 ? platforms.web : 0;
+            const totalTime = mobileTime + webTime;
             return [appName, totalTime] as [string, number];
           })
+          .filter(([, totalTime]) => totalTime > 0) // Only show apps with actual usage
           .sort(([, a], [, b]) => Number(b) - Number(a))
           .slice(0, 5)
           .map(([appName, totalTime], index) => {
@@ -60,7 +64,11 @@ export function AppUsageToday(props: AppUsageTodayProps) {
               </Box>
             );
           })}
-        {Object.keys(todaysApps).length === 0 && (
+        {Object.entries(todaysApps).filter(([, platforms]) => {
+          const mobileTime = platforms.mobile >= 1000 ? platforms.mobile : 0;
+          const webTime = platforms.web >= 1000 ? platforms.web : 0;
+          return (mobileTime + webTime) > 0;
+        }).length === 0 && (
           <Text style={{ color: currentColors.text.soft, textAlign: 'center', paddingVertical: 16 }}>
             No app usage data available
           </Text>

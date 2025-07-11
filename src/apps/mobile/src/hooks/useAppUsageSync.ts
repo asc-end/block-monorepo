@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { getHourlyAppUsage } from 'expo-app-blocker';
-import { useAuthStore } from '@blockit/ui';
+import { api, useAuthStore } from '@blockit/ui';
 
 const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const LAST_SYNC_KEY = 'lastAppUsageSync';
@@ -39,23 +39,15 @@ export const useAppUsageSync = () => {
     try {
       // Send each hourly usage record to the backend
       const promises = usageData.map(async (usage) => {
-        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/app-usage/hourly`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            ...usage,
-            platform: 'mobile',
-          }),
+        const { data } = await api().post('/app-usage/hourly', {
+          ...usage,
+          platform: 'mobile',
         });
 
-        if (!response.ok) {
-          throw new Error(`Failed to sync usage for ${usage.appName}`);
-        }
 
-        return response.json();
+        if (!data) throw new Error(`Failed to sync usage for ${usage.appName}`);
+
+        return data;
       });
 
       await Promise.all(promises);
@@ -67,8 +59,6 @@ export const useAppUsageSync = () => {
       const now = new Date();
       await setSecureItem(LAST_SYNC_KEY, now.toISOString());
       lastSyncRef.current = now;
-      
-      console.log(`Successfully synced ${usageData.length} usage records`);
     } catch (error) {
       console.error('Error syncing usage data:', error);
       // Keep pending data for retry
@@ -84,7 +74,6 @@ export const useAppUsageSync = () => {
       
       // Calculate hours since last sync
       const hoursSinceLastSync = Math.ceil((Date.now() - lastSync.getTime()) / (60 * 60 * 1000));
-      
       // Get hourly usage data from native module
       const result = await getHourlyAppUsage(Math.min(hoursSinceLastSync, 24)); // Max 24 hours
       
@@ -142,7 +131,7 @@ export const useAppUsageSync = () => {
         clearInterval(syncIntervalRef.current);
       }
     };
-  }, [token, collectAndSyncUsage]);
+  }, [token]);
 
   // Sync when app comes to foreground
   useEffect(() => {
