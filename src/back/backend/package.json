@@ -6,7 +6,7 @@
     "generate": "prisma generate",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "pnpm generate && tsc",
-    "start": "node dist/index.js"
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "@blockit/shared": "workspace:*",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
+    "ts-node": "^10.9.1",
     "uuid": "^9.0.1",
     "ws": "^8.16.0"
   },
