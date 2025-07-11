@@ -11,10 +11,7 @@ export async function sendMessageToExtension(
   const runtime = window.chrome?.runtime || window.browser?.runtime;
   if (!runtime) throw new Error("Browser runtime not available");
 
-  const message = { type, ...payload };
-
-  console.log("Sending message to extension", message);
-  const response = await runtime.sendMessage(extensionId, message);
+  const response = await runtime.sendMessage(extensionId, { type, ...payload });
 
   if (runtime.lastError) throw new Error(runtime.lastError.message);
   if (response?.error) throw new Error(response.error);

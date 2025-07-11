@@ -65,9 +65,10 @@ export function App() {
       const accessToken = await getAccessToken();
       setToken(accessToken);
       console.log("accessToken", accessToken)
+      const urlParams = new URLSearchParams(window.location.search);
+
       if (accessToken) {
         try {
-          const urlParams = new URLSearchParams(window.location.search);
           createUser(user?.wallet?.address || "");
 
           const extensionId = urlParams.get("extensionId") || "ialoopcgpppijlhebflkpfedjapfmoch";
@@ -77,11 +78,14 @@ export function App() {
             window
           );
 
-          if (urlParams.get("source") === "extension" && !urlParams.get("extensionId")) {
-            setTimeout(() => { window.close()}, 1000);
-          }
+
         } catch (error) {
           console.error("Error sending token to extension or creating user:", error);
+        } finally {
+          console.log("urlParams", urlParams)
+          if (urlParams.get("source") === "extension" && !!urlParams.get("extensionId")) {
+            setTimeout(() => { window.close() }, 1000);
+          }
         }
       }
     };
@@ -109,9 +113,9 @@ export function App() {
     return (
       <Box className="min-h-screen flex items-center justify-center" style={{ backgroundColor: currentColors.background }}>
         <Box className="text-center">
-          <Box 
+          <Box
             className="w-12 h-12 border-3 rounded-full animate-spin mx-auto mb-6"
-            style={{ 
+            style={{
               borderColor: currentColors.neutral[400],
               borderTopColor: currentColors.primary[300]
             }}
@@ -130,14 +134,14 @@ export function App() {
         {/* Left Panel - Content */}
         <Box className="hidden lg:flex lg:flex-1 p-12 flex-col justify-center relative overflow-hidden"
           style={{ backgroundColor: currentColors.neutral[200] }}>
-          
+
           {/* Background Pattern */}
           <Box className="absolute inset-0 opacity-10">
-            <Box 
+            <Box
               className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl"
               style={{ backgroundColor: currentColors.primary[300] + '40' }}
             />
-            <Box 
+            <Box
               className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl"
               style={{ backgroundColor: currentColors.secondary[300] + '40' }}
             />
@@ -146,7 +150,7 @@ export function App() {
           <Box className="relative z-10 max-w-lg">
             {/* Logo */}
             <Box className="flex items-center mb-12">
-              <Box 
+              <Box
                 className="w-12 h-12 rounded-xl flex items-center justify-center mr-4"
                 style={{ backgroundColor: currentColors.primary[300] }}
               >
@@ -165,7 +169,7 @@ export function App() {
               <Text variant="h1" className="leading-tight mb-6" style={{ color: currentColors.text.main }}>
                 Reclaim Your
                 <br />
-                <span style={{ 
+                <span style={{
                   background: `linear-gradient(to right, ${currentColors.primary[300]}, ${currentColors.secondary[300]})`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -185,14 +189,14 @@ export function App() {
                 <Box
                   key={index}
                   className={`transition-all duration-500 ${index === currentFeature
-                      ? 'opacity-100 transform translate-x-0'
-                      : 'opacity-40 transform translate-x-4'
+                    ? 'opacity-100 transform translate-x-0'
+                    : 'opacity-40 transform translate-x-4'
                     }`}
                 >
                   <Box className="flex items-start space-x-4">
-                    <Box 
+                    <Box
                       className="w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500"
-                      style={{ 
+                      style={{
                         backgroundColor: index === currentFeature ? currentColors.primary[300] : currentColors.neutral[400],
                         color: index === currentFeature ? currentColors.white : currentColors.text.soft
                       }}
@@ -219,7 +223,7 @@ export function App() {
                   key={index}
                   onPress={() => setCurrentFeature(index)}
                   className={`h-2 rounded-full transition-all duration-300 ${index === currentFeature ? 'w-6' : 'w-2'}`}
-                  style={{ 
+                  style={{
                     backgroundColor: index === currentFeature ? currentColors.primary[300] : currentColors.neutral[400]
                   }}
                 />
@@ -233,7 +237,7 @@ export function App() {
           <Box className="w-full max-w-lg">
             {/* Mobile Header (hidden on desktop) */}
             <Box className="lg:hidden text-center mb-8">
-              <Box 
+              <Box
                 className="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center mb-4"
                 style={{ backgroundColor: currentColors.primary[300] }}
               >
