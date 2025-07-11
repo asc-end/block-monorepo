@@ -3,57 +3,10 @@ import { formatTime } from '../lib/time';
 import { Image, Pressable, Box, Text, Button, useTheme } from '@blockit/cross-ui-toolkit';
 import { FocusSession } from './components/focus-sesion/FocusSession';
 import { AppUsageToday } from './components/usage/Today';
+import { useAppUsage } from '../hooks/useAppUsage';
 
 // Generate current date for demo data
 const today = new Date().toISOString().split('T')[0];
-const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-const appUsage = {
-    [today]: {
-        "Google Chrome": {
-            web: 4034004,
-            mobile: 0
-        },
-        "TikTok": {
-            web: 100000,
-            mobile: 0
-        },
-        "Instagram": {
-            web: 100000,
-            mobile: 0
-        },
-        "YouTube": {
-            web: 100000,
-            mobile: 0
-        },
-        "WhatsApp": {
-            web: 100000,
-            mobile: 0
-        }
-    },
-    [yesterday]: {
-        "Google Chrome": {
-            web: 100000,
-            mobile: 0
-        },
-        "TikTok": {
-            web: 100000,
-            mobile: 0
-        },
-        "Instagram": {
-            web: 100000,
-            mobile: 0
-        },
-        "YouTube": {
-            web: 100000,
-            mobile: 0
-        },
-        "WhatsApp": {
-            web: 100000,
-            mobile: 0
-        }
-    }
-}
 
 interface PermissionStatus {
   usageStatsGranted: boolean;
@@ -75,10 +28,24 @@ type HomeProps = {
   nativeAppBlocking?: NativeAppBlocking;
 }
 
+// Loading skeleton component for app usage
+const AppUsageLoadingSkeleton = () => {
+  const { currentColors } = useTheme();
+  return (
+    <Box 
+      className="animate-pulse rounded w-full h-[64px]" 
+      style={{ 
+        backgroundColor: currentColors.surface.card + '50',
+      }}
+    />
+  );
+};
+
 export function Home(props: HomeProps) {
   const { onCreateRoutine, nativeAppBlocking } = props;
   const { currentColors } = useTheme();
   const [showDetails, setShowDetails] = useState(false);
+  const { appUsage, loading } = useAppUsage()
 
   const todaysApps = appUsage[today] || {};
 
@@ -92,10 +59,14 @@ export function Home(props: HomeProps) {
     <Box className="flex flex-col flex-1 items-center p-4 w-full h-full" style={{ gap: 3 }}>
       <Text variant="caption">time spent today</Text>
       <Box className="flex flex-col items-center relative w-full">
-        <Pressable onPress={() => setShowDetails(!showDetails)}>
-          <Text variant='h1' className='tracking-widest'>{totalTime ? formatTime(totalTime) : "00:00"}</Text>
-        </Pressable>
-        {showDetails && (
+        {loading ? (
+          <AppUsageLoadingSkeleton />
+        ) : (
+          <Pressable onPress={() => setShowDetails(!showDetails)}>
+            <Text variant='h1' className='tracking-widest'>{totalTime ? formatTime(totalTime) : "00:00"}</Text>
+          </Pressable>
+        )}
+        {showDetails && !loading && (
           <Box
             style={{
               position: 'absolute',

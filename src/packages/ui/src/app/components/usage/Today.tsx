@@ -55,7 +55,7 @@ export function AppUsageToday(props: AppUsageTodayProps) {
                     fontFamily: 'monospace'
                   }}
                 >
-                  {formatTime(Math.round(Number(totalTime) / (1000 * 60)))}
+                  {formatTime(totalTime)}
                 </Text>
               </Box>
             );

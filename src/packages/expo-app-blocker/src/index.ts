@@ -21,12 +21,12 @@ interface AppBlockerNativeModule {
   }>;
   setNotificationBlockingEnabled(enabled: boolean): Promise<{ success: boolean }>;
   getInstalledApps(): Promise<Array<{ appName: string; packageName: string; isBlocked: boolean; iconUri?: string }>>;
+  getHourlyAppUsage(hours: number): Promise<{ hourlyStats: Record<string, Record<string, number>>; error?: string }>;
+
   startMonitoring(): Promise<{ success: boolean; error?: string }>;
   blockApps(packageNames: string[]): Promise<{ success: boolean; error?: string }>;
   getBlockingStats(): Promise<{ totalBlocks: number; appStats: Record<string, number> }>;
   getAppUsageTime(): Promise<{ appUsageTime: Record<string, number>; error?: string }>;
-  getHourlyAppUsage(hours: number): Promise<{ hourlyStats: Record<string, Record<string, number>>; error?: string }>;
-  getHistoricalAppUsage(days: number): Promise<{ historicalStats: Record<string, Record<string, number>>; error?: string }>;
   getUninstallationEvents(): Promise<Array<{ packageName: string; eventType: string }>>;
   getInstallationHistory(): Promise<{ 
     installEvents: string[]; 
@@ -61,7 +61,7 @@ export const blockApps = AppBlockerModule.blockApps;
 export const getBlockingStats = AppBlockerModule.getBlockingStats;
 export const getAppUsageTime = AppBlockerModule.getAppUsageTime;
 export const getHourlyAppUsage = AppBlockerModule.getHourlyAppUsage;
-export const getHistoricalAppUsage = AppBlockerModule.getHistoricalAppUsage;
+// export const getHistoricalAppUsage = AppBlockerModule.getHistoricalAppUsage;
 export const getUninstallationEvents = AppBlockerModule.getUninstallationEvents;
 export const getInstallationHistory = AppBlockerModule.getInstallationHistory;
 export const getCheatingAttempts = AppBlockerModule.getCheatingAttempts;

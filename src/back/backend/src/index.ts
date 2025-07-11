@@ -11,6 +11,7 @@ import cors from 'cors';
 import { wsManager } from './services/init';
 import Users from './routes/users';
 import FocusSessions from './routes/focus-sessions';
+import AppUsage from './routes/app-usage';
 
 const app = express();
 
@@ -32,6 +33,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 // ROUTES
 app.use('/users', Users);
 app.use('/focus-session', FocusSessions);
+app.use('/app-usage', AppUsage);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched

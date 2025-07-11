@@ -3,92 +3,9 @@ import { useState, useEffect } from "react";
 import { formatTime } from "../lib/time";
 import { ChevronIcon } from "./icons/ChevronIcon";
 import { useTheme, Box, Text, Pressable, ScrollView } from "@blockit/cross-ui-toolkit";
+import { useAppUsage } from "../hooks/useAppUsage";
 
 export type TimeRange = 'today' | 'week' | 'month';
-
-// Mock data types
-interface AppUsageData {
-  [date: string]: {
-    [appName: string]: {
-      mobile: number;
-      web: number;
-    };
-  };
-}
-
-interface HourlyData {
-  hourlyBreakdown: {
-    [hour: number]: {
-      [appName: string]: {
-        mobile: number;
-        web: number;
-      };
-    };
-  };
-}
-
-// Generate mock app usage data
-const generateMockAppUsage = (): AppUsageData => {
-  const appUsage: AppUsageData = {};
-  const apps = ['Instagram', 'YouTube', 'Twitter', 'TikTok', 'Discord', 'Spotify', 'Chrome', 'Safari', 'WhatsApp', 'Telegram'];
-  
-  // Generate data for the last 30 days
-  for (let i = 0; i < 30; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0];
-    
-    appUsage[dateStr] = {};
-    
-    // Randomly select 3-7 apps for each day
-    const numApps = Math.floor(Math.random() * 5) + 3;
-    const selectedApps = apps.sort(() => 0.5 - Math.random()).slice(0, numApps);
-    
-    selectedApps.forEach(app => {
-      // Generate random usage times (in milliseconds)
-      const mobileTime = Math.random() > 0.3 ? Math.floor(Math.random() * 4 * 60 * 60 * 1000) : 0; // 0-4 hours
-      const webTime = Math.random() > 0.5 ? Math.floor(Math.random() * 3 * 60 * 60 * 1000) : 0; // 0-3 hours
-      
-      appUsage[dateStr][app] = {
-        mobile: mobileTime,
-        web: webTime
-      };
-    });
-  }
-  
-  return appUsage;
-};
-
-// Generate mock hourly data for today
-const generateMockHourlyData = (): HourlyData => {
-  const apps = ['Instagram', 'YouTube', 'Twitter', 'TikTok', 'Discord'];
-  const hourlyBreakdown: HourlyData['hourlyBreakdown'] = {};
-  
-  for (let hour = 0; hour < 24; hour++) {
-    hourlyBreakdown[hour] = {};
-    
-    // More activity during typical waking hours (8am - 11pm)
-    const isActiveHour = hour >= 8 && hour <= 23;
-    const activityMultiplier = isActiveHour ? 1 : 0.2;
-    
-    if (Math.random() < 0.7 * activityMultiplier) { // 70% chance of activity during active hours
-      const numApps = Math.floor(Math.random() * 3) + 1;
-      const selectedApps = apps.sort(() => 0.5 - Math.random()).slice(0, numApps);
-      
-      selectedApps.forEach(app => {
-        const mobileTime = Math.random() > 0.4 ? Math.floor(Math.random() * 30 * 60 * 1000) : 0; // 0-30 minutes
-        const webTime = Math.random() > 0.6 ? Math.floor(Math.random() * 45 * 60 * 1000) : 0; // 0-45 minutes
-        
-        hourlyBreakdown[hour][app] = {
-          mobile: mobileTime,
-          web: webTime
-        };
-      });
-    }
-  }
-  
-  return { hourlyBreakdown };
-};
 
 export function Stats() {
   const { currentColors } = useTheme();
@@ -96,13 +13,6 @@ export function Stats() {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
   
-  // Mock data and loading states
-  const [appUsage] = useState<AppUsageData>(generateMockAppUsage());
-  const [hourlyData] = useState<HourlyData>(generateMockHourlyData());
-  const [loading] = useState<boolean>(false);
-  const [hourlyLoading] = useState<boolean>(false);
-  const [error] = useState<string | null>(null);
-
   // Ensure we don't start with a future date selected
   useEffect(() => {
     const today = new Date();
@@ -122,6 +32,20 @@ export function Stats() {
     const endDate = new Date(year, month + 1, 0);
     return { startDate, endDate };
   }, [currentMonth]);
+
+  const {
+    loading: appUsageLoading,
+    appUsage: appUsageData,
+    error: appUsageError,
+    hourlyData,
+    hourlyLoading,
+    hourlyError
+
+  } = useAppUsage({
+    beginDate: startDate,
+    endDate: endDate,
+    hourlyDate: selectedDate
+  });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -172,7 +96,7 @@ export function Stats() {
       const isFuture = date > today;
 
       // Calculate total time spent for this day - show empty if data is still loading
-      const totalTime = appUsage ? Object.entries(appUsage[dateStr] || {})
+      const totalTime = appUsageData ? Object.entries(appUsageData[dateStr] || {})
         .reduce((sum, [appName, platforms]) => {
           // Filter out usage less than 1 second
           const filteredPlatforms = Object.fromEntries(
@@ -234,11 +158,11 @@ export function Stats() {
       >
         <Box className="p-4">
           {/* Show error if there's one, but don't block the calendar */}
-          {error && (
+          {appUsageError && (
             <Box className="mb-4 p-3 rounded-lg" style={{
               backgroundColor: currentColors.error.light + '20'
             }}>
-              <Text style={{ color: currentColors.error.main }}>{error}</Text>
+              <Text style={{ color: currentColors.error.main }}>{appUsageError}</Text>
             </Box>
           )}
 
@@ -343,7 +267,7 @@ export function Stats() {
           </Box>
 
           {/* Show loading indicator for data if still loading */}
-          {loading && (
+          {appUsageLoading && (
             <Box style={{
               marginBottom: 16,
               padding: 10,
@@ -355,14 +279,14 @@ export function Stats() {
           )}
 
           {/* Selected Day Stats */}
-          {!loading && appUsage && (
+          {!appUsageLoading && appUsageData && (
             <Box className="mb-5 rounded-2xl flex flex-col gap-4">
               <Box className="flex flex-row justify-between items-center">
                 <Text variant="h1" className="text-2xl font-bold ">
                   {formatDate(selectedDate)}
                 </Text>
                 {(() => {
-                  const totalDayTime = Object.entries(appUsage[selectedDate] || {})
+                  const totalDayTime = Object.entries(appUsageData[selectedDate] || {})
                     .reduce((sum, [appName, platforms]) => {
                       // Filter out usage less than 1 second
                       const filteredPlatforms = Object.fromEntries(
@@ -383,8 +307,8 @@ export function Stats() {
               </Box>
 
               {/* Platform totals */}
-              {appUsage[selectedDate] && (() => {
-                const timesArr = Object.values(appUsage[selectedDate] || {});
+              {appUsageData[selectedDate] && (() => {
+                const timesArr = Object.values(appUsageData[selectedDate] || {});
                 const totalMobile = timesArr.reduce((sum, t: any) => {
                   const mobileTime = t.mobile || 0;
                   return sum + (mobileTime >= 1000 ? mobileTime : 0);
@@ -572,21 +496,21 @@ export function Stats() {
               )}
 
               {/* App usage list */}
-              {appUsage[selectedDate] ? (
+              {appUsageData[selectedDate] ? (
                 <Box>
                   <Box className="flex flex-row justify-between items-center mb-3">
                     <Text className="text-base font-semibold" style={{ color: currentColors.text.main }}>
                       App Usage
                     </Text>
                     <Text className="text-xs" style={{ color: currentColors.text.soft }}>
-                      {Object.entries(appUsage[selectedDate]).filter(([, times]) => {
+                      {Object.entries(appUsageData[selectedDate]).filter(([, times]) => {
                         const totalTime = (times.mobile >= 1000 ? times.mobile : 0) + (times.web >= 1000 ? times.web : 0);
                         return totalTime > 0;
                       }).length} apps
                     </Text>
                   </Box>
                   <Box className="space-y-2 flex flex-col gap-2">
-                    {Object.entries(appUsage[selectedDate])
+                    {Object.entries(appUsageData[selectedDate])
                       .filter(([, times]) => {
                         const totalTime = (times.mobile >= 1000 ? times.mobile : 0) + (times.web >= 1000 ? times.web : 0);
                         return totalTime > 0;
@@ -598,7 +522,7 @@ export function Stats() {
                       })
                       .map(([appName, times], index) => {
                         const totalTime = (times.mobile >= 1000 ? times.mobile : 0) + (times.web >= 1000 ? times.web : 0);
-                        const totalDayTime = Object.entries(appUsage[selectedDate])
+                        const totalDayTime = Object.entries(appUsageData[selectedDate])
                           .filter(([, t]) => {
                             const appTotal = (t.mobile >= 1000 ? t.mobile : 0) + (t.web >= 1000 ? t.web : 0);
                             return appTotal > 0;

@@ -1,6 +1,7 @@
 package expo.modules.appblocker
 
 import android.app.AppOpsManager
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -19,12 +20,13 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import android.util.Base64
 import java.io.ByteArrayOutputStream
+import java.util.Calendar
+import java.util.Date
 
 class AppBlockerModule : Module() {
   private val context: Context
     get() = appContext.reactContext ?: throw IllegalStateException("React context is null")
 
-  // Helper function defined at the class level
   private fun hasUsageStatsPermission(): Boolean {
     val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager?
     if (appOpsManager == null) {
@@ -71,7 +73,16 @@ class AppBlockerModule : Module() {
     val prefs = context.getSharedPreferences("app_blocker_prefs", Context.MODE_PRIVATE)
     prefs.edit().putBoolean("notification_blocking_enabled", enabled).apply()
   }
-  
+    // Add this function to mark focus session end
+  private fun markFocusSessionEnd() {
+    try {
+      val prefs = context.getSharedPreferences("app_blocker_stats", Context.MODE_PRIVATE)
+      prefs.edit().putLong("last_focus_session_end", System.currentTimeMillis()).apply()
+    } catch (e: Exception) {
+      Log.e("AppBlockerModule", "Error marking focus session end", e)
+    }
+  }
+
   // Helper function to convert a drawable to bitmap
   private fun drawableToBitmap(drawable: Drawable): Bitmap {
     if (drawable is BitmapDrawable) {
@@ -398,6 +409,166 @@ class AppBlockerModule : Module() {
       }
     }
 
+    AsyncFunction("getHourlyAppUsage") { hours: Int ->
+      try {
+        if (!hasUsageStatsPermission()) {
+          return@AsyncFunction mapOf(
+            "error" to "Usage stats permission not granted"
+          )
+        }
+
+        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val calendar = Calendar.getInstance()
+        val endTime = System.currentTimeMillis()
+        
+        // Calculate start time based on hours parameter
+        val startTime = endTime - (hours * 60 * 60 * 1000L)
+        
+        // Get usage events instead of usage stats for more granular data
+        val usageEvents = usageStatsManager.queryEvents(startTime, endTime)
+        
+        // Map to store hourly usage: hour -> app -> time
+        val hourlyStats = mutableMapOf<String, MutableMap<String, Long>>()
+        val appStartTimes = mutableMapOf<String, Long>()
+        
+        while (usageEvents.hasNextEvent()) {
+          val event = android.app.usage.UsageEvents.Event()
+          usageEvents.getNextEvent(event)
+          
+          when (event.eventType) {
+            android.app.usage.UsageEvents.Event.ACTIVITY_RESUMED,
+            android.app.usage.UsageEvents.Event.MOVE_TO_FOREGROUND -> {
+              // App moved to foreground
+              appStartTimes[event.packageName] = event.timeStamp
+            }
+            
+            android.app.usage.UsageEvents.Event.ACTIVITY_PAUSED,
+            android.app.usage.UsageEvents.Event.MOVE_TO_BACKGROUND -> {
+              // App moved to background
+              val startTimeForApp = appStartTimes[event.packageName]
+              if (startTimeForApp != null) {
+                val duration = event.timeStamp - startTimeForApp
+                
+                // Skip tracking our own app
+                if (event.packageName == context.packageName) {
+                  appStartTimes.remove(event.packageName)
+                  continue
+                }
+                
+                // Get app name
+                val appName = try {
+                  val appInfo = context.packageManager.getApplicationInfo(event.packageName, 0)
+                  context.packageManager.getApplicationLabel(appInfo).toString()
+                } catch (e: Exception) {
+                  event.packageName
+                }
+                
+                // Calculate hour bucket for the session
+                calendar.timeInMillis = startTimeForApp
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val hourKey = calendar.time.toInstant().toString()
+                
+                // Add to hourly stats
+                if (!hourlyStats.containsKey(hourKey)) {
+                  hourlyStats[hourKey] = mutableMapOf()
+                }
+                hourlyStats[hourKey]!![appName] = (hourlyStats[hourKey]!![appName] ?: 0L) + duration
+                
+                appStartTimes.remove(event.packageName)
+              }
+            }
+          }
+        }
+        
+        return@AsyncFunction mapOf(
+          "hourlyStats" to hourlyStats
+        )
+      } catch (e: Exception) {
+        Log.e("AppBlockerModule", "Error getting hourly usage", e)
+        return@AsyncFunction mapOf(
+          "error" to e.message
+        )
+      }
+    }
+
+    AsyncFunction("getHistoricalAppUsage") { days: Int ->
+      try {
+        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val calendar = Calendar.getInstance()
+        
+        // Get the current month and year from the calendar
+        val currentMonth = calendar.get(Calendar.MONTH)
+        val currentYear = calendar.get(Calendar.YEAR)
+        
+        // Set to the first day of the current month
+        calendar.set(currentYear, currentMonth, 1, 0, 0, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startTime = calendar.timeInMillis
+        
+        // Set to the last day of the current month
+        calendar.set(currentYear, currentMonth, calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val endTime = calendar.timeInMillis
+
+        Log.d("AppBlockerModule", "Querying usage stats from ${Date(startTime)} to ${Date(endTime)}")
+
+        val usageStats = usageStatsManager.queryUsageStats(
+          UsageStatsManager.INTERVAL_DAILY,
+          startTime,
+          endTime
+        )
+
+        val historicalStats = mutableMapOf<String, MutableMap<String, Long>>()
+        
+        // Initialize the map with dates
+        calendar.timeInMillis = startTime
+        while (calendar.timeInMillis <= endTime) {
+          val dateStr = String.format("%04d-%02d-%02d", 
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.DAY_OF_MONTH)
+          )
+          historicalStats[dateStr] = mutableMapOf()
+          calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        // Fill in the stats for each day
+        usageStats?.forEach { stats ->
+          val packageName = stats.packageName
+          val totalTime = stats.totalTimeInForeground
+          if (totalTime > 0) {
+            try {
+              val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+              val appName = context.packageManager.getApplicationLabel(appInfo).toString()
+              
+              // Get the date for this stat
+              calendar.timeInMillis = stats.lastTimeUsed
+              val dateStr = String.format("%04d-%02d-%02d", 
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH)
+              )
+              
+              // Add the usage time to the appropriate date
+              historicalStats[dateStr]?.put(appName, totalTime)
+            } catch (e: Exception) {
+              // Skip system apps or apps we can't get info for
+            }
+          }
+        }
+
+        return@AsyncFunction mapOf(
+          "historicalStats" to historicalStats
+        )
+      } catch (e: Exception) {
+        Log.e("AppBlockerModule", "Error getting historical usage", e)
+        return@AsyncFunction mapOf(
+          "error" to e.message
+        )
+      }
+    }
 
   }
 } 

@@ -15,12 +15,13 @@ enum FocusSessionStatus {
 
 model User {
   id            String          @id
-  walletAddress String
+  walletAddress String          @unique
   theme         String          @default("system")
   timezone      String          @default("UTC")
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   focusSessions FocusSession[]
+  appUsage      AppUsage[]
 
   @@map("users")
 }
@@ -31,9 +32,32 @@ model FocusSession {
   startTime DateTime  @default(now())
   duration  Int
   status    FocusSessionStatus
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([startTime])
+  @@index([status])
+  @@index([userId, status])
   @@map("focus_sessions")
 }
 
-// TODO add app usage
+model AppUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  appName   String
+  timeSpent Int      // milliseconds spent in this hour
+  platform  Platform
+  hourStart DateTime // UTC timestamp for hour start (e.g., 2024-01-01 14:00:00)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appName, platform, hourStart])
+  @@index([userId, hourStart])
+  @@index([appName])
+  @@index([platform])
+  @@map("app_usage")
+}
+
+enum Platform {
+  mobile
+  web
+}
