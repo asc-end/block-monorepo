@@ -1,12 +1,33 @@
-import { browser } from "wxt/browser";
+import { browser, ContentScriptContext } from "wxt/browser";
+
 
 const blockedSites = ['tiktok.com', 'youtube.com', 'twitter.com', 'x.com'];
 
+// Helper to check if current site is blocked
+const isBlockedSite = (hostname: string, sites: string[]): boolean => {
+  return sites.some(site => {
+    // Handle both www and non-www versions
+    return hostname === site || 
+           hostname === `www.${site}` || 
+           hostname.endsWith(`.${site}`);
+  });
+};
+
 export default defineContentScript({
   matches: ['<all_urls>'],
-  runAt: 'document_idle',
-  main() {
+  runAt: 'document_end',
+  main(ctx: ContentScriptContext) {
+    // Skip certain contexts silently
+    if (ctx.isIframe || ctx.isExtensionPage || ctx.isDevToolsPage) {
+      return;
+    }
+    if (ctx.isInvalidPage) {
+      // Skip invalid pages without reloading
+      return;
+    }
 
+    
+    
     // Create overlay element
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -47,8 +68,104 @@ export default defineContentScript({
     // Store original title
     let originalTitle = document.title;
 
+    // Function to pause all media elements
+    const pauseAllMedia = () => {
+      // Pause all video elements
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        if (!video.paused) {
+          video.pause();
+        }
+      });
+
+      // Pause all audio elements
+      const audios = document.querySelectorAll('audio');
+      audios.forEach(audio => {
+        if (!audio.paused) {
+          audio.pause();
+        }
+      });
+
+      // Try to pause YouTube specifically (if it's a YouTube page)
+      if (window.location.hostname.includes('youtube.com')) {
+        const ytPlayer = document.querySelector('.html5-main-video') as HTMLVideoElement;
+        if (ytPlayer && !ytPlayer.paused) {
+          ytPlayer.pause();
+        }
+        
+        // Also try clicking the pause button as a fallback
+        const pauseButton = document.querySelector('.ytp-play-button[aria-label*="Pause"]') as HTMLButtonElement;
+        if (pauseButton) {
+          pauseButton.click();
+        }
+      }
+      
+      // Handle iframes that might contain media
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach(iframe => {
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDoc) {
+            const iframeVideos = iframeDoc.querySelectorAll('video');
+            iframeVideos.forEach(video => {
+              if (!video.paused) {
+                video.pause();
+              }
+            });
+          }
+        } catch (e) {
+          // Cross-origin iframes will throw an error - silently ignore
+        }
+      });
+    };
+    
+    // Mutation observer to continuously pause media
+    let mediaObserver: MutationObserver | null = null;
+    
+    const startMediaObserver = () => {
+      if (mediaObserver) return;
+      
+      mediaObserver = new MutationObserver(() => {
+        // Re-pause any media that starts playing
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          if (!video.paused) {
+            video.pause();
+          }
+        });
+        
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(audio => {
+          if (!audio.paused) {
+            audio.pause();
+          }
+        });
+      });
+      
+      mediaObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'playing']
+      });
+    };
+    
+    const stopMediaObserver = () => {
+      if (mediaObserver) {
+        mediaObserver.disconnect();
+        mediaObserver = null;
+      }
+    };
+
     // Block page by adding overlay and preventing interactions
     const blockPage = () => {
+      pauseAllMedia();
+      startMediaObserver(); // Keep media paused
+      
+      // Add a small delay to ensure media elements are loaded
+      setTimeout(pauseAllMedia, 100);
+      setTimeout(pauseAllMedia, 500);
+      
       document.body.appendChild(overlay);
       document.title = '🚫 Focus Mode Active';
 
@@ -66,7 +183,11 @@ export default defineContentScript({
 
     // Unblock page by removing overlay and restoring interactions
     const unblockPage = () => {
-      overlay.remove();
+      stopMediaObserver(); // Stop monitoring media
+      
+      if (overlay.parentNode) {
+        overlay.remove();
+      }
       document.title = originalTitle;
       document.body.style.overflow = '';
       document.removeEventListener('click', preventInteraction, true);
@@ -89,24 +210,24 @@ export default defineContentScript({
         const storage = browser?.storage?.local;
         if (!storage) return;
 
-        const result = await storage.get(['blockedSites', 'activeFocusSession']);
-        const { blockedSites, activeFocusSession } = result;
+        const result = await storage.get(['currentFocusSession', 'authToken']);
+        const { currentFocusSession, authToken } = result;
 
-        if (activeFocusSession && blockedSites) {
+        // Only check for focus sessions if user is authenticated
+        if (!authToken) {
+          unblockPage();
+          return;
+        }
+
+        if (currentFocusSession && blockedSites) {
           const currentHostname = window.location.hostname;
-          console.log('Current hostname:', currentHostname);
-          console.log('Blocked sites:', blockedSites);
 
-          if (blockedSites.some((site: string) => currentHostname.includes(site))) {
-            console.log('Site is blocked, applying blocking...');
+          if (isBlockedSite(currentHostname, blockedSites)) {
             blockPage();
-            console.log('Blocking applied successfully');
           } else {
-            console.log('Site is not blocked');
             unblockPage();
           }
         } else {
-          console.log('No active focus session or no blocked sites');
           unblockPage();
         }
       } catch (error) {
@@ -119,17 +240,19 @@ export default defineContentScript({
 
     // Listen for messages from popup/background
     if (browser?.runtime?.onMessage) {
-      browser.runtime.onMessage.addListener((message: any, sender: any, sendResponse: any) => {
+      browser.runtime.onMessage.addListener((message: any) => {
         const currentHostname = window.location.hostname;
 
-        console.log("message", message)
-        if (message.action == "STOP_FOCUS_SESSION") {
-          if (blockedSites.some((site: string) => currentHostname.includes(site)))
+        if (message.type === "AUTH_TOKEN_RECEIVED") {
+          // User just authenticated, re-check for focus sessions
+          checkAndApplyBlocking();
+        }
+        else if (message.action == "STOP_FOCUS_SESSION") {
+          if (isBlockedSite(currentHostname, blockedSites))
             unblockPage();
-
         }
         else if (message.action == "BEGIN_FOCUS_SESSION") {
-          if (blockedSites.some((site: string) => currentHostname.includes(site)))
+          if (isBlockedSite(currentHostname, blockedSites))
             blockPage();
         }
       });
@@ -137,11 +260,9 @@ export default defineContentScript({
 
     let startTime = Date.now();
     let isActive = document.hasFocus() && document.visibilityState === 'visible';
-    let isFocused = document.hasFocus();
 
     if (isActive) {
       startTime = Date.now();
-      console.log('Page is already active, starting tracking');
     }
 
     // Function to track time spent
@@ -161,9 +282,7 @@ export default defineContentScript({
             });
           }
 
-          console.log(`SENDING MESSAGE: ${timeSpent}ms on ${domain}`)
           browser.runtime.sendMessage({ type: "TRACK_TIME", timeSpent, domain })
-            .then(() => console.log('Message sent successfully'))
             .catch(err => console.error('Failed to send message:', err))
         }
         // Don't set isActive to false here - let the event handlers manage it
@@ -172,41 +291,31 @@ export default defineContentScript({
     };
 
     window.addEventListener('focus', () => {
-      console.log('Window focused');
-      isFocused = true;
       if (document.visibilityState === 'visible') {
         startTime = Date.now();
         isActive = true;
-        console.log('Started tracking time on focus');
       }
     });
 
     window.addEventListener('blur', () => {
-      console.log('Window blurred');
-      isFocused = false;
       trackTimeSpent();
       isActive = false;
     });
 
     // Also listen for page focus/blur events which can be more reliable for tab switching
     window.addEventListener('pageshow', () => {
-      console.log('Page shown (tab switch or navigation)');
       if (document.hasFocus() && document.visibilityState === 'visible') {
         startTime = Date.now();
         isActive = true;
-        isFocused = true;
-        console.log('Started tracking time on page show');
       }
     });
 
     window.addEventListener('pagehide', (event) => {
-      console.log('Page hidden (tab switch or navigation)');
       trackTimeSpent();
       isActive = false;
-      
+
       // Force sync if the page is being unloaded (not just hidden)
       if (event && (event as PageTransitionEvent).persisted === false) {
-        console.log('Page being unloaded, forcing sync');
         browser.runtime.sendMessage({ type: "FORCE_SYNC" }).catch(() => {
           // Ignore errors if extension is being unloaded
         });
@@ -214,7 +323,6 @@ export default defineContentScript({
     });
 
     document.addEventListener('visibilitychange', () => {
-      console.log(`Visibility changed to: ${document.visibilityState}`);
       if (document.hidden) {
         trackTimeSpent();
         isActive = false;
@@ -222,8 +330,6 @@ export default defineContentScript({
         // When tab becomes visible and document has focus, start tracking
         startTime = Date.now();
         isActive = true;
-        isFocused = true; // Update the focused state
-        console.log('Started tracking time on visibility change');
       }
     });
 
@@ -236,33 +342,33 @@ export default defineContentScript({
       });
     });
 
-    const periodicTracker = setInterval(() => {
-      console.log(`Periodic check - isActive: ${isActive}, startTime: ${startTime}, focused: ${document.hasFocus()}, visible: ${document.visibilityState}`);
-      
-      if (isActive && startTime > 0) {
-        const tempTime = Date.now();
-        const timeSpent = tempTime - startTime;
-        if (timeSpent > 1000) { // Only track if more than 1 second
-          const domain = new URL(window.location.href).hostname;
-          console.log(`Periodic sync: ${timeSpent}ms on ${domain}`);
-          browser.runtime.sendMessage({ type: "TRACK_TIME", timeSpent, domain })
-            .then(() => {
-              console.log('Periodic message sent successfully');
-              startTime = tempTime; // Reset start time to now for next period
-            })
-            .catch(err => console.error('Failed to send periodic message:', err));
-        }
-      } else {
-        console.log(`Not tracking - isActive: ${isActive}, startTime: ${startTime}`);
-        // If the page is visible and focused but not active, restart tracking
-        if (document.hasFocus() && document.visibilityState === 'visible' && !isActive) {
-          console.log('Restarting tracking - page became active');
-          isActive = true;
-          isFocused = true;
-          startTime = Date.now();
-        }
-      }
-    }, 10000);
+    // const periodicTracker = setInterval(() => {
+    //   console.log(`Periodic check - isActive: ${isActive}, startTime: ${startTime}, focused: ${document.hasFocus()}, visible: ${document.visibilityState}`);
+
+    //   if (isActive && startTime > 0) {
+    //     const tempTime = Date.now();
+    //     const timeSpent = tempTime - startTime;
+    //     if (timeSpent > 1000) { // Only track if more than 1 second
+    //       const domain = new URL(window.location.href).hostname;
+    //       console.log(`Periodic sync: ${timeSpent}ms on ${domain}`);
+    //       browser.runtime.sendMessage({ type: "TRACK_TIME", timeSpent, domain })
+    //         .then(() => {
+    //           console.log('Periodic message sent successfully');
+    //           startTime = tempTime; // Reset start time to now for next period
+    //         })
+    //         .catch(err => console.error('Failed to send periodic message:', err));
+    //     }
+    //   } else {
+    //     console.log(`Not tracking - isActive: ${isActive}, startTime: ${startTime}`);
+    //     // If the page is visible and focused but not active, restart tracking
+    //     if (document.hasFocus() && document.visibilityState === 'visible' && !isActive) {
+    //       console.log('Restarting tracking - page became active');
+    //       isActive = true;
+    //       isFocused = true;
+    //       startTime = Date.now();
+    //     }
+    //   }
+    // }, 10000);
 
     // return () => {
     //   clearInterval(periodicTracker);

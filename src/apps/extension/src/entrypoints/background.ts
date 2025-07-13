@@ -16,7 +16,6 @@ const extractUserIdFromToken = async (token: string): Promise<string | null> => 
 
     if (response.ok) {
       const data = await response.json();
-      console.log("data", data)
       return data.userId;
     }
   } catch (error) {
@@ -28,7 +27,6 @@ const extractUserIdFromToken = async (token: string): Promise<string | null> => 
 function startHeartbeat() {
   websocketHeartbeatInterval = setInterval(function () {
     websocket?.send("heartbeat")
-    console.log("heartbeat")
   }, 20000)
 }
 
@@ -84,7 +82,6 @@ async function syncHourlyUsage() {
     for (const [hourStart, apps] of Object.entries(usageToSync)) {
       for (const [appName, timeSpent] of Object.entries(apps)) {
         if (timeSpent > 0) {
-          console.log(`Syncing ${timeSpent}ms for ${appName} at ${hourStart}`);
           
           const syncPromise = fetch(`${import.meta.env.WXT_PUBLIC_API_URL}/app-usage/hourly`, {
             method: 'POST',
@@ -111,7 +108,6 @@ async function syncHourlyUsage() {
               }
               throw new Error(`HTTP ${response.status}: ${errorText}`);
             } else {
-              console.log(`Successfully synced ${appName} (${timeSpent}ms)`);
               return { hourStart, appName, timeSpent };
             }
           });
@@ -143,13 +139,11 @@ async function syncHourlyUsage() {
     }
 
     if (hasSuccessfulSync) {
-      console.log('✅ Synced hourly usage data');
       // Clear pending data from storage if everything was synced
       if (Object.keys(hourlyUsage).length === 0) {
         await browser.storage.local.remove(['pendingHourlyUsage']);
       }
     } else {
-      console.warn('⚠️ No successful syncs, keeping data for retry');
     }
     
   } catch (error) {
@@ -164,14 +158,12 @@ async function makeWebsocket() {
   const storage = await browser.storage.local.get(['authToken']);
   const token = storage.authToken;
 
+
   if (!token) {
-    console.log('No auth token found, skipping WebSocket connection');
     return;
   }
 
-  console.log("token", token)
   const id = await extractUserIdFromToken(token)
-  console.log(id)
   websocket = new WebSocket(`${import.meta.env.WXT_PUBLIC_WS_URL}/api/ws?userId=${id}`)
   makeListeners()
 }
@@ -184,20 +176,48 @@ function makeListeners() {
   if (!websocket) return;
 
   websocket.onopen = function () {
-    console.log("Connected!")
     startHeartbeat()
   }
 
   websocket.onmessage = async function (event: MessageEvent) {
-    console.log("event, ", event, event.data)
     try {
       const data = JSON.parse(event.data);
       if (data.type === 'FOCUS_SESSION_UPDATED') {
+        // Store focus session state
+        if (data.payload.action === "created") {
+          await browser.storage.local.set({ currentFocusSession: true });
+        } else {
+          await browser.storage.local.remove('currentFocusSession');
+        }
+        
         const tabs = await browser.tabs.query({});
         for (const tab of tabs) {
-          if (tab.id) {
+          if (tab.id && tab.url) {
+            // Skip chrome:// URLs and other protected pages
+            if (tab.url.startsWith('chrome://') || 
+                tab.url.startsWith('chrome-extension://') ||
+                tab.url.startsWith('edge://') ||
+                tab.url.startsWith('about:')) {
+              continue;
+            }
+            
             const action = data.payload.action == "created" ? 'BEGIN_FOCUS_SESSION' : 'STOP_FOCUS_SESSION';
-            await browser.tabs.sendMessage(tab.id, { action });
+            try {
+              // First try to send the message
+              await browser.tabs.sendMessage(tab.id, { action });
+            } catch (error) {
+              try {
+                // Inject the content script if it's not already loaded
+                await browser.scripting.executeScript({
+                  target: { tabId: tab.id },
+                  files: ['content-scripts/content.js']
+                });
+                // Try sending the message again
+                await browser.tabs.sendMessage(tab.id, { action });
+              } catch (injectError) {
+                console.error(`❌ Failed to inject script or send ${action} to tab ${tab.id} (${tab.url}):`, injectError);
+              }
+            }
           }
         }
       }
@@ -208,7 +228,6 @@ function makeListeners() {
 
   websocket.onclose = function () {
     stopHeartbeat()
-    console.log("Disconnected!")
   }
 }
 
@@ -216,17 +235,21 @@ export default defineBackground(() => {
   let authWindowId: number | null = null;
   setInterval(syncHourlyUsage, SYNC_INTERVAL);
 
+  // Check initial auth status on startup
+  browser.storage.local.get(['authToken']).then((result) => {
+  });
+
+  // Content scripts are handled by manifest.json registration
+  // No need to manually inject on startup since they load automatically
 
   // Clear authWindowId when window is closed and sync data
   browser.windows.onRemoved.addListener(windowId => {
     if (windowId === authWindowId) authWindowId = null;
-    console.log('🔄 Window closed, syncing usage data...');
     debouncedSyncHourlyUsage(); // Debounced sync for window close
   });
 
   // Sync data when tabs are closed
   browser.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    console.log('🔄 Tab closed, syncing usage data...');
     debouncedSyncHourlyUsage(); // Debounced sync for tab close
   });
 
@@ -250,7 +273,42 @@ export default defineBackground(() => {
   });
 
   // Handle opening auth window
-  browser.runtime.onMessage.addListener(async (message: any) => {
+  browser.runtime.onMessage.addListener(async (message: any, sender: any, sendResponse: any) => {
+    if (message.type === 'CHECK_FOCUS_SESSION') {
+      // Retrieve authToken and check focus session status from backend
+      const { authToken } = await browser.storage.local.get('authToken');
+      if (!authToken) {
+        sendResponse({ inFocusSession: false, error: 'No authToken' });
+        return true;
+      }
+
+      try {
+        // Replace with your backend URL
+        const backendUrl = `${import.meta.env.WXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/focus-session/status`;
+        const response = await fetch(backendUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          console.error('Failed to fetch focus session status from backend:', response.statusText);
+          sendResponse({ inFocusSession: false, error: response.statusText });
+          return true;
+        }
+
+        const data = await response.json();
+        // Assume backend returns { inFocusSession: boolean }
+        sendResponse({ inFocusSession: !!data.inFocusSession });
+      } catch (error) {
+        console.error('Error checking focus session status from backend:', error);
+        sendResponse({ inFocusSession: false, error: (error as Error).message });
+      }
+      return true; // Keep the message channel open
+    }
+    
     if (message.type === "OPEN_AUTH_WINDOW") {
       // Try to focus existing window
       if (authWindowId !== null) {
@@ -279,16 +337,13 @@ export default defineBackground(() => {
 
       hourlyUsage[hourKey][message.domain] = (hourlyUsage[hourKey][message.domain] || 0) + message.timeSpent;
 
-      console.log(`Accumulated ${message.timeSpent}ms for ${message.domain} (total: ${hourlyUsage[hourKey][message.domain]}ms)`);
 
       // Check if we should sync (every 2 minutes)
       if (now - lastSyncTime >= SYNC_INTERVAL) {
         lastSyncTime = now;
-        console.log('🔄 Triggering sync due to interval');
         syncHourlyUsage(); // Direct sync for periodic interval
       }
     } else if (message.type == "FORCE_SYNC") {
-      console.log('🔄 Force sync requested');
       debouncedSyncHourlyUsage(); // Debounced sync for force requests
     }
   });
@@ -301,7 +356,6 @@ export default defineBackground(() => {
 
   // Sync data when browser is closing or extension is suspended
   browser.runtime.onSuspend.addListener(() => {
-    console.log('🔄 Extension suspending, syncing usage data...');
     debouncedSyncHourlyUsage(); // Debounced sync for suspension
   });
 
@@ -313,6 +367,7 @@ export default defineBackground(() => {
     }
   });
 
+  // Try to establish WebSocket connection on startup
   makeWebsocket()
 
 });

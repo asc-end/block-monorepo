@@ -8,12 +8,52 @@
     "clean": {
       "cache": false
     },
+    "generate": {
+      "outputs": ["node_modules/.prisma/**"]
+    },
     "build": {
-      "outputs": ["dist/**", "build/**", "public/**"]
+      "dependsOn": ["generate"],
+      "outputs": ["dist/**", "build/**", "public/**"],
+      "env": [
+        "DATABASE_URL", 
+        "PRIVY_SECRET", 
+        "NODE_ENV",
+        "WXT_PUBLIC_KEY",
+        "WXT_PUBLIC_WEB_URL", 
+        "WXT_PUBLIC_API_URL",
+        "WXT_PUBLIC_WS_URL"
+      ],
+      "passThroughEnv": [
+        "DATABASE_URL", 
+        "PRIVY_SECRET", 
+        "NODE_ENV",
+        "WXT_PUBLIC_KEY",
+        "WXT_PUBLIC_WEB_URL", 
+        "WXT_PUBLIC_API_URL",
+        "WXT_PUBLIC_WS_URL"
+      ]
     },
     "start": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "DATABASE_URL", 
+        "PRIVY_SECRET", 
+        "NODE_ENV",
+        "WXT_PUBLIC_KEY",
+        "WXT_PUBLIC_WEB_URL", 
+        "WXT_PUBLIC_API_URL",
+        "WXT_PUBLIC_WS_URL"
+      ],
+      "passThroughEnv": [
+        "DATABASE_URL", 
+        "PRIVY_SECRET", 
+        "NODE_ENV",
+        "WXT_PUBLIC_KEY",
+        "WXT_PUBLIC_WEB_URL", 
+        "WXT_PUBLIC_API_URL",
+        "WXT_PUBLIC_WS_URL"
+      ]
     },
     "dev": {
       "cache": false,

@@ -2,3 +2,6 @@ packages:
   - 'src/apps/*'
   - 'src/packages/*'
   - 'src/back/*'
+catalogs:
+  prisma:
+    prisma: latest

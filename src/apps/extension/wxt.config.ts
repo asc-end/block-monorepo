@@ -9,8 +9,8 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   manifest: {
-    permissions: ['storage', 'scripting', 'activeTab', "favicon"],
-    host_permissions: [WEB_URL, "https://blockit-web-production.up.railway.app/*"], 
+    permissions: ['storage', 'scripting', 'activeTab', "favicon", "tabs"],
+    host_permissions: ["<all_urls>"], 
     externally_connectable: {
       matches: [WEB_URL, "https://blockit-web-production.up.railway.app/*"]
     },

@@ -1,5 +1,5 @@
 import { PrivyClient } from '@privy-io/server-auth';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../node_modules/.prisma/client';
 
 // if (!process.env.PRIVY_SECRET) {
 //   throw new Error('PRIVY_SECRET environment variable is not set');

@@ -1,8 +1,15 @@
 
 
-if (process.env.NODE_ENV == "dev") {
-  require('dotenv').config();
-}
+// Load dotenv for local development
+// In production (Railway), env vars are provided by the platform
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Log environment info for debugging
+console.log('Starting backend...');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('PRIVY_SECRET exists:', !!process.env.PRIVY_SECRET);
 import express from 'express';
 import { createServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
