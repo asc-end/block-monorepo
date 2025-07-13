@@ -10,9 +10,9 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   manifest: {
     permissions: ['storage', 'scripting', 'activeTab', "favicon"],
-    host_permissions: [WEB_URL], 
+    host_permissions: [WEB_URL, "https://blockit-web-production.up.railway.app/*"], 
     externally_connectable: {
-      matches: [WEB_URL]
+      matches: [WEB_URL, "https://blockit-web-production.up.railway.app/*"]
     },
     key: EXTENSION_PUBLIC_KEY,
   },
