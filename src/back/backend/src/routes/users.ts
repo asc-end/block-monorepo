@@ -21,13 +21,12 @@ router.get('/verify', authMiddleware, async (req: Request & { verifiedClaims?: A
 router.post('/create',authMiddleware, async (req: Request & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
   try {
       const { walletAddress, theme, timezone } = req.body;
+      console.log("walletAddress", walletAddress)
       const userId = req.verifiedClaims?.userId;
-      if (!userId) {
-          return res.status(401).json({ error: 'User not authenticated' });
-      }
-      if (!walletAddress)
-          return res.status(400).json({ error: 'Missing required fields' });
+      if (!userId) return res.status(401).json({ error: 'User not authenticated' });
+      if (!walletAddress) return res.status(400).json({ error: 'Missing required fields' });
 
+      console.log("userId", userId, walletAddress)
       const user = await prisma.user.upsert({
           where: {
               id: userId

@@ -84,7 +84,7 @@ export function App() {
         } finally {
           console.log("urlParams", urlParams)
           if (urlParams.get("source") === "extension" && !!urlParams.get("extensionId")) {
-            setTimeout(() => { window.close() }, 1000);
+            // setTimeout(() => { window.close() }, 1000);
           }
         }
       }

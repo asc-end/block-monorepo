@@ -5,7 +5,7 @@ import { Box, Button, Text, useTheme } from '@blockit/cross-ui-toolkit';
 import { browser } from 'wxt/browser';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { HomeScreen, StatsScreen, CreateRoutineScreen, AppsScreen, TimeScreen, CalendarScreen, MoneyScreen } from './routes';
-import { useAuth, getApiUrl } from '@blockit/ui';
+import { useAuth, getApiUrl, useUserCreation } from '@blockit/ui';
 import { BackHeader } from './components/BackHeader';
 
 const router = createHashRouter([
@@ -88,11 +88,14 @@ export const App = () => {
     });
   };
 
+
+
   // Load token from browser storage on mount
   useEffect(() => {
     browser.storage.local.get(['authToken']).then((result: { authToken?: string }) => {
       if (result.authToken) {
         setToken(result.authToken);
+        createUser();
       }
     });
   }, [setToken]);

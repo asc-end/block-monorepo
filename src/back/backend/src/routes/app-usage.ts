@@ -34,7 +34,6 @@ router.post('/hourly', authMiddleware, async (req: AppUsageRequest & { verifiedC
         // Get canonical app name based on platform
         const canonicalAppName = getCanonicalName(appName,  platform )
 
-        console.log("appUsage", appName, timeSpent, platform, hourStart)
         // Upsert the app usage for this hour
         // Use increment to properly accumulate time instead of replacing
         const appUsage = await prisma.appUsage.upsert({
