@@ -6,13 +6,73 @@ declare function defineBackground(fn: () => void): any;
 let websocket: WebSocket | undefined;
 let websocketHeartbeatInterval: any;
 
+// Helper function to make authenticated API calls with automatic token refresh
+const makeAuthenticatedRequest = async (
+  url: string, 
+  options: RequestInit = {},
+  retryCount = 0
+): Promise<Response> => {
+  const storage = await browser.storage.local.get(['authToken']);
+  if (!storage.authToken) {
+    throw new Error('No auth token available');
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      'Authorization': `Bearer ${storage.authToken}`
+    }
+  });
+
+  // If unauthorized and haven't retried yet, try to refresh token
+  if (response.status === 401 && retryCount === 0) {
+    console.log('Token expired, requesting refresh from web app...');
+    
+    // Open web app to refresh token
+    const refreshPromise = new Promise<string>((resolve, reject) => {
+      const messageListener = (message: any, sender: any) => {
+        if (message.type === 'AUTH_TOKEN' && message.token) {
+          browser.runtime.onMessageExternal.removeListener(messageListener);
+          resolve(message.token);
+        }
+      };
+      
+      browser.runtime.onMessageExternal.addListener(messageListener);
+      
+      // Open web app in background tab to trigger token refresh
+      browser.tabs.create({
+        url: `${import.meta.env.WXT_PUBLIC_WEB_URL}?source=extension&extensionId=${browser.runtime.id}&refresh=true`,
+        active: false
+      });
+      
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        browser.runtime.onMessageExternal.removeListener(messageListener);
+        reject(new Error('Token refresh timeout'));
+      }, 10000);
+    });
+
+    try {
+      const newToken = await refreshPromise;
+      await browser.storage.local.set({ authToken: newToken });
+      
+      // Retry the original request with new token
+      return makeAuthenticatedRequest(url, options, retryCount + 1);
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+      throw new Error('Authentication failed');
+    }
+  }
+
+  return response;
+};
+
 const extractUserIdFromToken = async (token: string): Promise<string | null> => {
   try {
-    const response = await fetch(`${import.meta.env.WXT_PUBLIC_API_URL}/users/verify`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
+    const response = await makeAuthenticatedRequest(
+      `${import.meta.env.WXT_PUBLIC_API_URL}/users/verify`
+    );
 
     if (response.ok) {
       const data = await response.json();
@@ -83,29 +143,24 @@ async function syncHourlyUsage() {
       for (const [appName, timeSpent] of Object.entries(apps)) {
         if (timeSpent > 0) {
           
-          const syncPromise = fetch(`${import.meta.env.WXT_PUBLIC_API_URL}/app-usage/hourly`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${storage.authToken}`,
-            },
-            body: JSON.stringify({
-              appName,
-              platform: 'web',
-              timeSpent,
-              hourStart,
-            }),
-          }).then(async (response) => {
+          const syncPromise = makeAuthenticatedRequest(
+            `${import.meta.env.WXT_PUBLIC_API_URL}/app-usage/hourly`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                appName,
+                platform: 'web',
+                timeSpent,
+                hourStart,
+              }),
+            }
+          ).then(async (response) => {
             if (!response.ok) {
               const errorText = await response.text();
               console.error(`Failed to sync ${appName}: ${response.status} - ${errorText}`);
-
-              // If unauthorized, token might be expired
-              if (response.status === 401) {
-                console.error('Token expired - clearing auth');
-                await browser.storage.local.remove(['authToken']);
-                throw new Error('Authentication expired');
-              }
               throw new Error(`HTTP ${response.status}: ${errorText}`);
             } else {
               return { hourStart, appName, timeSpent };
@@ -283,12 +338,10 @@ export default defineBackground(() => {
       }
 
       try {
-        // Replace with your backend URL
         const backendUrl = `${import.meta.env.WXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/focus-session/status`;
-        const response = await fetch(backendUrl, {
+        const response = await makeAuthenticatedRequest(backendUrl, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json'
           }
         });
@@ -300,7 +353,6 @@ export default defineBackground(() => {
         }
 
         const data = await response.json();
-        // Assume backend returns { inFocusSession: boolean }
         sendResponse({ inFocusSession: !!data.inFocusSession });
       } catch (error) {
         console.error('Error checking focus session status from backend:', error);
