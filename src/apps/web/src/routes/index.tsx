@@ -64,7 +64,6 @@ export function App() {
     const sendTokenToExtension = async () => {
       const accessToken = await getAccessToken();
       setToken(accessToken);
-      console.log("accessToken", accessToken)
       const urlParams = new URLSearchParams(window.location.search);
 
       if (accessToken) {
@@ -72,7 +71,6 @@ export function App() {
           createUser(user?.wallet?.address || "");
 
           const extensionId = urlParams.get("extensionId") || "ialoopcgpppijlhebflkpfedjapfmoch";
-          console.log("extensionId", extensionId)
           await sendMessageToExtension(
             { type: "AUTH_TOKEN", token: accessToken, extensionId },
             window
@@ -84,16 +82,16 @@ export function App() {
         } finally {
           console.log("urlParams", urlParams)
           if (urlParams.get("source") === "extension" && !!urlParams.get("extensionId")) {
-            setTimeout(() => { window.close() }, 1000);
+            setTimeout(() => { window.close() }, 3000);
           }
         }
       }
     };
 
-    if (ready && authenticated && user?.wallet?.address) {
+    if (ready && user?.wallet?.address) {
       sendTokenToExtension();
     }
-  }, [ready, authenticated, user]);
+  }, [ready, user]);
 
   // Auto-rotate features
   useEffect(() => {
