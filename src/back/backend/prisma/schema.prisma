@@ -23,6 +23,7 @@ model User {
   focusSessions FocusSession[]
   appUsage      AppUsage[]
   routines      Routine[]
+  task          Task[]
 
   @@map("users")
 }
@@ -126,4 +127,25 @@ model RoutineApp {
 
   @@id([routineId, appId])
   @@map("routine_apps")
+}
+
+enum TaskState {
+  checked
+  unchecked
+  archived
+}
+
+model Task {
+  id            String    @id @default(cuid())
+  userId        String
+  task          String
+  state         TaskState
+  createdAt     DateTime  @default(now())
+  index         Int?
+  tags          String[]
+  scheduledDate DateTime
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("task_lists")
 }
