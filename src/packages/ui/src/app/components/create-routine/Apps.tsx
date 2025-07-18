@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from "react";
 import { useRoutineStore } from '../../../stores/routineStore';
 import { useTheme, Box, Text, Button, Pressable, TextInput, ScrollView, Image } from '@blockit/cross-ui-toolkit';
 import { APP_CATEGORIES } from "../../../constants/apps";
+import { api } from '../../../stores/authStore';
 
 interface AppItem {
+    id?: string;
     packageName: string;
     appName: string;
     iconUri?: string;
@@ -11,6 +13,8 @@ interface AppItem {
     category?: string;
     selected?: boolean;
     usageTime?: number;
+    domains?: string[];
+    isUserSubmitted?: boolean;
 }
 
 interface HistoricalStats {
@@ -70,34 +74,46 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
     const [loadingStats, setLoadingStats] = useState(true);
     const [loadingApps, setLoadingApps] = useState(true);
     const { currentColors } = useTheme();
-    const [installedApps, setInstalledApps] = useState<AppItem[]>(mockInstalledApps);
+    const [installedApps, setInstalledApps] = useState<AppItem[]>([]);
     const { setBlockedApps } = useRoutineStore();
+    const [showUrlInput, setShowUrlInput] = useState(false);
+    const [urlInput, setUrlInput] = useState("");
+    const [nameInput, setNameInput] = useState("");
+    const isWeb = typeof window !== 'undefined' && !('ReactNativeWebView' in window);
 
-    // Fetch installed apps with icons
+    // Fetch apps from database
     useEffect(() => {
-        const loadInstalledApps = async () => {
+        const loadDatabaseApps = async () => {
             try {
                 setLoadingApps(true);
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                // If no apps from props, use the mock data
-                if (!installedApps || installedApps.length === 0) {
-                    const appsWithSelection = mockInstalledApps.map(app => ({
-                        ...app,
-                        selected: blockedApps.some(blockedApp => blockedApp.packageName === app.packageName),
-                    }));
-                    setApps(appsWithSelection);
-                }
+                const response = await api().get('/apps');
+                const dbAppsData = response.data;
+                
+                const formattedApps = dbAppsData.map((app: any) => ({
+                    id: app.id,
+                    packageName: app.androidPackageName || app.iosBundleId || '',
+                    appName: app.name,
+                    iconUri: app.icon,
+                    isBlocked: false,
+                    category: app.category || 'Other',
+                    domains: app.domains || [],
+                    isUserSubmitted: app.isUserSubmitted
+                }));
+                
+                // On mobile, merge with installed apps (TODO: implement native app detection)
+                // For now, just use database apps
+                setInstalledApps(formattedApps);
             } catch (error) {
-                console.error("Error loading installed apps:", error);
+                console.error("Error loading apps from database:", error);
+                // Fallback to mock data
+                setInstalledApps(mockInstalledApps);
             } finally {
                 setLoadingApps(false);
             }
         };
 
-        loadInstalledApps();
-    }, [blockedApps]);
+        loadDatabaseApps();
+    }, []);
 
     // Mock usage stats data
     const mockUsageData: HistoricalStats = {
@@ -222,23 +238,50 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
         [groupedApps]
     );
 
-    const selectAllInCategory = (category: string) => {
-        const appsInCategory = groupedApps?.[category] || [];
-        const allSelected = appsInCategory.every(app => app.selected);
-
-        setApps(prevApps => {
-            return prevApps?.map(app => {
-                const isInCategory = appsInCategory.some(categoryApp => categoryApp.packageName === app.packageName);
-                if (isInCategory) {
-                    return { ...app, selected: !allSelected };
-                }
-                return app;
-            });
-        });
-    };
 
     // Get most used apps (top 6) from filtered apps
     const mostUsedApps = filteredApps?.sort((a, b) => (b.usageTime || 0) - (a.usageTime || 0)).slice(0, 6);
+
+    const handleAddUrl = async () => {
+        if (!urlInput || !nameInput) return;
+        
+        try {
+            // Extract domain from URL
+            let domain = urlInput;
+            try {
+                const url = new URL(urlInput.startsWith('http') ? urlInput : `https://${urlInput}`);
+                domain = url.hostname;
+            } catch (e) {
+                // Use as-is if not a valid URL
+            }
+            
+            const response = await api().post('/apps', {
+                name: nameInput,
+                domain: domain
+            });
+            
+            const newApp = response.data;
+            const formattedApp: AppItem = {
+                id: newApp.id,
+                packageName: domain,
+                appName: newApp.name,
+                iconUri: newApp.icon,
+                isBlocked: false,
+                category: newApp.category || 'Other',
+                domains: newApp.domains || [domain],
+                isUserSubmitted: true,
+                selected: true
+            };
+            
+            setInstalledApps(prev => [...prev, formattedApp]);
+            setApps(prev => prev ? [...prev, formattedApp] : [formattedApp]);
+            setUrlInput('');
+            setNameInput('');
+            setShowUrlInput(false);
+        } catch (error) {
+            console.error('Error adding URL:', error);
+        }
+    };
 
     const handleSave = () => {
         setBlockedApps(apps?.filter(app => app.selected) || []);
@@ -558,6 +601,53 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                     ))}
                 </ScrollView>
             </Box>
+
+            {/* Add URL button for web */}
+            {isWeb && (
+                <Box className="mb-4">
+                    {!showUrlInput ? (
+                        <Button
+                            title="Add Website"
+                            variant="secondary"
+                            onPress={() => setShowUrlInput(true)}
+                        />
+                    ) : (
+                        <Box className="p-4 rounded-lg" style={{ backgroundColor: currentColors.surface.card }}>
+                            <Text variant="h5" className="font-semibold mb-2" style={{ color: currentColors.text.main }}>
+                                Add Website to Block
+                            </Text>
+                            <TextInput
+                                placeholder="Website name (e.g., Facebook)"
+                                value={nameInput}
+                                onChangeText={setNameInput}
+                                className="mb-2"
+                            />
+                            <TextInput
+                                placeholder="URL (e.g., facebook.com)"
+                                value={urlInput}
+                                onChangeText={setUrlInput}
+                                className="mb-3"
+                            />
+                            <Box className="flex-row" style={{ gap: 8 }}>
+                                <Button
+                                    title="Add"
+                                    variant="primary"
+                                    onPress={handleAddUrl}
+                                />
+                                <Button
+                                    title="Cancel"
+                                    variant="secondary"
+                                    onPress={() => {
+                                        setShowUrlInput(false);
+                                        setUrlInput('');
+                                        setNameInput('');
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+                    )}
+                </Box>
+            )}
 
             {/* Save Button */}
             <Box className="p-4 pt-0">

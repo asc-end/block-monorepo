@@ -23,6 +23,7 @@ import FocusSessions from './routes/focus-sessions';
 import AppUsage from './routes/app-usage';
 import Todo from "./routes/todo";
 import Routines from './routes/routines';
+import Apps from './routes/apps';
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use('/focus-session', FocusSessions);
 app.use('/app-usage', AppUsage);
 app.use('/todo', Todo);
 app.use('/routines', Routines);
+app.use('/apps', Apps);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched
