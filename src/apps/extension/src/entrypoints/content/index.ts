@@ -1,7 +1,12 @@
 import { browser, ContentScriptContext } from "wxt/browser";
 
+// Add type declaration for WXT auto-imports
+declare function defineContentScript(config: any): any;
 
-const blockedSites = ['tiktok.com', 'youtube.com', 'twitter.com', 'x.com'];
+
+// Blocked domains will be loaded from storage
+let blockedDomains: string[] = [];
+let activeRoutines: any[] = [];
 
 // Helper to check if current site is blocked
 const isBlockedSite = (hostname: string, sites: string[]): boolean => {
@@ -54,14 +59,31 @@ export default defineContentScript({
     -ms-user-select: none;
     `;
 
-    const content = `
-      <div style="font-size: 4rem; margin-bottom: 1rem;">🚫</div>
-      <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Time to Focus!</h1>
-      <p style="font-size: 1.2rem; max-width: 600px; line-height: 1.6;">
-        This website is blocked during your focus session. Take a deep breath and return to your important tasks.
-      </p>
-      <div style="font-size: 1.5rem; margin-top: 2rem; font-weight: 500;">Focus Session Active</div>
-    `;
+    // Create dynamic content based on whether it's a routine or focus session
+    const getBlockContent = () => {
+      if (activeRoutines.length > 0) {
+        const routineNames = activeRoutines.map(r => r.name).join(', ');
+        return `
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🚫</div>
+          <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Blocked by Routine</h1>
+          <p style="font-size: 1.2rem; max-width: 600px; line-height: 1.6;">
+            This website is blocked during your active routine${activeRoutines.length > 1 ? 's' : ''}: <strong>${routineNames}</strong>
+          </p>
+          <div style="font-size: 1.5rem; margin-top: 2rem; font-weight: 500;">Routine Active</div>
+        `;
+      } else {
+        return `
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🚫</div>
+          <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Time to Focus!</h1>
+          <p style="font-size: 1.2rem; max-width: 600px; line-height: 1.6;">
+            This website is blocked during your focus session. Take a deep breath and return to your important tasks.
+          </p>
+          <div style="font-size: 1.5rem; margin-top: 2rem; font-weight: 500;">Focus Session Active</div>
+        `;
+      }
+    };
+
+    const content = getBlockContent();
 
     overlay.innerHTML = content;
 
@@ -204,29 +226,55 @@ export default defineContentScript({
       e.stopPropagation();
     };
 
+    // Load blocked domains from storage
+    const loadBlockedDomains = async () => {
+      try {
+        const storage = browser?.storage?.local;
+        if (!storage) return;
+        
+        const result = await storage.get(['blockedDomains', 'activeRoutines']);
+        if (result.blockedDomains) {
+          blockedDomains = result.blockedDomains;
+        }
+        if (result.activeRoutines) {
+          activeRoutines = result.activeRoutines;
+        }
+      } catch (error) {
+        console.error('Error loading blocked domains:', error);
+      }
+    };
+
     // Function to check and apply blocking
     const checkAndApplyBlocking = async () => {
       try {
         const storage = browser?.storage?.local;
         if (!storage) return;
 
+        // Load blocked domains first
+        await loadBlockedDomains();
+
         const result = await storage.get(['currentFocusSession', 'authToken']);
         const { currentFocusSession, authToken } = result;
 
-        // Only check for focus sessions if user is authenticated
+        // Only check for blocking if user is authenticated
         if (!authToken) {
           unblockPage();
           return;
         }
 
-        if (currentFocusSession && blockedSites) {
-          const currentHostname = window.location.hostname;
-
-          if (isBlockedSite(currentHostname, blockedSites)) {
-            blockPage();
-          } else {
-            unblockPage();
-          }
+        const currentHostname = window.location.hostname;
+        
+        // Check if blocked by routine
+        const isBlockedByRoutine = blockedDomains.length > 0 && isBlockedSite(currentHostname, blockedDomains);
+        
+        // Check if blocked by focus session (using hardcoded sites for now)
+        const focusBlockedSites = ['tiktok.com', 'youtube.com', 'twitter.com', 'x.com'];
+        const isBlockedByFocusSession = currentFocusSession && isBlockedSite(currentHostname, focusBlockedSites);
+        
+        if (isBlockedByRoutine || isBlockedByFocusSession) {
+          // Update content if needed
+          overlay.innerHTML = getBlockContent();
+          blockPage();
         } else {
           unblockPage();
         }
@@ -248,12 +296,17 @@ export default defineContentScript({
           checkAndApplyBlocking();
         }
         else if (message.action == "STOP_FOCUS_SESSION") {
-          if (isBlockedSite(currentHostname, blockedSites))
-            unblockPage();
+          checkAndApplyBlocking();
         }
         else if (message.action == "BEGIN_FOCUS_SESSION") {
-          if (isBlockedSite(currentHostname, blockedSites))
-            blockPage();
+          checkAndApplyBlocking();
+        }
+        else if (message.action == "UPDATE_BLOCKED_DOMAINS") {
+          // Update blocked domains from routine changes
+          if (message.blockedDomains) {
+            blockedDomains = message.blockedDomains;
+          }
+          checkAndApplyBlocking();
         }
       });
     }

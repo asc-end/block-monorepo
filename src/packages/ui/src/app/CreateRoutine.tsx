@@ -4,6 +4,7 @@ import { ChevronIcon } from './icons/ChevronIcon';
 import { EmojiPicker } from './components/EmojiPicker';
 import { useRoutineStore } from '../stores/routineStore';
 import { Box, Text, Button, Pressable, Drawer, useTheme, TextInput } from '@blockit/cross-ui-toolkit';
+import { api } from '../stores/authStore';
 
 function CardRow({ label, value, onPress }: { label: string; value: string; onPress?: () => void }) {
     const isNotSet = value === 'Not set';
@@ -38,14 +39,57 @@ export function CreateRoutine(props: CreateRoutineProps) {
     const { onBack, onApps, onRoutineTime, onCalendar, onMoney } = props;
     const [routineName, setRoutineName] = useState("New Routine");
     const [routineEmoji, setRoutineEmoji] = useState("🚀");
+    const [isCreating, setIsCreating] = useState(false);
 
 
-    const { endDate, blockedApps, stakeAmount, timeSettings } = useRoutineStore();
+    const { endDate, blockedApps, stakeAmount, timeSettings, resetRoutineState } = useRoutineStore();
 
-    const handleCreateRoutine = () => {
-        if (!routineName.trim()) return;
-        // TODO: Create routine
-        onBack();
+    const handleCreateRoutine = async () => {
+        if (!routineName.trim() || isCreating) return;
+        
+        try {
+            setIsCreating(true);
+            
+            const routineData = {
+                name: routineName,
+                emoji: routineEmoji,
+                timeMode: timeSettings.timeMode,
+                selectedDays: timeSettings.selectedDays,
+                startTime: timeSettings.timeMode === 'blocking' ? timeSettings.startTime : undefined,
+                endTime: timeSettings.timeMode === 'blocking' ? timeSettings.endTime : undefined,
+                dailyLimit: timeSettings.timeMode === 'limit' ? timeSettings.duration : undefined,
+                endDate: endDate?.toISOString(),
+                stakeAmount,
+                blockedApps: blockedApps.map(app => ({
+                    packageName: app.packageName,
+                    appName: app.appName,
+                    icon: app.icon
+                }))
+            };
+            console.log("routineData", routineData)
+            await api().post('/routines', routineData);
+            console.log("routine created")
+            
+            // Reset the routine store state
+            resetRoutineState();
+            
+            // Reset local state
+            setRoutineName("New Routine");
+            setRoutineEmoji("🚀");
+            
+            // Small delay to ensure the request completes before navigation
+            setTimeout(() => {
+                onBack();
+            }, 100);
+        } catch (error: any) {
+            console.error('Failed to create routine:', error);
+            if (error.response?.data?.error) {
+                console.error('Server error:', error.response.data.error);
+            }
+            // TODO: Show error message to user
+        } finally {
+            setIsCreating(false);
+        }
     };
 
     const formatEndDate = (date: Date | null) => {
@@ -108,10 +152,11 @@ export function CreateRoutine(props: CreateRoutineProps) {
             {/* Start Button */}
             <Box style={{ padding: 16 }}>
                 <Button
-                    title='Start'
+                    title={isCreating ? 'Creating...' : 'Start'}
                     variant="primary"
                     onPress={handleCreateRoutine}
-                    leftIcon={<PlayIcon size={18} color="white" />}
+                    leftIcon={!isCreating ? <PlayIcon size={18} color="white" /> : undefined}
+                    disabled={isCreating}
                 />
             </Box>
 

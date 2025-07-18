@@ -4,8 +4,8 @@ import { useBrowserMessages } from './hooks/useBrowserMessages';
 import { Box, Button, Text, useTheme } from '@blockit/cross-ui-toolkit';
 import { browser } from 'wxt/browser';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { HomeScreen, StatsScreen, CreateRoutineScreen, AppsScreen, TimeScreen, CalendarScreen, MoneyScreen } from './routes';
-import { useAuth, getApiUrl, useUserCreation } from '@blockit/ui';
+import { HomeScreen, StatsScreen, ViewRoutineScreen, CreateRoutineScreen, AppsScreen, TimeScreen, CalendarScreen, MoneyScreen } from './routes';
+import { useAuth, getApiUrl } from '@blockit/ui';
 import { BackHeader } from './components/BackHeader';
 
 const router = createHashRouter([
@@ -20,6 +20,10 @@ const router = createHashRouter([
         <BackHeader />
         <StatsScreen />
       </Fragment>
+  },
+  {
+    path: "/routine/:routineId",
+    element: <ViewRoutineScreen />
   },
   {
     path: "/create-routine",
@@ -89,13 +93,11 @@ export const App = () => {
   };
 
 
-
   // Load token from browser storage on mount
   useEffect(() => {
     browser.storage.local.get(['authToken']).then((result: { authToken?: string }) => {
       if (result.authToken) {
         setToken(result.authToken);
-        createUser();
       }
     });
   }, [setToken]);

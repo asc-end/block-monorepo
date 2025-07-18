@@ -1,7 +1,10 @@
 import AppBlockerModule from 'expo-app-blocker';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Platform, Alert, AppState } from 'react-native';
+import { usePrivyClient } from '@privy-io/expo';
+import type { Routine } from '@blockit/shared';
+import { RoutineBlockingService, configStore } from '@blockit/ui';
 
 interface InstalledApp {
     packageName: string; // or bundleId for iOS
@@ -37,6 +40,8 @@ const AppBlockerContext = createContext<AppBlockerContextType | null>(null);
 
 export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [installedApps, setInstalledApps] = useState<InstalledApp[]>([]);
+    const [routines, setRoutines] = useState<Routine[]>([]);
+    const [routineBlockedApps, setRoutineBlockedApps] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [hasPermissions, setHasPermissions] = useState(false);
     const [isUsageTrackingEnabled, setIsUsageTrackingEnabled] = useState(false);
@@ -55,6 +60,59 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         installEvents: [],
         lastInstallTime: 0
     });
+    
+    const privyClient = usePrivyClient();
+    const routineBlockingServiceRef = useRef<RoutineBlockingService | null>(null);
+
+    // Get auth token for routine service
+    const getAuthToken = async (): Promise<string | null> => {
+        if (!privyClient) return null;
+        try {
+            return await privyClient.getAccessToken();
+        } catch (error) {
+            console.error('Failed to get auth token:', error);
+            return null;
+        }
+    };
+
+    // Update native blocker with blocked apps
+    const updateNativeBlocker = async (blockedPackageNames: string[]) => {
+        if (Platform.OS === 'android' && hasPermissions) {
+            try {
+                // Combine manual blocks with routine blocks
+                const manuallyBlockedApps = installedApps
+                    .filter(app => app.isBlocked)
+                    .map(app => app.packageName);
+                
+                const allBlockedApps = [...new Set([...manuallyBlockedApps, ...blockedPackageNames])];
+                await AppBlockerModule.blockApps(allBlockedApps);
+            } catch (error) {
+                console.error('Failed to update blocked apps:', error);
+            }
+        }
+    };
+
+    // Initialize routine blocking service
+    const initializeRoutineBlocking = () => {
+        if (routineBlockingServiceRef.current) {
+            routineBlockingServiceRef.current.stop();
+        }
+
+        routineBlockingServiceRef.current = new RoutineBlockingService({
+            apiUrl: configStore.config?.apiUrl || 'http://localhost:3001',
+            getAuthToken,
+            onRoutinesUpdate: (newRoutines) => {
+                setRoutines(newRoutines);
+            },
+            onBlockedItemsUpdate: (items) => {
+                const blockedPackageNames = items.packageNames || [];
+                setRoutineBlockedApps(blockedPackageNames);
+                updateNativeBlocker(blockedPackageNames);
+            }
+        });
+
+        routineBlockingServiceRef.current.start();
+    };
 
     useEffect(() => {
         checkPermissionsAndLoadApps();
@@ -70,6 +128,9 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
         return () => {
             subscription?.remove();
+            if (routineBlockingServiceRef.current) {
+                routineBlockingServiceRef.current.stop();
+            }
         };
     }, []);
 
@@ -79,6 +140,13 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             startAppBlockingService();
         }
     }, [hasPermissions]);
+
+    // Start routine checking when we have auth
+    useEffect(() => {
+        if (privyClient) {
+            initializeRoutineBlocking();
+        }
+    }, [privyClient]);
 
     const checkPermissionsOnly = async () => {
         try {
@@ -189,13 +257,16 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
             // Platform-specific implementation
             if (Platform.OS === 'android') {
-                // Get all currently blocked apps
-                const blockedApps = installedApps
+                // Get all currently blocked apps (manual + routines)
+                const manuallyBlockedApps = installedApps
                     .filter(a => a.isBlocked || a.packageName === updatedApp.packageName && updatedApp.isBlocked)
                     .map(a => a.packageName);
 
+                // Combine with routine-blocked apps
+                const allBlockedApps = [...new Set([...manuallyBlockedApps, ...routineBlockedApps])];
+
                 // Send the updated list to the native module
-                await AppBlockerModule.blockApps(blockedApps);
+                await AppBlockerModule.blockApps(allBlockedApps);
             } else {
                 // iOS implementation would go here
             }

@@ -1,5 +1,7 @@
 import { RoutineApps } from "@blockit/ui";
+import { useNavigate } from "react-router-dom";
 
 export function AppsScreen() {
-    return <RoutineApps />;
+    const navigate = useNavigate();
+    return <RoutineApps onBack={() => navigate(-1)} />;
 }

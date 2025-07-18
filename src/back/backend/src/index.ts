@@ -17,11 +17,12 @@ import { IncomingMessage } from 'http';
 import cors from 'cors';
 import { wsManager } from './services/init';
 import { prisma } from './config';
+import { handleSaveTasks } from './services/todoHandlers';
 import Users from './routes/users';
 import FocusSessions from './routes/focus-sessions';
 import AppUsage from './routes/app-usage';
 import Todo from "./routes/todo";
-import { handleSaveTasks } from './services/todoHandlers';
+import Routines from './routes/routines';
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.use('/users', Users);
 app.use('/focus-session', FocusSessions);
 app.use('/app-usage', AppUsage);
 app.use('/todo', Todo);
+app.use('/routines', Routines);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched

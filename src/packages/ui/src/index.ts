@@ -6,12 +6,15 @@ export * from './lib/time';
 export * from './lib/users';
 export * from './app/icons';
 export * from './lib/config';
+export * from './lib/routine';
+export * from './lib/routineBlocking';
 
 // App components
 export * from './app/Home';
 export * from './app/Login';
 export * from './app/Stats';
 export * from './app/CreateRoutine';
+export * from './app/ViewRoutine';
 export * from './app/components/create-routine/Apps';
 export * from './app/components/create-routine/Time';
 export * from './app/components/create-routine/Calendar';

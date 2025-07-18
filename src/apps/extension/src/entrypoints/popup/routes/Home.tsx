@@ -13,7 +13,10 @@ export function HomeScreen() {
           <Link to="/stats" className="hover:opacity-70" style={{ color: currentColors.text.main }}>Stats</Link>
         </nav>
       </header>
-      <Home onCreateRoutine={() => navigate('/create-routine')} />
+      <Home 
+        onCreateRoutine={() => navigate('/create-routine')} 
+        onViewRoutine={(routineId) => navigate(`/routine/${routineId}`)}
+      />
     </div>
   )
 }

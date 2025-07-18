@@ -4,6 +4,7 @@ import { formatTime } from "../lib/time";
 import { ChevronIcon } from "./icons/ChevronIcon";
 import { useTheme, Box, Text, Pressable, ScrollView } from "@blockit/cross-ui-toolkit";
 import { useAppUsage } from "../hooks/useAppUsage";
+import { StatsSummary } from "./components/stats/StatsSummary";
 
 export type TimeRange = 'today' | 'week' | 'month';
 
@@ -174,6 +175,9 @@ export function Stats({ onDayChange }: StatsProps = {}) {
         style={{ flex: 1 }}
       >
         <Box className="p-4">
+          {/* Stats Summary at the top */}
+          <StatsSummary />
+
           {/* Show error if there's one, but don't block the calendar */}
           {appUsageError && (
             <Box className="mb-4 p-3 rounded-lg" style={{

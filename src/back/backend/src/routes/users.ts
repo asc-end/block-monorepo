@@ -102,4 +102,73 @@ router.put('/profile', authMiddleware, async (req: Request & { verifiedClaims?: 
   }
 });
 
+/**
+ * GET /users/stats
+ * Get user statistics for routines and focus sessions
+ */
+router.get('/stats', authMiddleware, async (req: Request & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
+  try {
+    const userId = req.verifiedClaims?.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Get routine statistics
+    const routineStats = await prisma.routine.groupBy({
+      by: ['status'],
+      where: { userId },
+      _count: true
+    });
+
+    const routinesCompleted = routineStats.find(s => s.status === 'completed')?._count || 0;
+    const routinesCanceled = routineStats.find(s => s.status === 'canceled')?._count || 0;
+
+    // Get focus session statistics
+    const focusSessionStats = await prisma.focusSession.groupBy({
+      by: ['status'],
+      where: { userId },
+      _count: true
+    });
+
+    const focusSessionsCompleted = focusSessionStats.find(s => s.status === 'finished')?._count || 0;
+    const focusSessionsCanceled = focusSessionStats.find(s => s.status === 'canceled')?._count || 0;
+
+    // Calculate total staked amount
+    const totalStakedResult = await prisma.routine.aggregate({
+      where: { userId },
+      _sum: {
+        stakeAmount: true
+      }
+    });
+    const totalStaked = totalStakedResult._sum.stakeAmount || 0;
+
+    // Calculate total lost (from canceled routines with stakes)
+    const totalLostResult = await prisma.routine.aggregate({
+      where: { 
+        userId,
+        status: 'canceled',
+        stakeAmount: {
+          gt: 0
+        }
+      },
+      _sum: {
+        stakeAmount: true
+      }
+    });
+    const totalLost = totalLostResult._sum.stakeAmount || 0;
+
+    res.json({
+      routinesCompleted,
+      routinesCanceled,
+      focusSessionsCompleted,
+      focusSessionsCanceled,
+      totalStaked,
+      totalLost
+    });
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({ error: 'Failed to fetch user statistics' });
+  }
+});
+
 export default router;

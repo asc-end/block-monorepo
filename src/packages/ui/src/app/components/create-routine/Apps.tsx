@@ -57,7 +57,11 @@ const mockInstalledApps: AppItem[] = [
     { packageName: 'com.android.settings', appName: 'Settings', iconUri: undefined, isBlocked: false },
 ];
 
-export function RoutineApps() {
+interface RoutineAppsProps {
+    onBack: () => void;
+}
+
+export function RoutineApps({ onBack }: RoutineAppsProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [apps, setApps] = useState<AppItem[]>()
@@ -235,6 +239,11 @@ export function RoutineApps() {
 
     // Get most used apps (top 6) from filtered apps
     const mostUsedApps = filteredApps?.sort((a, b) => (b.usageTime || 0) - (a.usageTime || 0)).slice(0, 6);
+
+    const handleSave = () => {
+        setBlockedApps(apps?.filter(app => app.selected) || []);
+        onBack();
+    };
 
     // Show skeleton while loading
     if (loadingApps || loadingStats) {
@@ -555,7 +564,7 @@ export function RoutineApps() {
                 <Button
                     title='Save'
                     variant="primary"
-                    onPress={() => setBlockedApps(apps?.filter(app => app.selected) || [])}
+                    onPress={handleSave}
                 />
             </Box>
         </Box>

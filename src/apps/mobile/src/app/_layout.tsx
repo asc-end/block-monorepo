@@ -156,7 +156,15 @@ function AppContent() {
             headerTitle: "Routine Time",
           }}
         />
+        <Stack.Screen
+          name="routine"
+          options={{
+            headerShown: true,
+            headerTitle: "Routine",
+          }}
+        />
       </Stack>
+      
     </>
   );
 }

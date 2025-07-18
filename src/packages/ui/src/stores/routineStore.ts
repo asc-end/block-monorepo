@@ -26,6 +26,15 @@ export type RoutineState = {
     timeSettings: TimeSettings;
     setTimeSettings: (settings: TimeSettings) => void;
     setTimeMode: (mode: TimeMode) => void;
+    resetRoutineState: () => void;
+};
+
+const initialTimeSettings: TimeSettings = {
+    selectedDays: [],
+    startTime: "09:00",
+    endTime: "17:00",
+    timeMode: 'blocking',
+    duration: 60
 };
 
 export const useRoutineStore = create<RoutineState>((set) => ({
@@ -35,15 +44,15 @@ export const useRoutineStore = create<RoutineState>((set) => ({
     setEndDate: (date) => set({ endDate: date }),
     stakeAmount: 0,
     setStakeAmount: (amount) => set({ stakeAmount: amount }),
-    timeSettings: {
-        selectedDays: [],
-        startTime: "09:00",
-        endTime: "17:00",
-        timeMode: 'blocking',
-        duration: 60
-    },
+    timeSettings: initialTimeSettings,
     setTimeSettings: (settings) => set({ timeSettings: settings }),
     setTimeMode: (mode: TimeMode) => set((state) => ({
         timeSettings: { ...state.timeSettings, timeMode: mode }
     })),
+    resetRoutineState: () => set({
+        blockedApps: [],
+        endDate: null,
+        stakeAmount: 0,
+        timeSettings: initialTimeSettings
+    }),
 })); 

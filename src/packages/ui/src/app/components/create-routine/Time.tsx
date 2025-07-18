@@ -4,6 +4,7 @@ import { ClockIcon } from '../../icons/ClockIcon';
 import { TimerIcon } from '../../icons/TimerIcon';
 import { TimeSettings, useRoutineStore } from '../../../stores/routineStore';
 import { HourSelector } from './HourSelector';
+import { TimeRangePicker } from './TimeRangePicker';
 
 const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
@@ -253,6 +254,7 @@ export function RoutineTime({ onBack }: TimeSettingsProps) {
         selectedDays: [],
     });
     const [localSelectedHours, setLocalSelectedHours] = useState<number[]>([]);
+    const [useHourSelector, setUseHourSelector] = useState(false); // Toggle for backup hour selector
     const { setTimeSettings } = useRoutineStore();
 
     const handleSave = () => {
@@ -293,27 +295,50 @@ export function RoutineTime({ onBack }: TimeSettingsProps) {
 
                 {localTimeSettings.timeMode === 'blocking' ? (
                     <>
-                        <Box className='flex flex-row items-start mt-1' style={{ gap: 4 }}>
-                            <Text variant="caption" style={{ color: currentColors.text.soft }}>
-                                Block apps during specific hours
-                            </Text>
-                            <Box className='flex-1 flex flex-row justify-end'>
-                                <Pressable
-                                    onPress={() => setLocalSelectedHours([])}
-                                    className="text-xs"
-                                    style={{ alignItems: 'flex-end' }}
-                                >
-                                    <Text variant="caption" className='text-end' style={{ color: currentColors.secondary[500], fontSize: 11 }}>
-                                        Reset Selection
+                        {/* Time Range Picker - Primary UI */}
+                        {!useHourSelector ? (
+                            <TimeRangePicker
+                                startTime={localTimeSettings.startTime}
+                                endTime={localTimeSettings.endTime}
+                                onStartTimeChange={(time) => {
+                                    setLocalTimeSettings(prev => ({
+                                        ...prev,
+                                        startTime: time
+                                    }));
+                                }}
+                                onEndTimeChange={(time) => {
+                                    setLocalTimeSettings(prev => ({
+                                        ...prev,
+                                        endTime: time
+                                    }));
+                                }}
+                            />
+                        ) : (
+                            /* Hour Selector - Backup UI (commented out by default) */
+                            <>
+                                <Box className='flex flex-row items-start mt-1' style={{ gap: 4 }}>
+                                    <Text variant="caption" style={{ color: currentColors.text.soft }}>
+                                        Block apps during specific hours
                                     </Text>
-                                </Pressable>
-                            </Box>
-                        </Box>
-                        <HourSelector
-                            selectedHours={localSelectedHours}
-                            onHoursChange={setLocalSelectedHours}
-                            currentColors={currentColors}
-                        />
+                                    <Box className='flex-1 flex flex-row justify-end'>
+                                        <Pressable
+                                            onPress={() => setLocalSelectedHours([])}
+                                            className="text-xs"
+                                            style={{ alignItems: 'flex-end' }}
+                                        >
+                                            <Text variant="caption" className='text-end' style={{ color: currentColors.secondary[500], fontSize: 11 }}>
+                                                Reset Selection
+                                            </Text>
+                                        </Pressable>
+                                    </Box>
+                                </Box>
+                                <HourSelector
+                                    selectedHours={localSelectedHours}
+                                    onHoursChange={setLocalSelectedHours}
+                                    currentColors={currentColors}
+                                />
+                            </>
+                        )}
                     </>
                 ) : (
                     <TimeLimitSelection

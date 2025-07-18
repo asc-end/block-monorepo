@@ -1,4 +1,5 @@
 import { browser } from "wxt/browser";
+import { RoutineBlockingService } from '@blockit/ui';
 
 // Add type declaration for WXT auto-imports
 declare function defineBackground(fn: () => void): any;
@@ -27,7 +28,6 @@ const makeAuthenticatedRequest = async (
 
   // If unauthorized and haven't retried yet, try to refresh token
   if (response.status === 401 && retryCount === 0) {
-    console.log('Token expired, requesting refresh from web app...');
     
     // Open web app to refresh token
     const refreshPromise = new Promise<string>((resolve, reject) => {
@@ -60,7 +60,6 @@ const makeAuthenticatedRequest = async (
       // Retry the original request with new token
       return makeAuthenticatedRequest(url, options, retryCount + 1);
     } catch (error) {
-      console.error('Failed to refresh token:', error);
       throw new Error('Authentication failed');
     }
   }
@@ -79,7 +78,6 @@ const extractUserIdFromToken = async (token: string): Promise<string | null> => 
       return data.userId;
     }
   } catch (error) {
-    console.error('Error extracting userId from token:', error);
   }
   return null;
 };
@@ -109,6 +107,9 @@ let lastSyncTime = Date.now();
 const SYNC_INTERVAL = 2 * 60 * 1000;
 // Debounce sync requests to prevent duplicate syncs
 let syncDebounceTimeout: any = null;
+
+// Routine blocking service instance
+let routineBlockingService: RoutineBlockingService | null = null;
 // Function to get hour key in UTC
 function getHourKey(timestamp: number): string {
   const date = new Date(timestamp);
@@ -160,7 +161,6 @@ async function syncHourlyUsage() {
           ).then(async (response) => {
             if (!response.ok) {
               const errorText = await response.text();
-              console.error(`Failed to sync ${appName}: ${response.status} - ${errorText}`);
               throw new Error(`HTTP ${response.status}: ${errorText}`);
             } else {
               return { hourStart, appName, timeSpent };
@@ -202,10 +202,68 @@ async function syncHourlyUsage() {
     }
     
   } catch (error) {
-    console.error('❌ Failed to sync hourly usage:', error);
     // Save current usage to storage for persistence in case of crashes
     await browser.storage.local.set({ pendingHourlyUsage: hourlyUsage });
   }
+}
+
+// Get auth token for routine service
+async function getAuthToken(): Promise<string | null> {
+  const storage = await browser.storage.local.get(['authToken']);
+  return storage.authToken || null;
+}
+
+// Notify all tabs about updated blocked domains
+async function notifyTabsAboutBlockedDomains(blockedDomains: string[]) {
+  const tabs = await browser.tabs.query({});
+  for (const tab of tabs) {
+    if (tab.id && tab.url) {
+      // Skip protected pages
+      if (tab.url.startsWith('chrome://') || 
+          tab.url.startsWith('chrome-extension://') ||
+          tab.url.startsWith('edge://') ||
+          tab.url.startsWith('about:')) {
+        continue;
+      }
+      
+      try {
+        await browser.tabs.sendMessage(tab.id, { 
+          action: 'UPDATE_BLOCKED_DOMAINS',
+          blockedDomains: blockedDomains
+        });
+      } catch (error) {
+        // Content script might not be loaded
+      }
+    }
+  }
+}
+
+// Initialize routine blocking service
+function initializeRoutineBlocking() {
+  if (routineBlockingService) {
+    routineBlockingService.stop();
+  }
+  
+  const apiUrl = import.meta.env.WXT_PUBLIC_API_URL || 'http://localhost:3001';
+  
+  routineBlockingService = new RoutineBlockingService({
+    apiUrl,
+    getAuthToken,
+    onRoutinesUpdate: (routines) => {
+      // Store active routines for content script
+      const activeRoutines = routineBlockingService?.getActiveRoutines() || [];
+      browser.storage.local.set({ activeRoutines });
+    },
+    onBlockedItemsUpdate: (items) => {
+      // Store blocked domains and notify tabs
+      browser.storage.local.set({ 
+        blockedDomains: items.domains || []
+      });
+      notifyTabsAboutBlockedDomains(items.domains || []);
+    }
+  });
+  
+  routineBlockingService.start();
 }
 
 
@@ -213,13 +271,15 @@ async function makeWebsocket() {
   const storage = await browser.storage.local.get(['authToken']);
   const token = storage.authToken;
 
-
   if (!token) {
     return;
   }
 
   const id = await extractUserIdFromToken(token)
-  websocket = new WebSocket(`${import.meta.env.WXT_PUBLIC_WS_URL}/api/ws?userId=${id}`)
+  
+  const wsUrl = `${import.meta.env.WXT_PUBLIC_WS_URL}/api/ws?userId=${id}`;
+  
+  websocket = new WebSocket(wsUrl);
   makeListeners()
 }
 
@@ -261,23 +321,12 @@ function makeListeners() {
               // First try to send the message
               await browser.tabs.sendMessage(tab.id, { action });
             } catch (error) {
-              try {
-                // Inject the content script if it's not already loaded
-                await browser.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  files: ['content-scripts/content.js']
-                });
-                // Try sending the message again
-                await browser.tabs.sendMessage(tab.id, { action });
-              } catch (injectError) {
-                console.error(`❌ Failed to inject script or send ${action} to tab ${tab.id} (${tab.url}):`, injectError);
-              }
+              // Content script might not be loaded
             }
           }
         }
       }
     } catch (e) {
-      console.error('Failed to handle websocket message:', e);
     }
   }
 
@@ -292,6 +341,10 @@ export default defineBackground(() => {
 
   // Check initial auth status on startup
   browser.storage.local.get(['authToken']).then((result) => {
+    if (result.authToken) {
+      // Start routine checking if authenticated
+      initializeRoutineBlocking();
+    }
   });
 
   // Content scripts are handled by manifest.json registration
@@ -318,6 +371,9 @@ export default defineBackground(() => {
         sendResponse({ success: true });
 
         await browser.runtime.sendMessage({ type: "AUTH_TOKEN_RECEIVED", token: message.token });
+        
+        // Start routine checking when authenticated
+        initializeRoutineBlocking();
 
       } catch (error) {
         sendResponse({ success: false, error: (error as Error).message });
@@ -347,7 +403,6 @@ export default defineBackground(() => {
         });
 
         if (!response.ok) {
-          console.error('Failed to fetch focus session status from backend:', response.statusText);
           sendResponse({ inFocusSession: false, error: response.statusText });
           return true;
         }
@@ -355,7 +410,6 @@ export default defineBackground(() => {
         const data = await response.json();
         sendResponse({ inFocusSession: !!data.inFocusSession });
       } catch (error) {
-        console.error('Error checking focus session status from backend:', error);
         sendResponse({ inFocusSession: false, error: (error as Error).message });
       }
       return true; // Keep the message channel open
