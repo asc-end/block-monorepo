@@ -16,9 +16,12 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { IncomingMessage } from 'http';
 import cors from 'cors';
 import { wsManager } from './services/init';
+import { prisma } from './config';
 import Users from './routes/users';
 import FocusSessions from './routes/focus-sessions';
 import AppUsage from './routes/app-usage';
+import Todo from "./routes/todo";
+import { handleSaveTasks } from './services/todoHandlers';
 
 const app = express();
 
@@ -30,10 +33,33 @@ const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
   const url = new URL(req.url!, `http://${req.headers.host}`);
-  const userId = url.searchParams.get('userId');
 
-  if (userId) return wsManager.addUserConnection(userId, ws);
-  ws.close(1008, 'Invalid or missing userId');
+  const userId = url.searchParams.get('userId');
+  if (!userId) return ws.close(1008, 'Invalid or missing userId');
+
+  wsManager.addUserConnection(userId, ws);
+
+  // Handle incoming messages
+  //TO DO add auth middleware
+  ws.on('message', async (data: Buffer) => {
+    const timestamp = new Date().toISOString();
+    const rawMessage = data.toString();
+    
+    try {
+      const message = JSON.parse(rawMessage);
+
+      switch (message.type) {
+        case 'saveTasks':
+          await handleSaveTasks(userId, message.payload);
+          break;
+      }
+    } catch (error) {
+      console.error(`[${timestamp}] Error handling WebSocket message from user ${userId}:`, {
+        error: error instanceof Error ? error.message : String(error),
+        rawMessage: rawMessage.substring(0, 200) + (rawMessage.length > 200 ? '...' : '')
+      });
+    }
+  });
 });
 
 
@@ -41,6 +67,7 @@ wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
 app.use('/users', Users);
 app.use('/focus-session', FocusSessions);
 app.use('/app-usage', AppUsage);
+app.use('/todo', Todo);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched
