@@ -127,3 +127,8 @@ temp/
 # Native directories (only top-level)
 /android/
 /ios/
+
+# Anchor/Solana artifacts
+target/
+.anchor/
+/Cargo.lock

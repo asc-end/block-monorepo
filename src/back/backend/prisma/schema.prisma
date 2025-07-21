@@ -24,6 +24,7 @@ model User {
   appUsage      AppUsage[]
   routines      Routine[]
   task          Task[]
+  commitments   Commitment[]
 
   @@map("users")
 }
@@ -35,6 +36,7 @@ model FocusSession {
   duration  Int
   status    FocusSessionStatus
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commitments Commitment[]
 
   @@index([userId])
   @@index([startTime])
@@ -76,6 +78,12 @@ enum RoutineStatus {
   canceled
 }
 
+enum CommitmentStatus {
+  active
+  claimed
+  forfeited
+}
+
 model Routine {
   id             String         @id @default(cuid())
   userId         String
@@ -93,6 +101,7 @@ model Routine {
   updatedAt      DateTime       @updatedAt
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   blockedApps    RoutineApp[]
+  commitments    Commitment[]
 
   @@index([userId])
   @@index([status])
@@ -148,4 +157,34 @@ model Task {
 
   @@index([userId])
   @@map("task_lists")
+}
+
+model Commitment {
+  id              String           @id // Commitment PDA as string
+  userId          String
+  userPubkey      String
+  amount          BigInt
+  unlockTime      DateTime
+  createdAt       DateTime
+  authorityPubkey String
+  status          CommitmentStatus @default(active)
+  claimedAt       DateTime?
+  forfeitedAt     DateTime?
+  txSignature     String?
+  
+  // Optional relationships
+  routineId       String?
+  focusSessionId  String?
+  
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routine         Routine?         @relation(fields: [routineId], references: [id], onDelete: SetNull)
+  focusSession    FocusSession?    @relation(fields: [focusSessionId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([status])
+  @@index([unlockTime])
+  @@index([routineId])
+  @@index([focusSessionId])
+  @@map("commitments")
 }

@@ -2,6 +2,7 @@ packages:
   - 'src/apps/*'
   - 'src/packages/*'
   - 'src/back/*'
+  - 'src/back/programs/*'
 catalogs:
   prisma:
     prisma: latest
