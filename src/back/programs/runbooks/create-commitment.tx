@@ -1,0 +1,105 @@
+addon "svm" {
+    rpc_api_url = input.rpc_api_url
+    network_id = input.network_id
+}
+
+signer "user" "svm::secret_key" {
+    keypair_json = input.payer_keypair_json
+}
+
+variable "program" {
+    description = "The escrow program to invoke."
+    value = svm::get_program_from_anchor_project("escrow")
+}
+
+variable "amount" {
+    description = "The amount of SOL (in lamports) to lock in the commitment. Default is 0.1 SOL"
+    value = 100000000
+    editable = true
+}
+
+variable "unlock_duration" {
+    description = "Duration in seconds from now until the commitment can be claimed. Default is 24 hours (86400 seconds)"
+    value = 86400
+    editable = true
+}
+
+variable "authority" {
+    description = "The public key that has permission to forfeit this commitment if conditions are not met"
+    value = "11111111111111111111111111111111"
+    editable = true
+}
+
+variable "current_timestamp" {
+    description = "The current Unix timestamp"
+    value = svm::get_current_slot_timestamp()
+}
+
+variable "unlock_time" {
+    description = "The Unix timestamp when the commitment can be claimed"
+    value = variable.current_timestamp + variable.unlock_duration
+}
+
+variable "commitment_pda" {
+    description = "The PDA for the commitment account"
+    value = svm::find_program_address(variable.program.program_id, [
+        "commitment",
+        signer.user.public_key,
+        svm::encode_le_u64(variable.current_timestamp),
+        svm::encode_le_u64(variable.unlock_time)
+    ])
+}
+
+variable "event_authority_pda" {
+    description = "The PDA for the event authority"
+    value = svm::find_program_address(variable.program.program_id, ["__event_authority"])
+}
+
+action "create_commitment" "svm::process_instructions" {
+    signers = [signer.user]
+    instruction {
+        program_idl = variable.program.idl
+        instruction_name = "create_commitment"
+        instruction_args = [
+            variable.amount,
+            variable.unlock_time,
+            variable.authority,
+            variable.current_timestamp
+        ]
+        commitment {
+            public_key = variable.commitment_pda.address
+        }
+        user {
+            public_key = signer.user.public_key
+        }
+        system_program {
+            public_key = "11111111111111111111111111111111"
+        }
+        event_authority {
+            public_key = variable.event_authority_pda.address
+        }
+        program {
+            public_key = variable.program.program_id
+        }
+    }
+}
+
+output "signature" {
+    description = "The signature of the create commitment transaction"
+    value = action.create_commitment.signature
+}
+
+output "commitment_address" {
+    description = "The address of the created commitment PDA"
+    value = variable.commitment_pda.address
+}
+
+output "unlock_time" {
+    description = "The Unix timestamp when this commitment can be claimed"
+    value = variable.unlock_time
+}
+
+output "amount_locked" {
+    description = "The amount of SOL locked in the commitment (in lamports)"
+    value = variable.amount
+}

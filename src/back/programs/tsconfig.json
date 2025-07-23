@@ -11,9 +11,9 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "outDir": "./dist",
-    "rootDir": "./",
-    "types": ["mocha", "chai"]
+    "rootDir": "../../../..",
+    "types": ["mocha", "chai", "node"]
   },
-  "include": ["tests/**/*", "target/types/**/*"],
+  "include": ["escrow/tests/**/*", "./target/types/**/*"],
   "exclude": ["node_modules", "dist"]
 }

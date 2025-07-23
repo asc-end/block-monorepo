@@ -1,0 +1,27 @@
+
+action "escrow_commitment_claimed" "svm::deploy_subgraph" {
+    program_id = action.deploy_escrow.program_id
+    program_idl = action.deploy_escrow.program_idl
+    block_height = 0 // action.deploy_escrow.block_height
+    event {
+        name = "CommitmentClaimedEvent"
+    }
+}
+
+action "escrow_commitment_created" "svm::deploy_subgraph" {
+    program_id = action.deploy_escrow.program_id
+    program_idl = action.deploy_escrow.program_idl
+    block_height = 0 // action.deploy_escrow.block_height
+    event {
+        name = "CommitmentCreatedEvent"
+    }
+}
+
+action "escrow_commitment_forfeited" "svm::deploy_subgraph" {
+    program_id = action.deploy_escrow.program_id
+    program_idl = action.deploy_escrow.program_idl
+    block_height = 0 // action.deploy_escrow.block_height
+    event {
+        name = "CommitmentForfeitedEvent"
+    }
+}
