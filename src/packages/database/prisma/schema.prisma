@@ -1,0 +1,281 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FocusSessionStatus {
+  in_progress
+  canceled
+  finished
+}
+
+model User {
+  id            String          @id
+  walletAddress String          @unique
+  theme         String          @default("system")
+  timezone      String          @default("UTC")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  focusSessions FocusSession[]
+  appUsage      AppUsage[]
+  routines      Routine[]
+  task          Task[]
+  commitments   Commitment[]
+
+  @@map("users")
+}
+
+model FocusSession {
+  id        String    @id @default(cuid())
+  userId    String
+  startTime DateTime  @default(now())
+  duration  Int
+  status    FocusSessionStatus
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commitments Commitment[]
+
+  @@index([userId])
+  @@index([startTime])
+  @@index([status])
+  @@index([userId, status])
+  @@map("focus_sessions")
+}
+
+model AppUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  appName   String
+  timeSpent Int      // milliseconds spent in this hour
+  platform  Platform
+  hourStart DateTime // UTC timestamp for hour start (e.g., 2024-01-01 14:00:00)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appName, platform, hourStart])
+  @@index([userId, hourStart])
+  @@index([appName])
+  @@index([platform])
+  @@map("app_usage")
+}
+
+enum Platform {
+  mobile
+  web
+}
+
+enum TimeMode {
+  blocking
+  limit
+}
+
+enum RoutineStatus {
+  active
+  paused
+  completed
+  canceled
+}
+
+enum CommitmentStatus {
+  active
+  claimed
+  forfeited
+}
+
+model Routine {
+  id             String         @id @default(cuid())
+  userId         String
+  name           String
+  emoji          String         @default("🚀")
+  timeMode       TimeMode
+  selectedDays   String[]       // Array of days (e.g., ["Mon", "Tue", "Wed"])
+  startTime      String?        // Time of day for blocking mode (e.g., "09:00")
+  endTime        String?        // Time of day for blocking mode (e.g., "17:00")
+  dailyLimit     Int?           // Minutes per day for limit mode
+  endDate        DateTime?      // When the routine expires
+  stakeAmount    Float          @default(0)
+  status         RoutineStatus  @default(active)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blockedApps    RoutineApp[]
+  commitments    Commitment[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("routines")
+}
+
+model App {
+  id                  String       @id @default(cuid())
+  name                String       // Display name (e.g., "Instagram")
+  icon                String?
+  domains             String[]     // Associated domains (e.g., ["instagram.com", "www.instagram.com"])
+  androidPackageName  String?      // Android package name (e.g., "com.instagram.android")
+  iosBundleId         String?      // iOS bundle ID (e.g., "com.burbn.instagram")
+  category            String?      // Category (e.g., "Social Media")
+  isUserSubmitted     Boolean      @default(false) // True if created from unknown app
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  routines            RoutineApp[]
+
+  @@unique([androidPackageName])
+  @@unique([iosBundleId])
+  @@index([category])
+  @@index([isUserSubmitted])
+  @@map("apps")
+}
+
+model RoutineApp {
+  routineId String
+  appId     String
+  routine   Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  app       App      @relation(fields: [appId], references: [id])
+
+  @@id([routineId, appId])
+  @@map("routine_apps")
+}
+
+enum TaskState {
+  checked
+  unchecked
+  archived
+}
+
+model Task {
+  id            String    @id @default(cuid())
+  userId        String
+  task          String
+  state         TaskState
+  createdAt     DateTime  @default(now())
+  index         Int?
+  tags          String[]
+  scheduledDate DateTime
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("task_lists")
+}
+
+model Commitment {
+  id              String           @id // Commitment PDA as string
+  userId          String
+  userPubkey      String
+  amount          BigInt
+  unlockTime      DateTime
+  createdAt       DateTime
+  authorityPubkey String
+  status          CommitmentStatus @default(active)
+  claimedAt       DateTime?
+  forfeitedAt     DateTime?
+  txSignature     String?
+  
+  // Optional relationships
+  routineId       String?
+  focusSessionId  String?
+  
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routine         Routine?         @relation(fields: [routineId], references: [id], onDelete: SetNull)
+  focusSession    FocusSession?    @relation(fields: [focusSessionId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([status])
+  @@index([unlockTime])
+  @@index([routineId])
+  @@index([focusSessionId])
+  @@map("commitments")
+}
+
+// Data Marketplace Models
+model MarketplaceConfig {
+  accountAddress      String   @id
+  authority           String
+  currentPeriodRevenue String  // Store as string to handle large numbers
+  totalLifetimeRevenue String
+  listingCounter      String
+  passCounter         String
+  snapshotPeriod      String
+  updatedAt           DateTime @updatedAt
+  
+  @@map("marketplace_config")
+}
+
+model DataSeller {
+  sellerAddress    String    @id
+  listingId        String?   // Optional, can be null
+  totalRevenue     String    // Store as string for large numbers
+  unclaimedRevenue String
+  accountAddress   String    @unique
+  updatedAt        DateTime  @updatedAt
+  
+  @@index([listingId])
+  @@map("data_sellers")
+}
+
+model DataListing {
+  listingId      String    @id
+  sellerAddress  String
+  startDate      DateTime
+  endDate        DateTime
+  pricePerDay    String    // Store as string for large numbers
+  accountAddress String    @unique
+  isActive       Boolean   @default(true)
+  updatedAt      DateTime  @updatedAt
+  
+  @@index([sellerAddress])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@map("data_listings")
+}
+
+model DataPass {
+  passId               String    @id
+  buyerAddress         String
+  startDate            DateTime
+  endDate              DateTime
+  maxPricePerDay       String    // Store as string
+  totalPaid            String
+  dataNftMint          String
+  purchasedAt          DateTime
+  eligibleSellerCount  Int
+  accountAddress       String    @unique
+  updatedAt            DateTime  @updatedAt
+  
+  @@index([buyerAddress])
+  @@index([purchasedAt])
+  @@map("data_passes")
+}
+
+model MerkleDistributor {
+  periodId           BigInt    @id
+  merkleRoot         String    // Base58 encoded
+  totalPoolBalance   String
+  snapshotTimestamp  DateTime
+  totalClaims        String
+  claimedAmount      String
+  accountAddress     String    @unique
+  updatedAt          DateTime  @updatedAt
+  
+  @@index([snapshotTimestamp])
+  @@map("merkle_distributors")
+}
+
+model SellerProof {
+  sellerAddress String
+  periodId      BigInt
+  amount        BigInt        // Using BigInt for lamport amounts
+  proof         Json          // Array of arrays: number[][]
+  claimed       Boolean       @default(false)
+  claimedAt     DateTime?
+  createdAt     DateTime      @default(now())
+  
+  @@id([sellerAddress, periodId])
+  @@index([sellerAddress])
+  @@index([periodId])
+  @@index([claimed])
+  @@map("seller_proofs")
+}

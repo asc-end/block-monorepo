@@ -1,11 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@blockit/database';
+export { Prisma } from '@blockit/database';
+export type { PrismaClient } from '@blockit/database';
 
-// PrismaClient is attached to the `global` object in development to prevent
-// exhausting your database connection limit.
-//
-// Learn more:
-// https://pris.ly/d/help/next-js-best-practices
-
+// Create PrismaClient instance with indexer's own environment variables
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =

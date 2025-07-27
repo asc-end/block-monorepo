@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Shared utilities and types for Blockit monorepo",
   "main": "src/index.ts",
-  "type": "module",
   "exports": {
     ".": {
       "import": "./src/index.ts",

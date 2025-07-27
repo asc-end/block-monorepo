@@ -3,15 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "generate": "prisma generate --schema=./prisma/schema.prisma",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "prisma generate --schema=./prisma/schema.prisma && ts-node src/index.ts"
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
+    "@blockit/database": "workspace:*",
     "@blockit/shared": "workspace:*",
     "@coral-xyz/anchor": "^0.31.1",
-    "@prisma/client": "^6.11.1",
     "@privy-io/server-auth": "^1.27.1",
     "@solana/web3.js": "^1.98.2",
     "cors": "^2.8.5",
@@ -29,7 +28,6 @@
     "@types/node": "^20.11.19",
     "@types/uuid": "^9.0.8",
     "@types/ws": "^8.5.10",
-    "prisma": "^6.11.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   }
