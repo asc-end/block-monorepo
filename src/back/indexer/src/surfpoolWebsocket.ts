@@ -174,6 +174,36 @@ export class SurfpoolWebsocketClient {
     return id;
   }
 
+  async accountSubscribe(
+    pubkey: PublicKey,
+    callback: (accountInfo: any) => void,
+    config?: {
+      encoding?: string;
+      commitment?: string;
+    }
+  ): Promise<number> {
+    const id = this.nextId++;
+    
+    const params = {
+      method: 'accountSubscribe',
+      params: [
+        pubkey.toBase58(),
+        {
+          encoding: config?.encoding || 'base64',
+          commitment: config?.commitment || 'confirmed'
+        }
+      ]
+    };
+    this.subscriptions.set(id, params);
+    this.callbacks.set(id, callback);
+    
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.sendSubscription(id, params);
+    }
+    
+    return id;
+  }
+
   async logsSubscribe(
     filter: { mentions?: string[] } | 'all',
     callback: (logs: any) => void,

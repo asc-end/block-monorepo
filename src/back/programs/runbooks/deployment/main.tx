@@ -13,3 +13,10 @@ action "deploy_escrow" "svm::deploy_program" {
     authority = signer.authority
     payer = signer.payer
 }
+
+action "deploy_data_marketplace" "svm::deploy_program" {
+    description = "Deploy data marketplace program"
+    program = svm::get_program_from_anchor_project("data_marketplace") 
+    authority = signer.authority
+    payer = signer.payer
+}

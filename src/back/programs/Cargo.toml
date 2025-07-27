@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "escrow"
+    "escrow",
+    "data-marketplace"
 ]
 resolver = "2"
 

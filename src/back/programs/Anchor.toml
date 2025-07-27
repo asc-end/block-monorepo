@@ -5,10 +5,11 @@ resolution = true
 skip-lint = false
 
 [workspace]
-members = ["escrow"]
+members = ["escrow", "data-marketplace"]
 
 [programs.localnet]
 escrow = "DYuG4KZ6S1A19aXzDwFhsCDiEHB99t4WgjF5xgbbxtRZ"
+data_marketplace = "5CkSqkGqrHKRzVWVRJGa1odNcaXo4bJnt9Sq2Npqpxpj"
 
 [registry]
 url = "https://api.apr.dev"
@@ -17,9 +18,21 @@ url = "https://api.apr.dev"
 cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
+[deploy]
+upgradeable = true
+
 [scripts]
 test-litesvm = "cargo test --manifest-path ./escrow/Cargo.toml --features litesvm"
 test = "pnpm run ts-mocha -p ./tsconfig.json -t 1000000 ./escrow/tests/**/*.ts"
+test-marketplace = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/**/*.test.ts"
+test-marketplace-normal = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/normal-flow.test.ts"
+test-marketplace-errors = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/error-cases.test.ts"
+test-marketplace-edge = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/edge-cases.test.ts"
+test-marketplace-authority = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/authority.test.ts"
+test-marketplace-seller = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/seller-behavior.test.ts"
+test-marketplace-buyer = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/buyer-behavior.test.ts"
+test-marketplace-merkle = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/merkle-proof.test.ts"
+test-marketplace-revenue = "ts-mocha -p ./tsconfig.json -t 1000000 ./data-marketplace/tests/revenue-tracking.test.ts"
 
 [test]
 skip-local-validator = true

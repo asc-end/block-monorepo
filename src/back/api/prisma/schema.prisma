@@ -188,3 +188,93 @@ model Commitment {
   @@index([focusSessionId])
   @@map("commitments")
 }
+
+// Data Marketplace Models
+model MarketplaceConfig {
+  accountAddress      String   @id
+  authority           String
+  currentPeriodRevenue String  // Store as string to handle large numbers
+  totalLifetimeRevenue String
+  listingCounter      String
+  passCounter         String
+  snapshotPeriod      String
+  updatedAt           DateTime @updatedAt
+  
+  @@map("marketplace_config")
+}
+
+model DataSeller {
+  sellerAddress    String    @id
+  listingId        String?   // Optional, can be null
+  totalRevenue     String    // Store as string for large numbers
+  unclaimedRevenue String
+  accountAddress   String    @unique
+  updatedAt        DateTime  @updatedAt
+  
+  @@index([listingId])
+  @@map("data_sellers")
+}
+
+model DataListing {
+  listingId      String    @id
+  sellerAddress  String
+  startDate      DateTime
+  endDate        DateTime
+  pricePerDay    String    // Store as string for large numbers
+  accountAddress String    @unique
+  isActive       Boolean   @default(true)
+  updatedAt      DateTime  @updatedAt
+  
+  @@index([sellerAddress])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@map("data_listings")
+}
+
+model DataPass {
+  passId               String    @id
+  buyerAddress         String
+  startDate            DateTime
+  endDate              DateTime
+  maxPricePerDay       String    // Store as string
+  totalPaid            String
+  dataNftMint          String
+  purchasedAt          DateTime
+  eligibleSellerCount  Int
+  accountAddress       String    @unique
+  updatedAt            DateTime  @updatedAt
+  
+  @@index([buyerAddress])
+  @@index([purchasedAt])
+  @@map("data_passes")
+}
+
+model MerkleDistributor {
+  periodId           BigInt    @id
+  merkleRoot         String    // Base58 encoded
+  totalPoolBalance   String
+  snapshotTimestamp  DateTime
+  totalClaims        String
+  claimedAmount      String
+  accountAddress     String    @unique
+  updatedAt          DateTime  @updatedAt
+  
+  @@index([snapshotTimestamp])
+  @@map("merkle_distributors")
+}
+
+model SellerProof {
+  sellerAddress String
+  periodId      BigInt
+  amount        BigInt        // Using BigInt for lamport amounts
+  proof         Json          // Array of arrays: number[][]
+  claimed       Boolean       @default(false)
+  claimedAt     DateTime?
+  createdAt     DateTime      @default(now())
+  
+  @@id([sellerAddress, periodId])
+  @@index([sellerAddress])
+  @@index([periodId])
+  @@index([claimed])
+  @@map("seller_proofs")
+}

@@ -24,6 +24,7 @@ import AppUsage from './routes/app-usage';
 import Todo from "./routes/todo";
 import Routines from './routes/routines';
 import Apps from './routes/apps';
+import Marketplace from './routes/marketplace';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/app-usage', AppUsage);
 app.use('/todo', Todo);
 app.use('/routines', Routines);
 app.use('/apps', Apps);
+app.use('/api/marketplace', Marketplace);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched

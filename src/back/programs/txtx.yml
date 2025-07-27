@@ -5,9 +5,6 @@ runbooks:
   - name: deployment
     description: Deploy programs
     location: runbooks/deployment
-  - name: create-commitment
-    description: Create a commitment
-    location: runbooks/create-commitment
 
 environments:
   localnet:

@@ -14,6 +14,6 @@
     "rootDir": "../../../..",
     "types": ["mocha", "chai", "node"]
   },
-  "include": ["escrow/tests/**/*", "./target/types/**/*"],
+  "include": ["escrow/tests/**/*", "data-marketplace/tests/**/*", "./target/types/**/*"],
   "exclude": ["node_modules", "dist"]
 }

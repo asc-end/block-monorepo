@@ -1,2 +1,2 @@
 export * from './apps';
-export * from '../types';
+export * from './data-marketplace';

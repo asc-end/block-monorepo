@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:all": "ts-node-dev --respawn --transpile-only src/combinedIndexer.ts",
+    "dev:marketplace": "ts-node-dev --respawn --transpile-only src/marketplaceIndexer.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "ts-mocha -p ./tsconfig.json 'tests/**/*.test.ts'",
@@ -23,7 +25,11 @@
     "@solana/web3.js": "^1.98.2",
     "@types/ws": "^8.5.10",
     "dotenv": "^16.4.5",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "merkletreejs": "^0.3.11",
+    "keccak256": "^1.0.6",
+    "@blockit/shared": "workspace:*",
+    "@sqds/multisig": "^2.1.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",
