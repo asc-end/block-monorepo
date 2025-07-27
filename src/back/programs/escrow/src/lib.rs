@@ -1,25 +1,16 @@
 pub mod errors;
 pub mod instructions;
+pub mod state;
 
 use anchor_lang::prelude::*;
 use instructions::*;
+pub use state::Commitment;
 
 declare_id!("DYuG4KZ6S1A19aXzDwFhsCDiEHB99t4WgjF5xgbbxtRZ");
 
 pub const PROTOCOL_FEE_BPS: u16 = 1000; // 10%
 pub const BPS_DENOMINATOR: u16 = 10000;
 pub const TREASURY_KEY: Pubkey = pubkey!("DoGXPkPav6iyXk6sKnaBQdzP2PsJ9hVZnv6CpPgVzkkA");
-
-#[account]
-#[derive(InitSpace)]
-pub struct Commitment {
-    pub user: Pubkey,
-    pub amount: u64,
-    pub unlock_time: i64,
-    pub authority: Pubkey,
-    pub created_at: i64,
-    pub bump: u8,
-}
 
 #[program]
 pub mod escrow {
