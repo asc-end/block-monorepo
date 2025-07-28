@@ -5,7 +5,8 @@ import { PublicKey, Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { expect } from "chai";
 import BN from "bn.js";
 import { createListingTx, updateListingTx, purchaseDataPassTx, calculateDataPassPayment,} from "@blockit/shared";
-import { createEligibilityMerkleRoot, getListing, getListingCounter, getPass, getPassCounter, initializeMarketplaceIfNeeded, mockMerkleRoot, timeToUnix } from "./utils/test-helpers";
+import { createEligibilityMerkleRoot, getListing, getListingCounter, getPass, getPassCounter, initializeMarketplaceIfNeeded, mockMerkleRoot } from "./utils/test-helpers";
+import { timeToUnix } from "@blockit/shared";
 
 describe("Data Marketplace - Edge Cases", () => {
   const provider = anchor.AnchorProvider.env();

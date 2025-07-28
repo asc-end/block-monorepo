@@ -13,6 +13,7 @@ pub fn initialize_marketplace(ctx: Context<InitializeMarketplace>) -> Result<()>
     Ok(())
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct InitializeMarketplace<'info> {
     #[account(

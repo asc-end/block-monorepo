@@ -21,8 +21,8 @@ export type RoutineState = {
     setBlockedApps: (apps: App[]) => void;
     endDate: Date | null;
     setEndDate: (date: Date | null) => void;
-    stakeAmount: number;
-    setStakeAmount: (amount: number) => void;
+    stakeAmount: number | undefined;
+    setStakeAmount: (amount: number | undefined) => void;
     timeSettings: TimeSettings;
     setTimeSettings: (settings: TimeSettings) => void;
     setTimeMode: (mode: TimeMode) => void;
@@ -42,7 +42,7 @@ export const useRoutineStore = create<RoutineState>((set) => ({
     setBlockedApps: (apps) => set({ blockedApps: apps }),
     endDate: null,
     setEndDate: (date) => set({ endDate: date }),
-    stakeAmount: 0,
+    stakeAmount: undefined,
     setStakeAmount: (amount) => set({ stakeAmount: amount }),
     timeSettings: initialTimeSettings,
     setTimeSettings: (settings) => set({ timeSettings: settings }),
@@ -52,7 +52,7 @@ export const useRoutineStore = create<RoutineState>((set) => ({
     resetRoutineState: () => set({
         blockedApps: [],
         endDate: null,
-        stakeAmount: 0,
+        stakeAmount: undefined,
         timeSettings: initialTimeSettings
     }),
 })); 

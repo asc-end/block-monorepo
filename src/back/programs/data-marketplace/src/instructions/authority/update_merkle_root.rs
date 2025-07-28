@@ -28,6 +28,7 @@ pub fn update_merkle_root( ctx: Context<UpdateMerkleRoot>, merkle_root: [u8; 32]
     Ok(())
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct UpdateMerkleRoot<'info> {
     #[account(mut)]

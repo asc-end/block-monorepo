@@ -7,7 +7,8 @@ import BN from "bn.js";
 import { MerkleTree } from "merkletreejs";
 import keccak256 from "keccak256";
 import { createListingTx, updateListingTx, removeListingTx, purchaseDataPassTx, claimRevenueTx, updateMerkleRootTx, createMerkleLeafData } from "@blockit/shared";
-import { getPeriodId, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, timeToUnix, getPassCounter, getPass, createEligibilityMerkleRoot } from "./utils/test-helpers";
+import { getPeriodId, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, getPassCounter, getPass, createEligibilityMerkleRoot } from "./utils/test-helpers";
+import { timeToUnix } from "@blockit/shared";
 
 describe("Data Marketplace - Error Cases", () => {
   const provider = anchor.AnchorProvider.env();

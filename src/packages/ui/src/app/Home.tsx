@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect, useCallback, useRef } from 'react';
 import { formatTime } from '../lib/time';
-import { Image, Pressable, Box, Text, Button, useTheme } from '@blockit/cross-ui-toolkit';
+import { Image, Pressable, Box, Text, Button, useTheme, ScrollView } from '@blockit/cross-ui-toolkit';
 import { FocusSession } from './components/focus-sesion/FocusSession';
 import { AppUsageToday } from './components/usage/Today';
 import { RoutineItem } from './components/routine/RoutineItem';
@@ -163,16 +163,13 @@ export function Home(props: HomeProps) {
         <FocusSession nativeAppBlocking={nativeAppBlocking} />
       </Box>
 
-      {/* Scrollable section with collapsible image */}
-      <Box 
+      {/* Scrollable section */}
+      <ScrollView 
         className="flex-1" 
-        // onScroll={handleScroll}
-        // showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
         <Box className="flex flex-col px-4 w-full">
-          {/* Collapsible wizard image */}
-
-
           {/* Routines section */}
           <Box className='flex flex-col w-full'>
             <Box className='w-full flex flex-row justify-between items-center mb-2'>
@@ -189,7 +186,7 @@ export function Home(props: HomeProps) {
                 <Text variant='h6'>No routines yet</Text>
               </Box>
             ) : (
-              <>
+              <Box className="flex flex-col" style={{ gap: 8 }}>
                 {routines.map((routine) => (
                   <RoutineItem 
                     key={routine.id}
@@ -197,14 +194,11 @@ export function Home(props: HomeProps) {
                     onPress={onViewRoutine || (() => {})}
                   />
                 ))}
-              </>
+              </Box>
             )}
           </Box>
-          
-          {/* Add some bottom padding for better scrolling */}
-          <Box style={{ height: 100 }} />
         </Box>
-      </Box>
+      </ScrollView>
     </Box>
   );
 }

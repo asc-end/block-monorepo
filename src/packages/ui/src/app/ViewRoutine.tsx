@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import { Box, Text, Button, useTheme, Alert, useAlert } from '@blockit/cross-ui-toolkit';
-import type { Routine } from '@blockit/shared';
+import type { Routine, Commitment } from '@blockit/shared';
 import { PauseIcon } from './icons/PauseIcon';
 import { PlayIcon } from './icons/PlayIcon';
 import { api } from '../stores/authStore';
@@ -116,8 +116,8 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
         );
     }
 
-    const formatEndDate = (date: string | null | undefined) => {
-        if (!date) return 'No end date';
+    const formatDate = (date: string | null | undefined, defaultText: string = 'Not set') => {
+        if (!date) return defaultText;
         return new Date(date).toLocaleDateString('default', {
             month: 'long',
             day: 'numeric',
@@ -128,6 +128,26 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
     const formatStakeAmount = (amount: number) => {
         if (amount === 0) return 'Free';
         return `${amount} SOL`;
+    };
+
+    const formatCommitmentInfo = () => {
+        if (!routine.commitments || routine.commitments.length === 0) {
+            return 'No on-chain commitment';
+        }
+        
+        const commitment = routine.commitments[0]; // Get the first commitment
+        const amountInSol = parseFloat(commitment.amount) / 1e9; // Convert lamports to SOL
+        
+        let statusText = '';
+        if (commitment.status === 'active') {
+            statusText = 'Locked';
+        } else if (commitment.status === 'claimed') {
+            statusText = 'Claimed';
+        } else if (commitment.status === 'forfeited') {
+            statusText = 'Forfeited';
+        }
+        
+        return `${amountInSol} SOL - ${statusText}`;
     };
 
     const formatTimeSettings = () => {
@@ -195,8 +215,8 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
                     value={formatSelectedDays()}
                 />
                 <CardRow
-                    label="End date"
-                    value={formatEndDate(routine.endDate)}
+                    label="Duration"
+                    value={`${formatDate(routine.createdAt)} - ${formatDate(routine.endDate, 'No end date')}`}
                 />
                 <CardRow
                     label="Blocking"
@@ -205,6 +225,10 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
                 <CardRow
                     label="Stake"
                     value={formatStakeAmount(routine.stakeAmount)}
+                />
+                <CardRow
+                    label="On-chain Commitment"
+                    value={formatCommitmentInfo()}
                 />
             </Box>
 

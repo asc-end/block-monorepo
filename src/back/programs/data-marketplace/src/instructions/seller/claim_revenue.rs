@@ -98,6 +98,7 @@ fn verify_merkle_proof(
     computed_hash == root
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct ClaimRevenue<'info> {
     #[account(mut)]

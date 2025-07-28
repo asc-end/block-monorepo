@@ -1,7 +1,9 @@
 import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction } from "@solana/web3.js";
-import { marketplacePDAs, MarketplaceProgram, METADATA_PROGRAM_ID } from "../data-marketplace";
+import { marketplacePDAs, METADATA_PROGRAM_ID } from "./constants";
+import type { MarketplaceProgram } from "./types";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { BN } from '@coral-xyz/anchor';
+import { timeToUnix } from "..";
 
 /**
  * Create a new listing transaction
@@ -38,7 +40,7 @@ export async function createListingTx(program: MarketplaceProgram, seller: Publi
     const newEndTimestamp = newEndDate ? new BN(Math.floor(newEndDate.getTime() / 1000)) : null;
   
     return await program.methods
-      .updateListing(newEndTimestamp, newPricePerDay)
+      .updateListing(newEndTimestamp, newPricePerDay ?? null)
       .accountsPartial({
         seller,
         listing,

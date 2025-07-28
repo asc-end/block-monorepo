@@ -69,7 +69,7 @@ pub fn forfeit_commitment(ctx: Context<Forfeit>) -> Result<()> {
 pub struct Forfeit<'info> {
     #[account(
         mut,
-        seeds = [b"commitment", commitment.user.as_ref(), &commitment.created_at.to_le_bytes(), &commitment.unlock_time.to_le_bytes()],
+        seeds = [b"commitment", commitment.user.as_ref(), &commitment.id.to_le_bytes()],
         bump = commitment.bump,
         close = user
     )]

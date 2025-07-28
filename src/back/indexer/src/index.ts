@@ -1,8 +1,9 @@
 import { Connection, PublicKey, Keypair, Logs, AccountInfo, KeyedAccountInfo } from '@solana/web3.js';
+import * as anchor from '@coral-xyz/anchor';
 import { Program, AnchorProvider, Wallet, IdlAccounts, BN, Idl } from '@coral-xyz/anchor';
 import * as dotenv from 'dotenv';
 import escrowIdl from '../../programs/target/idl/escrow.json';
-import type{ Escrow } from '../../programs/target/types/escrow';
+import type { Escrow } from '../../programs/target/types/escrow';
 import { createHandlers } from './handlers/escrow';
 import { prisma } from './lib/prisma';
 import { SurfpoolWebsocketClient } from './surfpoolWebsocket';
@@ -42,7 +43,7 @@ class EscrowIndexer {
       // Use Surfpool websocket client for localnet
       this.surfpoolClient = new SurfpoolWebsocketClient(WS_URL);
       await this.surfpoolClient.connect();
-      
+
       // Comment out program account subscription for now
       // this.subscriptionId = await this.surfpoolClient.programSubscribe(
       //   this.program.programId,
@@ -70,7 +71,7 @@ class EscrowIndexer {
         'confirmed'
       );
     }
-    
+
     console.log(`Indexer started with subscriptions: account=${this.subscriptionId}, logs=${this.logsSubscriptionId}`);
   }
 
@@ -98,20 +99,29 @@ class EscrowIndexer {
     try {
       const signatures = await this.connection.getSignaturesForAddress(this.program.programId, { limit: 1000 });
 
+      console.log(`Processing ${signatures.length} signatures`);
       for (const sigInfo of signatures) {
         try {
-          const tx = await this.connection.getTransaction(sigInfo.signature, { maxSupportedTransactionVersion: 0 });
+          const tx = await this.connection.getTransaction(sigInfo.signature, { maxSupportedTransactionVersion: 0, commitment: 'confirmed' });
 
-          const logs = tx?.meta?.logMessages
-          if (!logs) continue;
+          console.log(`Processing transaction ${sigInfo.signature}`);
+          if (tx.meta.innerInstructions && tx.meta.innerInstructions.length > 0) {
+            console.log(tx.meta.logMessages);
+            // const eventIx = tx.meta.innerInstructions[0].instructions[0];
 
-          // Process logs using EventParser for reconciliation
-          const eventParser = new (await import('@coral-xyz/anchor')).EventParser(this.program.programId, this.program.coder);
-          const events = eventParser.parseLogs(logs);
-          
-          for (const event of events) {
-            await this.handlers.processEvent(event);
+            for (const innerInstruction of tx.meta.innerInstructions[0].instructions) {
+              const eventIx = innerInstruction;
+              const rawData = anchor.utils.bytes.bs58.decode(eventIx.data);
+              const base64Data = anchor.utils.bytes.base64.encode(rawData.subarray(8));
+              const event = this.program.coder.events.decode(base64Data)
+
+              if (event)
+                await this.handlers.processEvent(event);
+
+            }
+
           }
+
         } catch (error) {
           console.error(`Error processing signature ${sigInfo.signature}:`, error);
         }

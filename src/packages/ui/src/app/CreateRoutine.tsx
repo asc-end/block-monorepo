@@ -5,6 +5,8 @@ import { EmojiPicker } from './components/EmojiPicker';
 import { useRoutineStore } from '../stores/routineStore';
 import { Box, Text, Button, Pressable, Drawer, useTheme, TextInput } from '@blockit/cross-ui-toolkit';
 import { api } from '../stores/authStore';
+import { createCommitmentWithRetry } from '@blockit/shared';
+import { useUser } from '../hooks/useUser';
 
 function CardRow({ label, value, onPress }: { label: string; value: string; onPress?: () => void }) {
     const isNotSet = value === 'Not set';
@@ -32,24 +34,26 @@ type CreateRoutineProps = {
     onRoutineTime: () => void;
     onCalendar: () => void;
     onMoney: () => void;
+    sendTransaction: (tx: any) => Promise<{signature: string}>;
 }
 
 export function CreateRoutine(props: CreateRoutineProps) {
     const modalizeRef = useRef<any>(null);
-    const { onBack, onApps, onRoutineTime, onCalendar, onMoney } = props;
+    const { onBack, onApps, onRoutineTime, onCalendar, onMoney, sendTransaction } = props;
     const [routineName, setRoutineName] = useState("New Routine");
     const [routineEmoji, setRoutineEmoji] = useState("🚀");
     const [isCreating, setIsCreating] = useState(false);
-
+    const {user} = useUser()
 
     const { endDate, blockedApps, stakeAmount, timeSettings, resetRoutineState } = useRoutineStore();
 
     const handleCreateRoutine = async () => {
-        if (!routineName.trim() || isCreating) return;
+        if (!routineName.trim() || isCreating || !user) return;
         
         try {
             setIsCreating(true);
             
+            // Prepare routine data first
             const routineData = {
                 name: routineName,
                 emoji: routineEmoji,
@@ -66,9 +70,45 @@ export function CreateRoutine(props: CreateRoutineProps) {
                     icon: app.icon
                 }))
             };
+            
             console.log("routineData", routineData)
-            await api().post('/routines', routineData);
-            console.log("routine created")
+            
+            // Create routine first to get the routine ID
+            const routineResponse = await api().post('/routines', routineData);
+            const routineId = routineResponse.data.id;
+            console.log("routine created with ID:", routineId)
+
+            // If there's a stake amount, create the on-chain commitment
+            if(stakeAmount && user.walletAddress){
+                try {
+                    const result = await createCommitmentWithRetry(user.walletAddress, stakeAmount, endDate);
+                    const signature = await sendTransaction(result.tx);
+                    
+                    if(!signature) throw new Error("Failed to create commitment");
+                    
+                    // Create commitment record in database
+                    const commitmentData = {
+                        routineId,
+                        userId: user.id,
+                        commitmentId: result.id.toString(),
+                        amount: stakeAmount,
+                        unlockTime: endDate?.toISOString(),
+                        signature: signature.signature
+                    };
+                    
+                    await api().post('/commitments', commitmentData);
+                    console.log("commitment record created in database")
+                } catch (commitmentError) {
+                    // Delete the routine if any part of commitment creation fails
+                    try {
+                        await api().delete(`/routines/${routineId}`);
+                        console.log("Deleted routine due to commitment error");
+                    } catch (deleteError) {
+                        console.error("Failed to delete routine after commitment error:", deleteError);
+                    }
+                    throw commitmentError;
+                }
+            }
             
             // Reset the routine store state
             resetRoutineState();
@@ -78,9 +118,7 @@ export function CreateRoutine(props: CreateRoutineProps) {
             setRoutineEmoji("🚀");
             
             // Small delay to ensure the request completes before navigation
-            setTimeout(() => {
-                onBack();
-            }, 100);
+            setTimeout(() => { onBack()}, 100);
         } catch (error: any) {
             console.error('Failed to create routine:', error);
             if (error.response?.data?.error) {
@@ -105,7 +143,7 @@ export function CreateRoutine(props: CreateRoutineProps) {
         if (amount === 0) return 'Free';
         return `${amount} SOL`;
     };
-
+    
     return (
         <Box className="flex-1 flex flex-col px-4">
             {/* Emoji and Title */}
@@ -144,7 +182,7 @@ export function CreateRoutine(props: CreateRoutineProps) {
                 />
                 <CardRow
                     label="Money"
-                    value={formatStakeAmount(stakeAmount)}
+                    value={stakeAmount ? formatStakeAmount(stakeAmount) : 'Not set'}
                     onPress={onMoney}
                 />
             </Box>
@@ -156,7 +194,7 @@ export function CreateRoutine(props: CreateRoutineProps) {
                     variant="primary"
                     onPress={handleCreateRoutine}
                     leftIcon={!isCreating ? <PlayIcon size={18} color="white" /> : undefined}
-                    disabled={isCreating}
+                    disabled={!!isCreating || !user || (!!stakeAmount && !user.walletAddress) || !endDate || !blockedApps.length || !timeSettings.timeMode || !timeSettings.selectedDays.length}
                 />
             </Box>
 

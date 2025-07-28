@@ -49,6 +49,7 @@ pub fn create_listing(
     Ok(())
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct CreateListing<'info> {
     #[account(mut)]

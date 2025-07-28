@@ -7,7 +7,8 @@ import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import MerkleTree from "merkletreejs";
 import keccak256 from "keccak256";
-import { createEligibilityMerkleRoot, getMarketplaceConfig, getMerkleDistributor, getPeriodId, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, TEST_DATES, timeToUnix } from "./utils";
+import { createEligibilityMerkleRoot, getMarketplaceConfig, getMerkleDistributor, getPeriodId, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, TEST_DATES } from "./utils";
+import { timeToUnix } from "@blockit/shared";
 
 // Helper function to create merkle leaf data
 function createMerkleLeafData(seller: anchor.web3.PublicKey, amount: BN): Buffer {

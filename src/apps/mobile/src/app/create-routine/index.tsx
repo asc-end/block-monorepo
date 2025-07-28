@@ -1,7 +1,9 @@
 import { router } from "expo-router";
 import { CreateRoutine } from "@blockit/ui";
+import { useSolana } from "../../hooks/useSolana";
 
-export default function CreateRoutinePage() {
+export default function CreateRoutinePage() {    
+    const { signAndSendTransaction } = useSolana();
 
     return (
         <CreateRoutine
@@ -10,6 +12,7 @@ export default function CreateRoutinePage() {
             onRoutineTime={() => router.push("create-routine/time")}
             onCalendar={() => router.push("create-routine/calendar")}
             onMoney={() => router.push("create-routine/money")}
+            sendTransaction={signAndSendTransaction}
         />
     );
 }

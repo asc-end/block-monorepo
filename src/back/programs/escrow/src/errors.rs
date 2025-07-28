@@ -10,8 +10,6 @@ pub enum EscrowError {
     AlreadyUnlocked,
     #[msg("Invalid user")]
     InvalidUser,
-    #[msg("Invalid timestamp - must be within 5 seconds of current time")]
-    InvalidTimestamp,
     #[msg("Invalid authority")]
     InvalidAuthority,
     #[msg("Invalid treasury")]

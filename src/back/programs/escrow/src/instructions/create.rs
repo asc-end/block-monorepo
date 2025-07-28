@@ -5,19 +5,19 @@ use anchor_lang::solana_program::clock::Clock;
 use anchor_lang::solana_program::system_instruction;
 
 
-pub fn create_commitment( ctx: Context<Create>, amount: u64, unlock_time: i64, authority: Pubkey, created_at: i64) -> Result<()> {
+pub fn create_commitment( ctx: Context<Create>, id: u64, amount: u64, unlock_time: i64, authority: Pubkey) -> Result<()> {
     let clock = Clock::get()?;
 
-    require!( (clock.unix_timestamp - created_at).abs() <= 5, EscrowError::InvalidTimestamp );
     require!( unlock_time > clock.unix_timestamp, EscrowError::InvalidUnlockTime );
 
     // Initialize commitment account data
     let commitment = &mut ctx.accounts.commitment;
     commitment.user = ctx.accounts.user.key();
+    commitment.id = id;
     commitment.amount = amount;
     commitment.unlock_time = unlock_time;
     commitment.authority = authority;
-    commitment.created_at = created_at;
+    commitment.created_at = clock.unix_timestamp;
     commitment.bump = ctx.bumps.commitment;
 
     // Store values we need for the event before moving ownership
@@ -38,10 +38,11 @@ pub fn create_commitment( ctx: Context<Create>, amount: u64, unlock_time: i64, a
     emit_cpi!(CommitmentCreatedEvent{
             commitment: commitment_key,
             user: ctx.accounts.user.key(),
+            id,
             amount,
             unlock_time,
             authority,
-            created_at,
+            created_at: clock.unix_timestamp,
     });
 
     Ok(())
@@ -49,13 +50,13 @@ pub fn create_commitment( ctx: Context<Create>, amount: u64, unlock_time: i64, a
 
 #[event_cpi]
 #[derive(Accounts)]
-#[instruction(amount: u64, unlock_time: i64, authority: Pubkey, created_at: i64)]
+#[instruction(id: u64, amount: u64, unlock_time: i64, authority: Pubkey)]
 pub struct Create<'info> {
     #[account(
         init,
         payer = user,
         space = 8 + Commitment::INIT_SPACE,
-        seeds = [b"commitment", user.key().as_ref(), &created_at.to_le_bytes(), &unlock_time.to_le_bytes()],
+        seeds = [b"commitment", user.key().as_ref(), &id.to_le_bytes()],
         bump
     )]
     pub commitment: Account<'info, Commitment>,
@@ -70,6 +71,7 @@ pub struct Create<'info> {
 pub struct CommitmentCreatedEvent {
     pub commitment: Pubkey,
     pub user: Pubkey,
+    pub id: u64,
     pub amount: u64,
     pub unlock_time: i64,
     pub authority: Pubkey,

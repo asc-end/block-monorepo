@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
-import { marketplacePDAs } from './index';
+import { marketplacePDAs } from './constants';
 import type { DataListingAccount, DataPassAccount, MarketplaceProgram } from './types';
 
 // Query helpers for the frontend

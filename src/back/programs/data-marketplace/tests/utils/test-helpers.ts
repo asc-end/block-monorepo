@@ -240,7 +240,3 @@ export async function getMerkleDistributor(program: Program<DataMarketplace>, pe
   const distributor = await program.account.merkleDistributor.fetch(merkleDistributorPda);
   return distributor;
 }
-
-export function timeToUnix(timestamp: BN): Date {
-  return new Date(timestamp.toNumber() * 1000);
-}

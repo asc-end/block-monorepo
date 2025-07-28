@@ -7,7 +7,8 @@ import BN from "bn.js";
 import { MerkleTree } from "merkletreejs";
 import keccak256 from "keccak256";
 import { createListingTx, updateListingTx, removeListingTx, purchaseDataPassTx, claimRevenueTx, marketplacePDAs, calculateDataPassPayment, createMerkleLeafData, updateMerkleRootTx } from "@blockit/shared";
-import { getListing, getListingCounter, getMerkleDistributor, getPass, getPassCounter, getPeriodId, getRevenueClaim, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, timeToUnix, createEligibilityMerkleRoot } from "./utils";
+import { getListing, getListingCounter, getMerkleDistributor, getPass, getPassCounter, getPeriodId, getRevenueClaim, getSeller, initializeMarketplaceIfNeeded, mockMerkleRoot, createEligibilityMerkleRoot } from "./utils";
+import { timeToUnix } from "@blockit/shared";
 
 // This test demonstrates the complete normal flow of the data marketplace:
 // 1. Initialize marketplace

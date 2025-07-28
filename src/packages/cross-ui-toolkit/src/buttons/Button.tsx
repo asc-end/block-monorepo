@@ -78,12 +78,17 @@ export function Button(props: ButtonProps): React.ReactElement {
   const displayTitle = loading ? (loadingText || title) : title;
 
   return (
-    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: '100%' }}>
       <div style={shadowStyle} />
       <button
         style={buttonStyle}
         className={className}
-        onClick={() => onPress?.()}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Button clicked!');
+          onPress?.();
+        }}
         onMouseDown={() => { setIsPressed(true); onPressIn?.() }}
         onMouseUp={() => setIsPressed(false)}
         onMouseLeave={() => {

@@ -1,12 +1,12 @@
 import { BN, IdlAccounts, EventParser, Program } from "@coral-xyz/anchor";
 import { KeyedAccountInfo, Logs, PublicKey, Connection } from "@solana/web3.js";
-import { Escrow } from "target/types/escrow";
+import { Escrow } from "../../../programs/target/types/escrow";
 import { prisma } from "../lib/prisma";
 
 // Anchor event discriminators
-const COMMITMENT_CREATED_DISCRIMINATOR = "CommitmentCreated";
-const COMMITMENT_CLAIMED_DISCRIMINATOR = "CommitmentClaimed";
-const COMMITMENT_FORFEITED_DISCRIMINATOR = "CommitmentForfeited";
+const COMMITMENT_CREATED_DISCRIMINATOR = "commitmentCreatedEvent";
+const COMMITMENT_CLAIMED_DISCRIMINATOR = "commitmentClaimedEvent";
+const COMMITMENT_FORFEITED_DISCRIMINATOR = "commitmentForfeitedEvent";
 
 export function createHandlers(program: Program<Escrow>, connection: Connection) {
   return {
@@ -27,7 +27,7 @@ export function createHandlers(program: Program<Escrow>, connection: Connection)
     async handleAccountChange(account: KeyedAccountInfo) {
       try {
         const commitment = program.account.commitment.coder.accounts.decode('commitment', account.accountInfo.data);
-        await indexCommitmentAccount(commitment, account.accountId);
+        await indexCommitmentAccount(commitment);
       } catch (error) {
         console.error('Error decoding account:', error);
       }
@@ -38,21 +38,28 @@ export function createHandlers(program: Program<Escrow>, connection: Connection)
 }
 
 // Helper function to index commitment accounts
-export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["commitment"], accountId: PublicKey) {
+export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["commitment"]) {
     try {
       await prisma.commitment.upsert({
-        where: { id: accountId.toString() },
+        where: { id: commitment.id.toString() },
         create: {
-          id: accountId.toString(),
+          id: commitment.id.toString(),
           userId: commitment.user.toString(),
+          userPubkey: commitment.user.toString(),
           amount: BigInt(commitment.amount.toString()),
           unlockTime: new Date(commitment.unlockTime.toNumber() * 1000),
           authorityPubkey: commitment.authority.toString(),
-          userPubkey: commitment.user.toString(),
           createdAt: new Date(commitment.createdAt.toNumber() * 1000),
           status: 'active',
         },
-        update: {}
+        update: {
+          amount: BigInt(commitment.amount.toString()),
+          userPubkey: commitment.user.toString(),
+          unlockTime: new Date(commitment.unlockTime.toNumber() * 1000),
+          authorityPubkey: commitment.authority.toString(),
+          createdAt: new Date(commitment.createdAt.toNumber() * 1000),
+          status: 'active',
+        }
       });
     } catch (error) {
       console.error('Error storing commitment:', error);
@@ -80,16 +87,17 @@ export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["co
     }
   }
 
-  async function handleCommitmentCreated(data: any) {
+  async function handleCommitmentCreated(data: IdlAccounts<Escrow>["commitment"]) {
     try {
       await indexCommitmentAccount({
         user: data.user,
+        id: data.id,
         amount: data.amount,
         unlockTime: data.unlockTime,
         authority: data.authority,
         createdAt: data.createdAt,
         bump: 0
-      }, data.commitment);
+      });
     } catch (error) {
       console.error('Error handling commitment created event:', error);
     }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, ScrollView, Platform, Alert, Appearance } from 'react-native';
 import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@blockit/cross-ui-toolkit';
 import { useAppBlocker } from '../context/AppBlockerContext';
 import AppBlockerModule from 'expo-app-blocker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingItem = ({ 
   title, 
@@ -29,19 +30,20 @@ const SettingItem = ({
   
   return (
     <TouchableOpacity 
-      style={[styles.settingItem, { backgroundColor: currentColors.background }]} 
+      className="flex-row items-center p-4 border-b border-black/10"
+      style={{ backgroundColor: currentColors.background }}
       onPress={onPress}
       disabled={!onPress}
     >
-      <View style={styles.settingIcon}>
+      <View className="w-10 h-10 rounded-full bg-black/5 justify-center items-center mr-3">
         <Ionicons name={icon as any} size={24} color={currentColors.primary[500]} />
       </View>
-      <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, { color: currentColors.text.main }]}>
+      <View className="flex-1">
+        <Text className="text-base font-semibold mb-1" style={{ color: currentColors.text.main }}>
           {title}
         </Text>
         {description && (
-          <Text style={[styles.settingDescription, { color: currentColors.text.soft }]}>
+          <Text className="text-sm" style={{ color: currentColors.text.soft }}>
             {description}
           </Text>
         )}
@@ -55,7 +57,7 @@ const SettingItem = ({
         />
       )}
       {showValue && valueText && (
-        <Text style={[styles.settingValue, { color: currentColors.text.soft }]}>
+        <Text className="text-sm ml-2" style={{ color: currentColors.text.soft }}>
           {valueText}
         </Text>
       )}
@@ -73,11 +75,11 @@ const SettingsSection = ({
   const { currentColors } = useTheme();
   
   return (
-    <View style={styles.section}>
-      <Text style={[styles.sectionTitle, { color: currentColors.text.soft }]}>
+    <View className="mb-6">
+      <Text className="text-sm font-semibold mb-2 uppercase" style={{ color: currentColors.text.soft }}>
         {title}
       </Text>
-      <View style={[styles.sectionContent, { backgroundColor: currentColors.background }]}>
+      <View className="rounded-xl overflow-hidden" style={{ backgroundColor: currentColors.background }}>
         {children}
       </View>
     </View>
@@ -86,6 +88,8 @@ const SettingsSection = ({
 
 const SettingsScreen = () => {
   const { currentColors } = useTheme();
+  const colorScheme = useColorScheme();
+  const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
   const [isBlockingNotifications, setIsBlockingNotifications] = useState(false);
   const { 
     hasPermissions, 
@@ -97,14 +101,49 @@ const SettingsScreen = () => {
     uninstallEvents,
     installationHistory,
     loading,
-    isUsageTrackingEnabled,
-    toggleUsageTracking
+    isUsageTrackingEnabled
   } = useAppBlocker();
+
+  // Load theme preference on mount
+  React.useEffect(() => {
+    AsyncStorage.getItem('themeMode').then((mode) => {
+      if (mode === 'light' || mode === 'dark') {
+        setThemeMode(mode);
+        Appearance.setColorScheme(mode);
+      }
+    });
+  }, []);
+
+  const handleThemeChange = async (mode: 'auto' | 'light' | 'dark') => {
+    setThemeMode(mode);
+    await AsyncStorage.setItem('themeMode', mode);
+    
+    if (mode === 'auto') {
+      Appearance.setColorScheme(null);
+    } else {
+      Appearance.setColorScheme(mode);
+    }
+  };
+
+  const cycleTheme = () => {
+    const modes: ('auto' | 'light' | 'dark')[] = ['auto', 'light', 'dark'];
+    const currentIndex = modes.indexOf(themeMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    handleThemeChange(modes[nextIndex]);
+  };
+
+  const getThemeDisplayText = () => {
+    if (themeMode === 'auto') {
+      return `Auto (${colorScheme === 'dark' ? 'Dark' : 'Light'})`;
+    }
+    return themeMode === 'dark' ? 'Dark' : 'Light';
+  };
 
   return (
     <ScrollView 
-      style={[styles.container, { backgroundColor: currentColors.background }]}
-      contentContainerStyle={styles.contentContainer}
+      className="flex-1"
+      style={{ backgroundColor: currentColors.background }}
+      contentContainerClassName="p-4"
     >
       <SettingsSection title="App Blocking Permissions">
         <SettingItem
@@ -149,14 +188,16 @@ const SettingsScreen = () => {
 
       <SettingsSection title="App Usage Settings">
         <SettingItem
-          title="Enable Usage Tracking"
+          title="Usage Tracking"
           description="Monitor app usage and screen time"
           icon="analytics-outline"
-          value={isUsageTrackingEnabled}
-          showToggle
+          valueText={isUsageTrackingEnabled ? "Enabled" : "Disabled"}
+          showValue
           onPress={async () => {
-            const success = await toggleUsageTracking();
-            if (!success) {
+            try {
+              await AppBlockerModule.openUsageStatsSettings();
+            } catch (error) {
+              console.error('Error opening usage stats settings:', error);
               Alert.alert(
                 "Error",
                 "Unable to open settings. Please navigate to Settings > Privacy & Security > Analytics & Improvements manually.",
@@ -165,7 +206,17 @@ const SettingsScreen = () => {
             }
           }}
         />
+      </SettingsSection>
 
+      <SettingsSection title="Appearance">
+        <SettingItem
+          title="Theme"
+          description="Choose your preferred color theme"
+          icon="color-palette-outline"
+          valueText={getThemeDisplayText()}
+          showValue
+          onPress={cycleTheme}
+        />
       </SettingsSection>
 
       <SettingsSection title="About">
@@ -180,58 +231,5 @@ const SettingsScreen = () => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 16,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  sectionContent: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  settingItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
-  settingIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  settingContent: {
-    flex: 1,
-  },
-  settingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  settingDescription: {
-    fontSize: 14,
-  },
-  settingValue: {
-    fontSize: 14,
-    marginLeft: 8,
-  },
-}); 
 
 export default SettingsScreen;

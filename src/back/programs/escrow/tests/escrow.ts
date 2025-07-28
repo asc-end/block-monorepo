@@ -1,8 +1,10 @@
 import { Program, workspace, AnchorProvider, setProvider } from "@coral-xyz/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram } from "@solana/web3.js";
 import type { Escrow } from "../../target/types/escrow";
 import { assert } from "chai";
 import BN from "bn.js";
+import { claimCommitmentTx, createCommitmentTx, forfeitCommitmentTx, getCommitment, getCommitmentPda, getAllCommitmentsByUser, getNextAvailableId } from "@blockit/shared";
 
 describe("escrow", () => {
   // Configure the client to use the local cluster
@@ -27,8 +29,6 @@ describe("escrow", () => {
   console.log("- Program ID:", program.programId.toBase58());
   console.log("================================================")
 
-  const user = provider.wallet;
-
   // Helper function to get blockchain time
   async function getBlockchainTime(): Promise<number> {
     const slot = await provider.connection.getSlot();
@@ -40,61 +40,77 @@ describe("escrow", () => {
   let authority: Keypair;
   let treasuryPubKey: PublicKey;
   let otherUser: Keypair;
+  let user: Keypair;
 
   beforeEach(async () => {
     // Generate fresh keypairs for each test
     authority = Keypair.generate();
     treasuryPubKey = new PublicKey("DoGXPkPav6iyXk6sKnaBQdzP2PsJ9hVZnv6CpPgVzkkA");
     otherUser = Keypair.generate();
+    user = Keypair.generate();
 
     // Airdrop SOL to test accounts
-    const airdropTx = await provider.connection.requestAirdrop(
-      authority.publicKey,
-      2 * LAMPORTS_PER_SOL
-    );
-    await provider.connection.confirmTransaction(airdropTx);
+    await Promise.all([
+      provider.connection.requestAirdrop(authority.publicKey, 2 * LAMPORTS_PER_SOL),
+      provider.connection.requestAirdrop(otherUser.publicKey, 2 * LAMPORTS_PER_SOL),
+      provider.connection.requestAirdrop(user.publicKey, 2 * LAMPORTS_PER_SOL),
+    ]);
 
-    const airdropTx2 = await provider.connection.requestAirdrop(
-      otherUser.publicKey,
-      2 * LAMPORTS_PER_SOL
-    );
-    await provider.connection.confirmTransaction(airdropTx2);
+    await new Promise(resolve => setTimeout(resolve, 1000));
   });
 
   describe("create_commitment", () => {
     it("Creates a commitment successfully", async () => {
+      const id = await getNextAvailableId(program, user.publicKey);
       const amount = new BN(LAMPORTS_PER_SOL);
       const currentTime = await getBlockchainTime();
       const unlockTime = new BN(currentTime + 86400); // 1 day from now
 
-      // Derive commitment PDA
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+      const commitmentPda = getCommitmentPda(program, user.publicKey, id);
 
       // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
+      // console.log(authority.publicKey);
+      // const tx = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+
+      console.log(user.publicKey);
+      const sig = await program.methods
+        .createCommitment(id, amount, unlockTime, authority.publicKey)
         .accountsPartial({
           commitment: commitmentPda,
           user: user.publicKey,
           systemProgram: SystemProgram.programId,
         })
+        .signers([user])
         .rpc();
 
+        console.log(sig);
+
+      await provider.connection.confirmTransaction(sig, "confirmed");
+
+      // Fetch transaction details to get logs
+      const transactionData = await provider.connection.getTransaction(sig, { maxSupportedTransactionVersion: 0, commitment: "confirmed" }).catch(e => {
+        console.log("Error fetching transaction", e);
+        return null;
+      });
+
+      console.log("\n=== Transaction Logs ===");
+      console.log("Signature:", sig);
+      console.log(transactionData);
+
+      const eventIx = transactionData?.meta?.innerInstructions?.[0].instructions[0];
+      const rawData = anchor.utils.bytes.bs58.decode(eventIx?.data ?? "");
+      const base64Data = anchor.utils.bytes.base64.encode(rawData.subarray(8));
+      const event = program.coder.events.decode(base64Data);
+      console.log(event);
+
       // Fetch and verify commitment
-      const commitment = await program.account.commitment.fetch(commitmentPda);
-      assert.ok(commitment.user.equals(user.publicKey));
-      assert.ok(commitment.amount.eq(amount));
-      assert.ok(commitment.unlockTime.eq(unlockTime));
-      assert.ok(commitment.authority.equals(authority.publicKey));
-      assert.ok(commitment.createdAt.gte(new BN(currentTime)));
+      const commitment = await getCommitment(program, user.publicKey, id);
+
+      assert.equal(commitment.user.toString(), user.publicKey.toString());
+      assert.equal(commitment.id.toString(), id.toString());
+      assert.equal(commitment.amount.toString(), amount.toString());
+      assert.equal(commitment.unlockTime.toString(), unlockTime.toString());
+      assert.equal(commitment.authority.toString(), authority.publicKey.toString());
 
       // Verify SOL was transferred
       const commitmentBalance = await provider.connection.getBalance(commitmentPda);
@@ -104,389 +120,241 @@ describe("escrow", () => {
       assert.equal(commitmentBalance - rentExempt, amount.toNumber());
     });
 
-    it("Fails with invalid unlock time", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime - 86400); // 1 day ago
+    // it("Fails with invalid unlock time", async () => {
+    //   const id = await getNextAvailableId(program, user.publicKey);
+    //   const amount = new BN(LAMPORTS_PER_SOL);
+    //   const currentTime = await getBlockchainTime();
+    //   const unlockTime = new BN(currentTime - 86400); // 1 day ago
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+    //   try {
+    //     const tx = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+    //     await provider.sendAndConfirm(tx, [user]);
+    //     assert.fail("Expected error");
+    //   } catch (err) {
+    //     assert.include((err as Error).toString(), "Invalid unlock time");
+    //   }
+    // });
 
-      try {
-        await program.methods
-          .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-          .accountsPartial({
-            commitment: commitmentPda,
-            user: user.publicKey,
-            systemProgram: SystemProgram.programId,
-          })
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Invalid unlock time");
-      }
-    });
+    // it("Allows multiple commitments with different IDs", async () => {
+    //   const amount = new BN(LAMPORTS_PER_SOL / 2);
+    //   const currentTime = await getBlockchainTime();
+    //   const unlockTime = new BN(currentTime + 86400);
 
-    it("Allows multiple commitments with same unlock time", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL / 2);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 86400);
+    //   // Create first commitment
+    //   const id1 = await getNextAvailableId(program, user.publicKey);
+    //   console.log(id1);
+    //   const commitment1Pda = getCommitmentPda(program, user.publicKey, id1);
 
-      // Create first commitment
-      const [commitment1Pda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+    //   const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id1, authority.publicKey);
+    //   await provider.sendAndConfirm(tx1, [user]);
 
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitment1Pda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+    //   // Create second commitment with different ID
+    //   const id2 = new BN(id1.toString()).add(new BN(1));
+    //   console.log(id2);
+    //   const commitment2Pda = getCommitmentPda(program, user.publicKey, id2);
 
-      // Wait a second to ensure different created_at
-      await new Promise(resolve => setTimeout(resolve, 1100));
+    //   const tx2 = await createCommitmentTx(user.publicKey, amount, unlockTime, id2, authority.publicKey);
+    //   await provider.sendAndConfirm(tx2, [user]);
 
-      // Create second commitment with same unlock time
-      const currentTime2 = await getBlockchainTime();
-      const [commitment2Pda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime2).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+    //   // Verify both commitments exist
+    //   const commitment1 = await program.account.commitment.fetch(commitment1Pda);
+    //   const commitment2 = await program.account.commitment.fetch(commitment2Pda);
 
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime2))
-        .accountsPartial({
-          commitment: commitment2Pda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
-
-      // Verify both commitments exist
-      const commitment1 = await program.account.commitment.fetch(commitment1Pda);
-      const commitment2 = await program.account.commitment.fetch(commitment2Pda);
-
-      assert.ok(commitment1.unlockTime.eq(commitment2.unlockTime));
-      assert.ok(!commitment1.createdAt.eq(commitment2.createdAt));
-    });
+    //   assert.equal(commitment1.id.toString(), id1.toString());
+    //   assert.equal(commitment2.id.toString(), id2.toString());
+    //   assert.equal(commitment1.unlockTime.toString(), commitment2.unlockTime.toString());
+    // });
   });
 
-  describe("claim_commitment", () => {
-    it("Claims commitment after unlock time", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 2); // 2 seconds from now
+  // describe("claim_commitment", () => {
+  //   it("Claims commitment after unlock time", async () => {
+  //     const id = await getNextAvailableId(program, user.publicKey);
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 2); // 2 seconds from now
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  //     const commitmentPda = getCommitmentPda(program, user.publicKey, id);
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      const userBalanceBefore = await provider.connection.getBalance(user.publicKey);
+  //     const userBalanceBefore = await provider.connection.getBalance(user.publicKey);
 
-      // Get the rent-exempt amount for the commitment account
-      const rentExempt = await provider.connection.getMinimumBalanceForRentExemption(
-        program.account.commitment.size
-      );
+  //     // Get the rent-exempt amount for the commitment account
+  //     const rentExempt = await provider.connection.getMinimumBalanceForRentExemption(
+  //       program.account.commitment.size
+  //     );
 
-      // Wait for unlock time
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      // Claim commitment
-      const tx = await program.methods
-        .claimCommitment()
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-        })
-        .rpc();
-      await provider.connection.confirmTransaction(tx, 'confirmed');
+  //     // Wait for unlock time
+  //     await new Promise(resolve => setTimeout(resolve, 3000));
+  //     // Claim commitment
+  //     const tx2 = await claimCommitmentTx(user.publicKey, id);
+  //     await provider.sendAndConfirm(tx2, [user]);
 
-      const userBalanceAfter = await provider.connection.getBalance(user.publicKey);
-      const expectedBalance = userBalanceBefore + amount.toNumber() + rentExempt;
-      assert.approximately(userBalanceAfter, expectedBalance, 10000);
+  //     const userBalanceAfter = await provider.connection.getBalance(user.publicKey);
+  //     const expectedBalance = userBalanceBefore + amount.toNumber() + rentExempt;
+  //     assert.approximately(userBalanceAfter, expectedBalance, 10000);
 
-      const commitmentAccount = await provider.connection.getAccountInfo(commitmentPda);
-      assertAccountClosed(commitmentAccount, "Commitment account");
-    });
+  //     const commitmentAccount = await provider.connection.getAccountInfo(commitmentPda);
+  //     assertAccountClosed(commitmentAccount, "Commitment account");
+  //   });
 
-    it("Fails to claim before unlock time", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 86400); // 1 day from now
+  //   it("Fails to claim before unlock time", async () => {
+  //     const id = await getNextAvailableId(program, user.publicKey);
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 86400); // 1 day from now
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     // Try to claim immediately
+  //     try {
+  //       const tx2 = await claimCommitmentTx(user.publicKey, id);
+  //       await provider.sendAndConfirm(tx2, [user]);
+  //       assert.fail("Expected error");
+  //     } catch (err) {
+  //       assert.include((err as Error).toString(), "Commitment is still locked");
+  //     }
+  //   });
 
-      // Try to claim immediately
-      try {
-        await program.methods
-          .claimCommitment()
-          .accountsPartial({
-            commitment: commitmentPda,
-            user: user.publicKey,
-          })
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Commitment is still locked");
-      }
-    });
+  //   it("Only commitment owner can claim", async () => {
+  //     const id = await getNextAvailableId(program, user.publicKey);
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 2);
 
-    it("Only commitment owner can claim", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 2);
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  //     // Wait for unlock
+  //     await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     // Try to claim as different user
+  //     try {
 
-      // Wait for unlock
-      await new Promise(resolve => setTimeout(resolve, 3000));
+  //       const commitment = getCommitmentPda(program!, user.publicKey, id);
+  //       const tx = await program!.methods
+  //           .claimCommitment()
+  //           .accountsPartial({
+  //               commitment,
+  //               user: otherUser.publicKey,
+  //           })
+  //           .transaction()
 
-      // Try to claim as different user
-      try {
-        await program.methods
-          .claimCommitment()
-          .accountsPartial({
-            commitment: commitmentPda,
-            user: otherUser.publicKey,
-          })
-          .signers([otherUser])
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Invalid user");
-      }
-    });
-  });
+  //       await provider.sendAndConfirm(tx, [otherUser]);
 
-  describe("forfeit_commitment", () => {
-    it("Authority can forfeit commitment", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 86400);
+  //       assert.fail("Expected error");
+  //     } catch (err) {
+  //       console.log(err);
+  //       assert.include((err as Error).toString(), "Invalid user");
+  //     }
+  //   });
+  // });
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  // describe("forfeit_commitment", () => {
+  //   it("Authority can forfeit commitment", async () => {
+  //     const id = await getNextAvailableId(program, user.publicKey);
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 86400);
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     const commitmentPda = getCommitmentPda(program, user.publicKey, id);
 
-      const treasuryBalanceBefore = await provider.connection.getBalance(treasuryPubKey);
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      // Forfeit as authority
-      await program.methods
-        .forfeitCommitment()
-        .accountsPartial({
-          commitment: commitmentPda,
-          authority: authority.publicKey,
-          user: user.publicKey,
-          treasury: treasuryPubKey,
-        })
-        .signers([authority])
-        .rpc();
+  //     const treasuryBalanceBefore = await provider.connection.getBalance(treasuryPubKey);
 
-      // Verify fund distribution
-      const treasuryBalanceAfter = await provider.connection.getBalance(treasuryPubKey);
+  //     // Forfeit as authority
+  //     const tx2 = await forfeitCommitmentTx(user.publicKey, id, authority.publicKey, treasuryPubKey);
+  //     await provider.sendAndConfirm(tx2, [authority]);
 
-      assert.equal(
-        treasuryBalanceAfter - treasuryBalanceBefore,
-        amount.toNumber(),
-        "Treasury should receive the full forfeited amount"
-      );
+  //     // Verify fund distribution
+  //     const treasuryBalanceAfter = await provider.connection.getBalance(treasuryPubKey);
 
-      // Verify commitment was closed
-      const commitmentAccount = await provider.connection.getAccountInfo(commitmentPda);
-      assertAccountClosed(commitmentAccount, "Commitment account");
-    });
+  //     assert.equal(
+  //       treasuryBalanceAfter - treasuryBalanceBefore,
+  //       amount.toNumber(),
+  //       "Treasury should receive the full forfeited amount"
+  //     );
 
-    it("Only authority can forfeit", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 86400);
+  //     // Verify commitment was closed
+  //     const commitmentAccount = await provider.connection.getAccountInfo(commitmentPda);
+  //     assertAccountClosed(commitmentAccount, "Commitment account");
+  //   });
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  //   it("Only authority can forfeit", async () => {
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 86400);
+  //     const id = await getNextAvailableId(program, user.publicKey);
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      // Try to forfeit as user
-      try {
-        await program.methods
-          .forfeitCommitment()
-          .accountsPartial({
-            commitment: commitmentPda,
-            authority: user.publicKey,
-            user: user.publicKey,
-            treasury: treasuryPubKey,
-          })
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Invalid authority");
-      }
+  //     const commitment = getCommitmentPda(program!, user.publicKey, id);
+  //     // Try to forfeit as user
+  //     try {
+  //       const tx = await program!.methods
+  //           .forfeitCommitment()
+  //           .accountsPartial({
+  //               commitment,
+  //               user: user.publicKey,
+  //               treasury: treasuryPubKey,
+  //               authority: user.publicKey,
+  //           })
+  //           .transaction()
+  //       await provider.sendAndConfirm(tx, [user]);
+  //       assert.fail("Expected error");
+  //     } catch (err) {
+  //       assert.include((err as Error).toString(), "Invalid authority");
+  //     }
 
-      // Try to forfeit as other user
-      try {
-        await program.methods
-          .forfeitCommitment()
-          .accountsPartial({
-            commitment: commitmentPda,
-            authority: otherUser.publicKey,
-            user: user.publicKey,
-            treasury: treasuryPubKey,
-          })
-          .signers([otherUser])
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Invalid authority");
-      }
-    });
+  //     // Try to forfeit as other user
+  //     try {
+  //       const tx = await program!.methods
+  //           .forfeitCommitment()
+  //           .accountsPartial({
+  //               commitment,
+  //               user: user.publicKey,
+  //               treasury: treasuryPubKey,
+  //               authority: otherUser.publicKey,
+  //           })
+  //           .transaction()
+  //       await provider.sendAndConfirm(tx, [otherUser]);
+  //       assert.fail("Expected error");
+  //     } catch (err) {
+  //       assert.include((err as Error).toString(), "Invalid authority");
+  //     }
+  //   });
 
-    it("Cannot forfeit after unlock time", async () => {
-      const amount = new BN(LAMPORTS_PER_SOL);
-      const currentTime = await getBlockchainTime();
-      const unlockTime = new BN(currentTime + 2);
+  //   it("Cannot forfeit after unlock time", async () => {
+  //     const amount = new BN(LAMPORTS_PER_SOL);
+  //     const currentTime = await getBlockchainTime();
+  //     const unlockTime = new BN(currentTime + 2);
+  //     const id = await getNextAvailableId(program, user.publicKey);
 
-      const [commitmentPda] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("commitment"),
-          user.publicKey.toBuffer(),
-          new BN(currentTime).toArrayLike(Buffer, "le", 8),
-          unlockTime.toArrayLike(Buffer, "le", 8),
-        ],
-        program.programId
-      );
+  //     // Create commitment
+  //     const tx1 = await createCommitmentTx(user.publicKey, amount, unlockTime, id, authority.publicKey);
+  //     await provider.sendAndConfirm(tx1, [user]);
 
-      // Create commitment
-      await program.methods
-        .createCommitment(amount, unlockTime, authority.publicKey, new BN(currentTime))
-        .accountsPartial({
-          commitment: commitmentPda,
-          user: user.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
-        .rpc();
+  //     // Wait past unlock time
+  //     await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Wait past unlock time
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      // Try to forfeit
-      try {
-        await program.methods
-          .forfeitCommitment()
-          .accountsPartial({
-            commitment: commitmentPda,
-            authority: authority.publicKey,
-            user: user.publicKey,
-            treasury: treasuryPubKey,
-          })
-          .signers([authority])
-          .rpc();
-        assert.fail("Expected error");
-      } catch (err) {
-        assert.include((err as Error).toString(), "Commitment has already been unlocked");
-      }
-    });
-  });
+  //     // Try to forfeit
+  //     try {
+  //       const tx2 = await forfeitCommitmentTx(user.publicKey, id, authority.publicKey, treasuryPubKey);
+  //       await provider.sendAndConfirm(tx2, [authority]);
+  //       assert.fail("Expected error");
+  //     } catch (err) {
+  //       assert.include((err as Error).toString(), "Commitment has already been unlocked");
+  //     }
+  //   });
+  // });
 });

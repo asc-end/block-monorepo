@@ -6,7 +6,8 @@ import {getAssociatedTokenAddress } from "@solana/spl-token";
 import { expect } from "chai";
 import BN from "bn.js";
 import { createListingTx, purchaseDataPassTx, marketplacePDAs, calculateDataPassPayment } from "@blockit/shared";
-import { getMarketplaceConfig, getPass, getPassCounter, initializeMarketplaceIfNeeded, mockMerkleRoot, timeToUnix, createEligibilityMerkleRoot } from "./utils";
+import { getMarketplaceConfig, getPass, getPassCounter, initializeMarketplaceIfNeeded, mockMerkleRoot, createEligibilityMerkleRoot } from "./utils";
+import { timeToUnix } from "@blockit/shared";
 
 describe("Data Marketplace - Buyer Behavior", () => {
   const provider = anchor.AnchorProvider.env();

@@ -132,3 +132,7 @@ temp/
 target/
 .anchor/
 /Cargo.lock
+
+# Authority keypair - NEVER commit this!
+.authority.json
+**/authority.json

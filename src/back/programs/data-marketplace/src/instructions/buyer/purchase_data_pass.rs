@@ -64,7 +64,7 @@ pub fn purchase_data_pass(
     let data_pass = &mut ctx.accounts.data_pass;
     
     // Calculate total days and payment
-    let days = ((end_date - start_date) / 86400);
+    let days = (end_date - start_date) / 86400;
     require!(days > 0 && days <= 365, MarketplaceError::InvalidDateRange);
     
     let total_payment = max_price_per_day * days as u64 * eligible_seller_count as u64;
@@ -167,6 +167,7 @@ pub fn purchase_data_pass(
     Ok(())
 }
 
+#[event_cpi]
 #[derive(Accounts)]
 pub struct PurchaseDataPass<'info> {
     #[account(mut)]

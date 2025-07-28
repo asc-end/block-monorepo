@@ -2,6 +2,23 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::errors::*;
 
+pub fn remove_listing(ctx: Context<RemoveListing>) -> Result<()> {
+    let data_seller = &mut ctx.accounts.data_seller;
+    let listing_id = ctx.accounts.listing.listing_id;
+    let seller = ctx.accounts.seller.key();
+    
+    // Remove listing ID from seller
+    data_seller.listing_id = None;
+    
+    emit_cpi!(ListingRemovedEvent {
+        listing_id,
+        seller,
+    });
+    
+    Ok(())
+}
+
+#[event_cpi]
 #[derive(Accounts)]
 pub struct RemoveListing<'info> {
     #[account(mut)]
@@ -29,22 +46,6 @@ pub struct RemoveListing<'info> {
         bump = marketplace_config.bump
     )]
     pub marketplace_config: Account<'info, MarketplaceConfig>,
-}
-
-pub fn remove_listing(ctx: Context<RemoveListing>) -> Result<()> {
-    let data_seller = &mut ctx.accounts.data_seller;
-    let listing_id = ctx.accounts.listing.listing_id;
-    let seller = ctx.accounts.seller.key();
-    
-    // Remove listing ID from seller
-    data_seller.listing_id = None;
-    
-    emit_cpi!(ListingRemovedEvent {
-        listing_id,
-        seller,
-    });
-    
-    Ok(())
 }
 
 #[event]
