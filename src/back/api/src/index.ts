@@ -24,8 +24,9 @@ import AppUsage from './routes/app-usage';
 import Todo from "./routes/todo";
 import Routines from './routes/routines';
 import Apps from './routes/apps';
-import Marketplace from './routes/marketplace';
 import Commitments from './routes/commitments';
+import Marketplace from './routes/marketplace/index';
+import MarketplaceSellers from './routes/marketplace/sellers';
 
 const app = express();
 
@@ -74,7 +75,8 @@ app.use('/app-usage', AppUsage);
 app.use('/todo', Todo);
 app.use('/routines', Routines);
 app.use('/apps', Apps);
-app.use('/api/marketplace', Marketplace);
+app.use('/marketplace', Marketplace);
+app.use('/marketplace/sellers', MarketplaceSellers);
 app.use('/commitments', Commitments);
 
 app.get('/', (req, res) => { res.send('Hello World!') });

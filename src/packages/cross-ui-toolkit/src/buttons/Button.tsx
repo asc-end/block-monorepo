@@ -31,7 +31,7 @@ export function Button(props: ButtonProps): React.ReactElement {
   const buttonStyle = useMemo(() => ({
     width: '100%',
     position: 'relative' as const,
-    opacity: disabled ? 0.5 : 1,
+    opacity: disabled ? 0.5 : loading ? 0.7 : 1,
     backgroundColor: style?.backgroundColor ?? variantStyle.backgroundColor,
     borderWidth: variantStyle.borderWidth,
     borderColor: style?.borderColor ?? variantStyle.borderColor,

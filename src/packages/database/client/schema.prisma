@@ -204,34 +204,6 @@ model MarketplaceConfig {
   @@map("marketplace_config")
 }
 
-model DataSeller {
-  sellerAddress    String   @id
-  listingId        String? // Optional, can be null
-  totalRevenue     String // Store as string for large numbers
-  unclaimedRevenue String
-  accountAddress   String   @unique
-  updatedAt        DateTime @updatedAt
-
-  @@index([listingId])
-  @@map("data_sellers")
-}
-
-model DataListing {
-  listingId      String   @id
-  sellerAddress  String
-  startDate      DateTime
-  endDate        DateTime
-  pricePerDay    String // Store as string for large numbers
-  accountAddress String   @unique
-  isActive       Boolean  @default(true)
-  updatedAt      DateTime @updatedAt
-
-  @@index([sellerAddress])
-  @@index([isActive])
-  @@index([startDate, endDate])
-  @@map("data_listings")
-}
-
 model DataPass {
   passId              String   @id
   buyerAddress        String
@@ -264,14 +236,46 @@ model MerkleDistributor {
   @@map("merkle_distributors")
 }
 
+model DataSeller {
+  sellerAddress    String        @id
+  listingId        String?       @unique // Optional, can be null
+  totalRevenue     String // Store as string for large numbers
+  unclaimedRevenue String
+  accountAddress   String        @unique
+  updatedAt        DateTime      @updatedAt
+  listing          DataListing?  @relation(fields: [listingId], references: [listingId])
+  proofs           SellerProof[] // All proofs for this seller
+
+  @@index([listingId])
+  @@map("data_sellers")
+}
+
+model DataListing {
+  listingId      String      @id
+  sellerAddress  String
+  startDate      DateTime
+  endDate        DateTime
+  pricePerDay    String // Store as string for large numbers
+  accountAddress String      @unique
+  isActive       Boolean     @default(true)
+  updatedAt      DateTime    @updatedAt
+  seller         DataSeller? // Reverse relation
+
+  @@index([sellerAddress])
+  @@index([isActive])
+  @@index([startDate, endDate])
+  @@map("data_listings")
+}
+
 model SellerProof {
   sellerAddress String
   periodId      BigInt
   amount        BigInt // Using BigInt for lamport amounts
   proof         Json // Array of arrays: number[][]
-  claimed       Boolean   @default(false)
+  claimed       Boolean    @default(false)
   claimedAt     DateTime?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime   @default(now())
+  seller        DataSeller @relation(fields: [sellerAddress], references: [sellerAddress])
 
   @@id([sellerAddress, periodId])
   @@index([sellerAddress])

@@ -219,26 +219,6 @@ exports.Prisma.MarketplaceConfigScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.DataSellerScalarFieldEnum = {
-  sellerAddress: 'sellerAddress',
-  listingId: 'listingId',
-  totalRevenue: 'totalRevenue',
-  unclaimedRevenue: 'unclaimedRevenue',
-  accountAddress: 'accountAddress',
-  updatedAt: 'updatedAt'
-};
-
-exports.Prisma.DataListingScalarFieldEnum = {
-  listingId: 'listingId',
-  sellerAddress: 'sellerAddress',
-  startDate: 'startDate',
-  endDate: 'endDate',
-  pricePerDay: 'pricePerDay',
-  accountAddress: 'accountAddress',
-  isActive: 'isActive',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.DataPassScalarFieldEnum = {
   passId: 'passId',
   buyerAddress: 'buyerAddress',
@@ -261,6 +241,26 @@ exports.Prisma.MerkleDistributorScalarFieldEnum = {
   totalClaims: 'totalClaims',
   claimedAmount: 'claimedAmount',
   accountAddress: 'accountAddress',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DataSellerScalarFieldEnum = {
+  sellerAddress: 'sellerAddress',
+  listingId: 'listingId',
+  totalRevenue: 'totalRevenue',
+  unclaimedRevenue: 'unclaimedRevenue',
+  accountAddress: 'accountAddress',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DataListingScalarFieldEnum = {
+  listingId: 'listingId',
+  sellerAddress: 'sellerAddress',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  pricePerDay: 'pricePerDay',
+  accountAddress: 'accountAddress',
+  isActive: 'isActive',
   updatedAt: 'updatedAt'
 };
 
@@ -343,10 +343,10 @@ exports.Prisma.ModelName = {
   Task: 'Task',
   Commitment: 'Commitment',
   MarketplaceConfig: 'MarketplaceConfig',
-  DataSeller: 'DataSeller',
-  DataListing: 'DataListing',
   DataPass: 'DataPass',
   MerkleDistributor: 'MerkleDistributor',
+  DataSeller: 'DataSeller',
+  DataListing: 'DataListing',
   SellerProof: 'SellerProof'
 };
 

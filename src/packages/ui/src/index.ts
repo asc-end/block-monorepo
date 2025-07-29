@@ -21,7 +21,7 @@ export * from './app/components/create-routine/Time';
 export * from './app/components/create-routine/Calendar';
 export * from './app/components/create-routine/Money';
 export * from './app/components/focus-sesion/FocusSession';
-
+export * from './app/components/stats/StatsSummary';
 // Hooks
 export * from './hooks';
 

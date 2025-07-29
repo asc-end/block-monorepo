@@ -59,16 +59,6 @@ export type Commitment = $Result.DefaultSelection<Prisma.$CommitmentPayload>
  */
 export type MarketplaceConfig = $Result.DefaultSelection<Prisma.$MarketplaceConfigPayload>
 /**
- * Model DataSeller
- * 
- */
-export type DataSeller = $Result.DefaultSelection<Prisma.$DataSellerPayload>
-/**
- * Model DataListing
- * 
- */
-export type DataListing = $Result.DefaultSelection<Prisma.$DataListingPayload>
-/**
  * Model DataPass
  * 
  */
@@ -78,6 +68,16 @@ export type DataPass = $Result.DefaultSelection<Prisma.$DataPassPayload>
  * 
  */
 export type MerkleDistributor = $Result.DefaultSelection<Prisma.$MerkleDistributorPayload>
+/**
+ * Model DataSeller
+ * 
+ */
+export type DataSeller = $Result.DefaultSelection<Prisma.$DataSellerPayload>
+/**
+ * Model DataListing
+ * 
+ */
+export type DataListing = $Result.DefaultSelection<Prisma.$DataListingPayload>
 /**
  * Model SellerProof
  * 
@@ -382,26 +382,6 @@ export class PrismaClient<
   get marketplaceConfig(): Prisma.MarketplaceConfigDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.dataSeller`: Exposes CRUD operations for the **DataSeller** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more DataSellers
-    * const dataSellers = await prisma.dataSeller.findMany()
-    * ```
-    */
-  get dataSeller(): Prisma.DataSellerDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.dataListing`: Exposes CRUD operations for the **DataListing** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more DataListings
-    * const dataListings = await prisma.dataListing.findMany()
-    * ```
-    */
-  get dataListing(): Prisma.DataListingDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.dataPass`: Exposes CRUD operations for the **DataPass** model.
     * Example usage:
     * ```ts
@@ -420,6 +400,26 @@ export class PrismaClient<
     * ```
     */
   get merkleDistributor(): Prisma.MerkleDistributorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dataSeller`: Exposes CRUD operations for the **DataSeller** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DataSellers
+    * const dataSellers = await prisma.dataSeller.findMany()
+    * ```
+    */
+  get dataSeller(): Prisma.DataSellerDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dataListing`: Exposes CRUD operations for the **DataListing** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DataListings
+    * const dataListings = await prisma.dataListing.findMany()
+    * ```
+    */
+  get dataListing(): Prisma.DataListingDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.sellerProof`: Exposes CRUD operations for the **SellerProof** model.
@@ -879,10 +879,10 @@ export namespace Prisma {
     Task: 'Task',
     Commitment: 'Commitment',
     MarketplaceConfig: 'MarketplaceConfig',
-    DataSeller: 'DataSeller',
-    DataListing: 'DataListing',
     DataPass: 'DataPass',
     MerkleDistributor: 'MerkleDistributor',
+    DataSeller: 'DataSeller',
+    DataListing: 'DataListing',
     SellerProof: 'SellerProof'
   };
 
@@ -902,7 +902,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "focusSession" | "appUsage" | "routine" | "app" | "routineApp" | "task" | "commitment" | "marketplaceConfig" | "dataSeller" | "dataListing" | "dataPass" | "merkleDistributor" | "sellerProof"
+      modelProps: "user" | "focusSession" | "appUsage" | "routine" | "app" | "routineApp" | "task" | "commitment" | "marketplaceConfig" | "dataPass" | "merkleDistributor" | "dataSeller" | "dataListing" | "sellerProof"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1572,154 +1572,6 @@ export namespace Prisma {
           }
         }
       }
-      DataSeller: {
-        payload: Prisma.$DataSellerPayload<ExtArgs>
-        fields: Prisma.DataSellerFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.DataSellerFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.DataSellerFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          findFirst: {
-            args: Prisma.DataSellerFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.DataSellerFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          findMany: {
-            args: Prisma.DataSellerFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
-          }
-          create: {
-            args: Prisma.DataSellerCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          createMany: {
-            args: Prisma.DataSellerCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.DataSellerCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
-          }
-          delete: {
-            args: Prisma.DataSellerDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          update: {
-            args: Prisma.DataSellerUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          deleteMany: {
-            args: Prisma.DataSellerDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.DataSellerUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.DataSellerUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
-          }
-          upsert: {
-            args: Prisma.DataSellerUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
-          }
-          aggregate: {
-            args: Prisma.DataSellerAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateDataSeller>
-          }
-          groupBy: {
-            args: Prisma.DataSellerGroupByArgs<ExtArgs>
-            result: $Utils.Optional<DataSellerGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.DataSellerCountArgs<ExtArgs>
-            result: $Utils.Optional<DataSellerCountAggregateOutputType> | number
-          }
-        }
-      }
-      DataListing: {
-        payload: Prisma.$DataListingPayload<ExtArgs>
-        fields: Prisma.DataListingFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.DataListingFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.DataListingFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          findFirst: {
-            args: Prisma.DataListingFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.DataListingFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          findMany: {
-            args: Prisma.DataListingFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
-          }
-          create: {
-            args: Prisma.DataListingCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          createMany: {
-            args: Prisma.DataListingCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.DataListingCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
-          }
-          delete: {
-            args: Prisma.DataListingDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          update: {
-            args: Prisma.DataListingUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          deleteMany: {
-            args: Prisma.DataListingDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.DataListingUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.DataListingUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
-          }
-          upsert: {
-            args: Prisma.DataListingUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
-          }
-          aggregate: {
-            args: Prisma.DataListingAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateDataListing>
-          }
-          groupBy: {
-            args: Prisma.DataListingGroupByArgs<ExtArgs>
-            result: $Utils.Optional<DataListingGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.DataListingCountArgs<ExtArgs>
-            result: $Utils.Optional<DataListingCountAggregateOutputType> | number
-          }
-        }
-      }
       DataPass: {
         payload: Prisma.$DataPassPayload<ExtArgs>
         fields: Prisma.DataPassFieldRefs
@@ -1865,6 +1717,154 @@ export namespace Prisma {
           count: {
             args: Prisma.MerkleDistributorCountArgs<ExtArgs>
             result: $Utils.Optional<MerkleDistributorCountAggregateOutputType> | number
+          }
+        }
+      }
+      DataSeller: {
+        payload: Prisma.$DataSellerPayload<ExtArgs>
+        fields: Prisma.DataSellerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DataSellerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DataSellerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          findFirst: {
+            args: Prisma.DataSellerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DataSellerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          findMany: {
+            args: Prisma.DataSellerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
+          }
+          create: {
+            args: Prisma.DataSellerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          createMany: {
+            args: Prisma.DataSellerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DataSellerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
+          }
+          delete: {
+            args: Prisma.DataSellerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          update: {
+            args: Prisma.DataSellerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          deleteMany: {
+            args: Prisma.DataSellerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DataSellerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DataSellerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>[]
+          }
+          upsert: {
+            args: Prisma.DataSellerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataSellerPayload>
+          }
+          aggregate: {
+            args: Prisma.DataSellerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDataSeller>
+          }
+          groupBy: {
+            args: Prisma.DataSellerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DataSellerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DataSellerCountArgs<ExtArgs>
+            result: $Utils.Optional<DataSellerCountAggregateOutputType> | number
+          }
+        }
+      }
+      DataListing: {
+        payload: Prisma.$DataListingPayload<ExtArgs>
+        fields: Prisma.DataListingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DataListingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DataListingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          findFirst: {
+            args: Prisma.DataListingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DataListingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          findMany: {
+            args: Prisma.DataListingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
+          }
+          create: {
+            args: Prisma.DataListingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          createMany: {
+            args: Prisma.DataListingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DataListingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
+          }
+          delete: {
+            args: Prisma.DataListingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          update: {
+            args: Prisma.DataListingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          deleteMany: {
+            args: Prisma.DataListingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DataListingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DataListingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>[]
+          }
+          upsert: {
+            args: Prisma.DataListingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataListingPayload>
+          }
+          aggregate: {
+            args: Prisma.DataListingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDataListing>
+          }
+          groupBy: {
+            args: Prisma.DataListingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DataListingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DataListingCountArgs<ExtArgs>
+            result: $Utils.Optional<DataListingCountAggregateOutputType> | number
           }
         }
       }
@@ -2035,10 +2035,10 @@ export namespace Prisma {
     task?: TaskOmit
     commitment?: CommitmentOmit
     marketplaceConfig?: MarketplaceConfigOmit
-    dataSeller?: DataSellerOmit
-    dataListing?: DataListingOmit
     dataPass?: DataPassOmit
     merkleDistributor?: MerkleDistributorOmit
+    dataSeller?: DataSellerOmit
+    dataListing?: DataListingOmit
     sellerProof?: SellerProofOmit
   }
 
@@ -2295,6 +2295,37 @@ export namespace Prisma {
    */
   export type AppCountOutputTypeCountRoutinesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoutineAppWhereInput
+  }
+
+
+  /**
+   * Count Type DataSellerCountOutputType
+   */
+
+  export type DataSellerCountOutputType = {
+    proofs: number
+  }
+
+  export type DataSellerCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    proofs?: boolean | DataSellerCountOutputTypeCountProofsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DataSellerCountOutputType without action
+   */
+  export type DataSellerCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSellerCountOutputType
+     */
+    select?: DataSellerCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DataSellerCountOutputType without action
+   */
+  export type DataSellerCountOutputTypeCountProofsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SellerProofWhereInput
   }
 
 
@@ -12561,2048 +12592,6 @@ export namespace Prisma {
 
 
   /**
-   * Model DataSeller
-   */
-
-  export type AggregateDataSeller = {
-    _count: DataSellerCountAggregateOutputType | null
-    _min: DataSellerMinAggregateOutputType | null
-    _max: DataSellerMaxAggregateOutputType | null
-  }
-
-  export type DataSellerMinAggregateOutputType = {
-    sellerAddress: string | null
-    listingId: string | null
-    totalRevenue: string | null
-    unclaimedRevenue: string | null
-    accountAddress: string | null
-    updatedAt: Date | null
-  }
-
-  export type DataSellerMaxAggregateOutputType = {
-    sellerAddress: string | null
-    listingId: string | null
-    totalRevenue: string | null
-    unclaimedRevenue: string | null
-    accountAddress: string | null
-    updatedAt: Date | null
-  }
-
-  export type DataSellerCountAggregateOutputType = {
-    sellerAddress: number
-    listingId: number
-    totalRevenue: number
-    unclaimedRevenue: number
-    accountAddress: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type DataSellerMinAggregateInputType = {
-    sellerAddress?: true
-    listingId?: true
-    totalRevenue?: true
-    unclaimedRevenue?: true
-    accountAddress?: true
-    updatedAt?: true
-  }
-
-  export type DataSellerMaxAggregateInputType = {
-    sellerAddress?: true
-    listingId?: true
-    totalRevenue?: true
-    unclaimedRevenue?: true
-    accountAddress?: true
-    updatedAt?: true
-  }
-
-  export type DataSellerCountAggregateInputType = {
-    sellerAddress?: true
-    listingId?: true
-    totalRevenue?: true
-    unclaimedRevenue?: true
-    accountAddress?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type DataSellerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DataSeller to aggregate.
-     */
-    where?: DataSellerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataSellers to fetch.
-     */
-    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: DataSellerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataSellers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataSellers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned DataSellers
-    **/
-    _count?: true | DataSellerCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: DataSellerMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: DataSellerMaxAggregateInputType
-  }
-
-  export type GetDataSellerAggregateType<T extends DataSellerAggregateArgs> = {
-        [P in keyof T & keyof AggregateDataSeller]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateDataSeller[P]>
-      : GetScalarType<T[P], AggregateDataSeller[P]>
-  }
-
-
-
-
-  export type DataSellerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DataSellerWhereInput
-    orderBy?: DataSellerOrderByWithAggregationInput | DataSellerOrderByWithAggregationInput[]
-    by: DataSellerScalarFieldEnum[] | DataSellerScalarFieldEnum
-    having?: DataSellerScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: DataSellerCountAggregateInputType | true
-    _min?: DataSellerMinAggregateInputType
-    _max?: DataSellerMaxAggregateInputType
-  }
-
-  export type DataSellerGroupByOutputType = {
-    sellerAddress: string
-    listingId: string | null
-    totalRevenue: string
-    unclaimedRevenue: string
-    accountAddress: string
-    updatedAt: Date
-    _count: DataSellerCountAggregateOutputType | null
-    _min: DataSellerMinAggregateOutputType | null
-    _max: DataSellerMaxAggregateOutputType | null
-  }
-
-  type GetDataSellerGroupByPayload<T extends DataSellerGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<DataSellerGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof DataSellerGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], DataSellerGroupByOutputType[P]>
-            : GetScalarType<T[P], DataSellerGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type DataSellerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    sellerAddress?: boolean
-    listingId?: boolean
-    totalRevenue?: boolean
-    unclaimedRevenue?: boolean
-    accountAddress?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataSeller"]>
-
-  export type DataSellerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    sellerAddress?: boolean
-    listingId?: boolean
-    totalRevenue?: boolean
-    unclaimedRevenue?: boolean
-    accountAddress?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataSeller"]>
-
-  export type DataSellerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    sellerAddress?: boolean
-    listingId?: boolean
-    totalRevenue?: boolean
-    unclaimedRevenue?: boolean
-    accountAddress?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataSeller"]>
-
-  export type DataSellerSelectScalar = {
-    sellerAddress?: boolean
-    listingId?: boolean
-    totalRevenue?: boolean
-    unclaimedRevenue?: boolean
-    accountAddress?: boolean
-    updatedAt?: boolean
-  }
-
-  export type DataSellerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sellerAddress" | "listingId" | "totalRevenue" | "unclaimedRevenue" | "accountAddress" | "updatedAt", ExtArgs["result"]["dataSeller"]>
-
-  export type $DataSellerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "DataSeller"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      sellerAddress: string
-      listingId: string | null
-      totalRevenue: string
-      unclaimedRevenue: string
-      accountAddress: string
-      updatedAt: Date
-    }, ExtArgs["result"]["dataSeller"]>
-    composites: {}
-  }
-
-  type DataSellerGetPayload<S extends boolean | null | undefined | DataSellerDefaultArgs> = $Result.GetResult<Prisma.$DataSellerPayload, S>
-
-  type DataSellerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<DataSellerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: DataSellerCountAggregateInputType | true
-    }
-
-  export interface DataSellerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataSeller'], meta: { name: 'DataSeller' } }
-    /**
-     * Find zero or one DataSeller that matches the filter.
-     * @param {DataSellerFindUniqueArgs} args - Arguments to find a DataSeller
-     * @example
-     * // Get one DataSeller
-     * const dataSeller = await prisma.dataSeller.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends DataSellerFindUniqueArgs>(args: SelectSubset<T, DataSellerFindUniqueArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one DataSeller that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {DataSellerFindUniqueOrThrowArgs} args - Arguments to find a DataSeller
-     * @example
-     * // Get one DataSeller
-     * const dataSeller = await prisma.dataSeller.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends DataSellerFindUniqueOrThrowArgs>(args: SelectSubset<T, DataSellerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DataSeller that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerFindFirstArgs} args - Arguments to find a DataSeller
-     * @example
-     * // Get one DataSeller
-     * const dataSeller = await prisma.dataSeller.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends DataSellerFindFirstArgs>(args?: SelectSubset<T, DataSellerFindFirstArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DataSeller that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerFindFirstOrThrowArgs} args - Arguments to find a DataSeller
-     * @example
-     * // Get one DataSeller
-     * const dataSeller = await prisma.dataSeller.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends DataSellerFindFirstOrThrowArgs>(args?: SelectSubset<T, DataSellerFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more DataSellers that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all DataSellers
-     * const dataSellers = await prisma.dataSeller.findMany()
-     * 
-     * // Get first 10 DataSellers
-     * const dataSellers = await prisma.dataSeller.findMany({ take: 10 })
-     * 
-     * // Only select the `sellerAddress`
-     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.findMany({ select: { sellerAddress: true } })
-     * 
-     */
-    findMany<T extends DataSellerFindManyArgs>(args?: SelectSubset<T, DataSellerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a DataSeller.
-     * @param {DataSellerCreateArgs} args - Arguments to create a DataSeller.
-     * @example
-     * // Create one DataSeller
-     * const DataSeller = await prisma.dataSeller.create({
-     *   data: {
-     *     // ... data to create a DataSeller
-     *   }
-     * })
-     * 
-     */
-    create<T extends DataSellerCreateArgs>(args: SelectSubset<T, DataSellerCreateArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many DataSellers.
-     * @param {DataSellerCreateManyArgs} args - Arguments to create many DataSellers.
-     * @example
-     * // Create many DataSellers
-     * const dataSeller = await prisma.dataSeller.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends DataSellerCreateManyArgs>(args?: SelectSubset<T, DataSellerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many DataSellers and returns the data saved in the database.
-     * @param {DataSellerCreateManyAndReturnArgs} args - Arguments to create many DataSellers.
-     * @example
-     * // Create many DataSellers
-     * const dataSeller = await prisma.dataSeller.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many DataSellers and only return the `sellerAddress`
-     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.createManyAndReturn({
-     *   select: { sellerAddress: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends DataSellerCreateManyAndReturnArgs>(args?: SelectSubset<T, DataSellerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a DataSeller.
-     * @param {DataSellerDeleteArgs} args - Arguments to delete one DataSeller.
-     * @example
-     * // Delete one DataSeller
-     * const DataSeller = await prisma.dataSeller.delete({
-     *   where: {
-     *     // ... filter to delete one DataSeller
-     *   }
-     * })
-     * 
-     */
-    delete<T extends DataSellerDeleteArgs>(args: SelectSubset<T, DataSellerDeleteArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one DataSeller.
-     * @param {DataSellerUpdateArgs} args - Arguments to update one DataSeller.
-     * @example
-     * // Update one DataSeller
-     * const dataSeller = await prisma.dataSeller.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends DataSellerUpdateArgs>(args: SelectSubset<T, DataSellerUpdateArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more DataSellers.
-     * @param {DataSellerDeleteManyArgs} args - Arguments to filter DataSellers to delete.
-     * @example
-     * // Delete a few DataSellers
-     * const { count } = await prisma.dataSeller.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends DataSellerDeleteManyArgs>(args?: SelectSubset<T, DataSellerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DataSellers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many DataSellers
-     * const dataSeller = await prisma.dataSeller.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends DataSellerUpdateManyArgs>(args: SelectSubset<T, DataSellerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DataSellers and returns the data updated in the database.
-     * @param {DataSellerUpdateManyAndReturnArgs} args - Arguments to update many DataSellers.
-     * @example
-     * // Update many DataSellers
-     * const dataSeller = await prisma.dataSeller.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more DataSellers and only return the `sellerAddress`
-     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.updateManyAndReturn({
-     *   select: { sellerAddress: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends DataSellerUpdateManyAndReturnArgs>(args: SelectSubset<T, DataSellerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one DataSeller.
-     * @param {DataSellerUpsertArgs} args - Arguments to update or create a DataSeller.
-     * @example
-     * // Update or create a DataSeller
-     * const dataSeller = await prisma.dataSeller.upsert({
-     *   create: {
-     *     // ... data to create a DataSeller
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the DataSeller we want to update
-     *   }
-     * })
-     */
-    upsert<T extends DataSellerUpsertArgs>(args: SelectSubset<T, DataSellerUpsertArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of DataSellers.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerCountArgs} args - Arguments to filter DataSellers to count.
-     * @example
-     * // Count the number of DataSellers
-     * const count = await prisma.dataSeller.count({
-     *   where: {
-     *     // ... the filter for the DataSellers we want to count
-     *   }
-     * })
-    **/
-    count<T extends DataSellerCountArgs>(
-      args?: Subset<T, DataSellerCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], DataSellerCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a DataSeller.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends DataSellerAggregateArgs>(args: Subset<T, DataSellerAggregateArgs>): Prisma.PrismaPromise<GetDataSellerAggregateType<T>>
-
-    /**
-     * Group by DataSeller.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataSellerGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends DataSellerGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: DataSellerGroupByArgs['orderBy'] }
-        : { orderBy?: DataSellerGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, DataSellerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataSellerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the DataSeller model
-   */
-  readonly fields: DataSellerFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for DataSeller.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__DataSellerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the DataSeller model
-   */
-  interface DataSellerFieldRefs {
-    readonly sellerAddress: FieldRef<"DataSeller", 'String'>
-    readonly listingId: FieldRef<"DataSeller", 'String'>
-    readonly totalRevenue: FieldRef<"DataSeller", 'String'>
-    readonly unclaimedRevenue: FieldRef<"DataSeller", 'String'>
-    readonly accountAddress: FieldRef<"DataSeller", 'String'>
-    readonly updatedAt: FieldRef<"DataSeller", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * DataSeller findUnique
-   */
-  export type DataSellerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter, which DataSeller to fetch.
-     */
-    where: DataSellerWhereUniqueInput
-  }
-
-  /**
-   * DataSeller findUniqueOrThrow
-   */
-  export type DataSellerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter, which DataSeller to fetch.
-     */
-    where: DataSellerWhereUniqueInput
-  }
-
-  /**
-   * DataSeller findFirst
-   */
-  export type DataSellerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter, which DataSeller to fetch.
-     */
-    where?: DataSellerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataSellers to fetch.
-     */
-    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DataSellers.
-     */
-    cursor?: DataSellerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataSellers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataSellers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DataSellers.
-     */
-    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
-  }
-
-  /**
-   * DataSeller findFirstOrThrow
-   */
-  export type DataSellerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter, which DataSeller to fetch.
-     */
-    where?: DataSellerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataSellers to fetch.
-     */
-    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DataSellers.
-     */
-    cursor?: DataSellerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataSellers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataSellers.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DataSellers.
-     */
-    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
-  }
-
-  /**
-   * DataSeller findMany
-   */
-  export type DataSellerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter, which DataSellers to fetch.
-     */
-    where?: DataSellerWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataSellers to fetch.
-     */
-    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing DataSellers.
-     */
-    cursor?: DataSellerWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataSellers from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataSellers.
-     */
-    skip?: number
-    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
-  }
-
-  /**
-   * DataSeller create
-   */
-  export type DataSellerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * The data needed to create a DataSeller.
-     */
-    data: XOR<DataSellerCreateInput, DataSellerUncheckedCreateInput>
-  }
-
-  /**
-   * DataSeller createMany
-   */
-  export type DataSellerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many DataSellers.
-     */
-    data: DataSellerCreateManyInput | DataSellerCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * DataSeller createManyAndReturn
-   */
-  export type DataSellerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * The data used to create many DataSellers.
-     */
-    data: DataSellerCreateManyInput | DataSellerCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * DataSeller update
-   */
-  export type DataSellerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * The data needed to update a DataSeller.
-     */
-    data: XOR<DataSellerUpdateInput, DataSellerUncheckedUpdateInput>
-    /**
-     * Choose, which DataSeller to update.
-     */
-    where: DataSellerWhereUniqueInput
-  }
-
-  /**
-   * DataSeller updateMany
-   */
-  export type DataSellerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update DataSellers.
-     */
-    data: XOR<DataSellerUpdateManyMutationInput, DataSellerUncheckedUpdateManyInput>
-    /**
-     * Filter which DataSellers to update
-     */
-    where?: DataSellerWhereInput
-    /**
-     * Limit how many DataSellers to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataSeller updateManyAndReturn
-   */
-  export type DataSellerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * The data used to update DataSellers.
-     */
-    data: XOR<DataSellerUpdateManyMutationInput, DataSellerUncheckedUpdateManyInput>
-    /**
-     * Filter which DataSellers to update
-     */
-    where?: DataSellerWhereInput
-    /**
-     * Limit how many DataSellers to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataSeller upsert
-   */
-  export type DataSellerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * The filter to search for the DataSeller to update in case it exists.
-     */
-    where: DataSellerWhereUniqueInput
-    /**
-     * In case the DataSeller found by the `where` argument doesn't exist, create a new DataSeller with this data.
-     */
-    create: XOR<DataSellerCreateInput, DataSellerUncheckedCreateInput>
-    /**
-     * In case the DataSeller was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<DataSellerUpdateInput, DataSellerUncheckedUpdateInput>
-  }
-
-  /**
-   * DataSeller delete
-   */
-  export type DataSellerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-    /**
-     * Filter which DataSeller to delete.
-     */
-    where: DataSellerWhereUniqueInput
-  }
-
-  /**
-   * DataSeller deleteMany
-   */
-  export type DataSellerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DataSellers to delete
-     */
-    where?: DataSellerWhereInput
-    /**
-     * Limit how many DataSellers to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataSeller without action
-   */
-  export type DataSellerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataSeller
-     */
-    select?: DataSellerSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataSeller
-     */
-    omit?: DataSellerOmit<ExtArgs> | null
-  }
-
-
-  /**
-   * Model DataListing
-   */
-
-  export type AggregateDataListing = {
-    _count: DataListingCountAggregateOutputType | null
-    _min: DataListingMinAggregateOutputType | null
-    _max: DataListingMaxAggregateOutputType | null
-  }
-
-  export type DataListingMinAggregateOutputType = {
-    listingId: string | null
-    sellerAddress: string | null
-    startDate: Date | null
-    endDate: Date | null
-    pricePerDay: string | null
-    accountAddress: string | null
-    isActive: boolean | null
-    updatedAt: Date | null
-  }
-
-  export type DataListingMaxAggregateOutputType = {
-    listingId: string | null
-    sellerAddress: string | null
-    startDate: Date | null
-    endDate: Date | null
-    pricePerDay: string | null
-    accountAddress: string | null
-    isActive: boolean | null
-    updatedAt: Date | null
-  }
-
-  export type DataListingCountAggregateOutputType = {
-    listingId: number
-    sellerAddress: number
-    startDate: number
-    endDate: number
-    pricePerDay: number
-    accountAddress: number
-    isActive: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type DataListingMinAggregateInputType = {
-    listingId?: true
-    sellerAddress?: true
-    startDate?: true
-    endDate?: true
-    pricePerDay?: true
-    accountAddress?: true
-    isActive?: true
-    updatedAt?: true
-  }
-
-  export type DataListingMaxAggregateInputType = {
-    listingId?: true
-    sellerAddress?: true
-    startDate?: true
-    endDate?: true
-    pricePerDay?: true
-    accountAddress?: true
-    isActive?: true
-    updatedAt?: true
-  }
-
-  export type DataListingCountAggregateInputType = {
-    listingId?: true
-    sellerAddress?: true
-    startDate?: true
-    endDate?: true
-    pricePerDay?: true
-    accountAddress?: true
-    isActive?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type DataListingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DataListing to aggregate.
-     */
-    where?: DataListingWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataListings to fetch.
-     */
-    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: DataListingWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataListings from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataListings.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned DataListings
-    **/
-    _count?: true | DataListingCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: DataListingMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: DataListingMaxAggregateInputType
-  }
-
-  export type GetDataListingAggregateType<T extends DataListingAggregateArgs> = {
-        [P in keyof T & keyof AggregateDataListing]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateDataListing[P]>
-      : GetScalarType<T[P], AggregateDataListing[P]>
-  }
-
-
-
-
-  export type DataListingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: DataListingWhereInput
-    orderBy?: DataListingOrderByWithAggregationInput | DataListingOrderByWithAggregationInput[]
-    by: DataListingScalarFieldEnum[] | DataListingScalarFieldEnum
-    having?: DataListingScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: DataListingCountAggregateInputType | true
-    _min?: DataListingMinAggregateInputType
-    _max?: DataListingMaxAggregateInputType
-  }
-
-  export type DataListingGroupByOutputType = {
-    listingId: string
-    sellerAddress: string
-    startDate: Date
-    endDate: Date
-    pricePerDay: string
-    accountAddress: string
-    isActive: boolean
-    updatedAt: Date
-    _count: DataListingCountAggregateOutputType | null
-    _min: DataListingMinAggregateOutputType | null
-    _max: DataListingMaxAggregateOutputType | null
-  }
-
-  type GetDataListingGroupByPayload<T extends DataListingGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<DataListingGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof DataListingGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], DataListingGroupByOutputType[P]>
-            : GetScalarType<T[P], DataListingGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type DataListingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    listingId?: boolean
-    sellerAddress?: boolean
-    startDate?: boolean
-    endDate?: boolean
-    pricePerDay?: boolean
-    accountAddress?: boolean
-    isActive?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataListing"]>
-
-  export type DataListingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    listingId?: boolean
-    sellerAddress?: boolean
-    startDate?: boolean
-    endDate?: boolean
-    pricePerDay?: boolean
-    accountAddress?: boolean
-    isActive?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataListing"]>
-
-  export type DataListingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    listingId?: boolean
-    sellerAddress?: boolean
-    startDate?: boolean
-    endDate?: boolean
-    pricePerDay?: boolean
-    accountAddress?: boolean
-    isActive?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["dataListing"]>
-
-  export type DataListingSelectScalar = {
-    listingId?: boolean
-    sellerAddress?: boolean
-    startDate?: boolean
-    endDate?: boolean
-    pricePerDay?: boolean
-    accountAddress?: boolean
-    isActive?: boolean
-    updatedAt?: boolean
-  }
-
-  export type DataListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"listingId" | "sellerAddress" | "startDate" | "endDate" | "pricePerDay" | "accountAddress" | "isActive" | "updatedAt", ExtArgs["result"]["dataListing"]>
-
-  export type $DataListingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "DataListing"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      listingId: string
-      sellerAddress: string
-      startDate: Date
-      endDate: Date
-      pricePerDay: string
-      accountAddress: string
-      isActive: boolean
-      updatedAt: Date
-    }, ExtArgs["result"]["dataListing"]>
-    composites: {}
-  }
-
-  type DataListingGetPayload<S extends boolean | null | undefined | DataListingDefaultArgs> = $Result.GetResult<Prisma.$DataListingPayload, S>
-
-  type DataListingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<DataListingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: DataListingCountAggregateInputType | true
-    }
-
-  export interface DataListingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataListing'], meta: { name: 'DataListing' } }
-    /**
-     * Find zero or one DataListing that matches the filter.
-     * @param {DataListingFindUniqueArgs} args - Arguments to find a DataListing
-     * @example
-     * // Get one DataListing
-     * const dataListing = await prisma.dataListing.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends DataListingFindUniqueArgs>(args: SelectSubset<T, DataListingFindUniqueArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one DataListing that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {DataListingFindUniqueOrThrowArgs} args - Arguments to find a DataListing
-     * @example
-     * // Get one DataListing
-     * const dataListing = await prisma.dataListing.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends DataListingFindUniqueOrThrowArgs>(args: SelectSubset<T, DataListingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DataListing that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingFindFirstArgs} args - Arguments to find a DataListing
-     * @example
-     * // Get one DataListing
-     * const dataListing = await prisma.dataListing.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends DataListingFindFirstArgs>(args?: SelectSubset<T, DataListingFindFirstArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first DataListing that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingFindFirstOrThrowArgs} args - Arguments to find a DataListing
-     * @example
-     * // Get one DataListing
-     * const dataListing = await prisma.dataListing.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends DataListingFindFirstOrThrowArgs>(args?: SelectSubset<T, DataListingFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more DataListings that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all DataListings
-     * const dataListings = await prisma.dataListing.findMany()
-     * 
-     * // Get first 10 DataListings
-     * const dataListings = await prisma.dataListing.findMany({ take: 10 })
-     * 
-     * // Only select the `listingId`
-     * const dataListingWithListingIdOnly = await prisma.dataListing.findMany({ select: { listingId: true } })
-     * 
-     */
-    findMany<T extends DataListingFindManyArgs>(args?: SelectSubset<T, DataListingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a DataListing.
-     * @param {DataListingCreateArgs} args - Arguments to create a DataListing.
-     * @example
-     * // Create one DataListing
-     * const DataListing = await prisma.dataListing.create({
-     *   data: {
-     *     // ... data to create a DataListing
-     *   }
-     * })
-     * 
-     */
-    create<T extends DataListingCreateArgs>(args: SelectSubset<T, DataListingCreateArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many DataListings.
-     * @param {DataListingCreateManyArgs} args - Arguments to create many DataListings.
-     * @example
-     * // Create many DataListings
-     * const dataListing = await prisma.dataListing.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends DataListingCreateManyArgs>(args?: SelectSubset<T, DataListingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many DataListings and returns the data saved in the database.
-     * @param {DataListingCreateManyAndReturnArgs} args - Arguments to create many DataListings.
-     * @example
-     * // Create many DataListings
-     * const dataListing = await prisma.dataListing.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many DataListings and only return the `listingId`
-     * const dataListingWithListingIdOnly = await prisma.dataListing.createManyAndReturn({
-     *   select: { listingId: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends DataListingCreateManyAndReturnArgs>(args?: SelectSubset<T, DataListingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a DataListing.
-     * @param {DataListingDeleteArgs} args - Arguments to delete one DataListing.
-     * @example
-     * // Delete one DataListing
-     * const DataListing = await prisma.dataListing.delete({
-     *   where: {
-     *     // ... filter to delete one DataListing
-     *   }
-     * })
-     * 
-     */
-    delete<T extends DataListingDeleteArgs>(args: SelectSubset<T, DataListingDeleteArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one DataListing.
-     * @param {DataListingUpdateArgs} args - Arguments to update one DataListing.
-     * @example
-     * // Update one DataListing
-     * const dataListing = await prisma.dataListing.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends DataListingUpdateArgs>(args: SelectSubset<T, DataListingUpdateArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more DataListings.
-     * @param {DataListingDeleteManyArgs} args - Arguments to filter DataListings to delete.
-     * @example
-     * // Delete a few DataListings
-     * const { count } = await prisma.dataListing.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends DataListingDeleteManyArgs>(args?: SelectSubset<T, DataListingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DataListings.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many DataListings
-     * const dataListing = await prisma.dataListing.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends DataListingUpdateManyArgs>(args: SelectSubset<T, DataListingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more DataListings and returns the data updated in the database.
-     * @param {DataListingUpdateManyAndReturnArgs} args - Arguments to update many DataListings.
-     * @example
-     * // Update many DataListings
-     * const dataListing = await prisma.dataListing.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more DataListings and only return the `listingId`
-     * const dataListingWithListingIdOnly = await prisma.dataListing.updateManyAndReturn({
-     *   select: { listingId: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends DataListingUpdateManyAndReturnArgs>(args: SelectSubset<T, DataListingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one DataListing.
-     * @param {DataListingUpsertArgs} args - Arguments to update or create a DataListing.
-     * @example
-     * // Update or create a DataListing
-     * const dataListing = await prisma.dataListing.upsert({
-     *   create: {
-     *     // ... data to create a DataListing
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the DataListing we want to update
-     *   }
-     * })
-     */
-    upsert<T extends DataListingUpsertArgs>(args: SelectSubset<T, DataListingUpsertArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of DataListings.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingCountArgs} args - Arguments to filter DataListings to count.
-     * @example
-     * // Count the number of DataListings
-     * const count = await prisma.dataListing.count({
-     *   where: {
-     *     // ... the filter for the DataListings we want to count
-     *   }
-     * })
-    **/
-    count<T extends DataListingCountArgs>(
-      args?: Subset<T, DataListingCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], DataListingCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a DataListing.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends DataListingAggregateArgs>(args: Subset<T, DataListingAggregateArgs>): Prisma.PrismaPromise<GetDataListingAggregateType<T>>
-
-    /**
-     * Group by DataListing.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {DataListingGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends DataListingGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: DataListingGroupByArgs['orderBy'] }
-        : { orderBy?: DataListingGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, DataListingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataListingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the DataListing model
-   */
-  readonly fields: DataListingFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for DataListing.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__DataListingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the DataListing model
-   */
-  interface DataListingFieldRefs {
-    readonly listingId: FieldRef<"DataListing", 'String'>
-    readonly sellerAddress: FieldRef<"DataListing", 'String'>
-    readonly startDate: FieldRef<"DataListing", 'DateTime'>
-    readonly endDate: FieldRef<"DataListing", 'DateTime'>
-    readonly pricePerDay: FieldRef<"DataListing", 'String'>
-    readonly accountAddress: FieldRef<"DataListing", 'String'>
-    readonly isActive: FieldRef<"DataListing", 'Boolean'>
-    readonly updatedAt: FieldRef<"DataListing", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * DataListing findUnique
-   */
-  export type DataListingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter, which DataListing to fetch.
-     */
-    where: DataListingWhereUniqueInput
-  }
-
-  /**
-   * DataListing findUniqueOrThrow
-   */
-  export type DataListingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter, which DataListing to fetch.
-     */
-    where: DataListingWhereUniqueInput
-  }
-
-  /**
-   * DataListing findFirst
-   */
-  export type DataListingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter, which DataListing to fetch.
-     */
-    where?: DataListingWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataListings to fetch.
-     */
-    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DataListings.
-     */
-    cursor?: DataListingWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataListings from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataListings.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DataListings.
-     */
-    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
-  }
-
-  /**
-   * DataListing findFirstOrThrow
-   */
-  export type DataListingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter, which DataListing to fetch.
-     */
-    where?: DataListingWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataListings to fetch.
-     */
-    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for DataListings.
-     */
-    cursor?: DataListingWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataListings from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataListings.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of DataListings.
-     */
-    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
-  }
-
-  /**
-   * DataListing findMany
-   */
-  export type DataListingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter, which DataListings to fetch.
-     */
-    where?: DataListingWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of DataListings to fetch.
-     */
-    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing DataListings.
-     */
-    cursor?: DataListingWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` DataListings from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` DataListings.
-     */
-    skip?: number
-    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
-  }
-
-  /**
-   * DataListing create
-   */
-  export type DataListingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * The data needed to create a DataListing.
-     */
-    data: XOR<DataListingCreateInput, DataListingUncheckedCreateInput>
-  }
-
-  /**
-   * DataListing createMany
-   */
-  export type DataListingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many DataListings.
-     */
-    data: DataListingCreateManyInput | DataListingCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * DataListing createManyAndReturn
-   */
-  export type DataListingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * The data used to create many DataListings.
-     */
-    data: DataListingCreateManyInput | DataListingCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * DataListing update
-   */
-  export type DataListingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * The data needed to update a DataListing.
-     */
-    data: XOR<DataListingUpdateInput, DataListingUncheckedUpdateInput>
-    /**
-     * Choose, which DataListing to update.
-     */
-    where: DataListingWhereUniqueInput
-  }
-
-  /**
-   * DataListing updateMany
-   */
-  export type DataListingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update DataListings.
-     */
-    data: XOR<DataListingUpdateManyMutationInput, DataListingUncheckedUpdateManyInput>
-    /**
-     * Filter which DataListings to update
-     */
-    where?: DataListingWhereInput
-    /**
-     * Limit how many DataListings to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataListing updateManyAndReturn
-   */
-  export type DataListingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * The data used to update DataListings.
-     */
-    data: XOR<DataListingUpdateManyMutationInput, DataListingUncheckedUpdateManyInput>
-    /**
-     * Filter which DataListings to update
-     */
-    where?: DataListingWhereInput
-    /**
-     * Limit how many DataListings to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataListing upsert
-   */
-  export type DataListingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * The filter to search for the DataListing to update in case it exists.
-     */
-    where: DataListingWhereUniqueInput
-    /**
-     * In case the DataListing found by the `where` argument doesn't exist, create a new DataListing with this data.
-     */
-    create: XOR<DataListingCreateInput, DataListingUncheckedCreateInput>
-    /**
-     * In case the DataListing was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<DataListingUpdateInput, DataListingUncheckedUpdateInput>
-  }
-
-  /**
-   * DataListing delete
-   */
-  export type DataListingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-    /**
-     * Filter which DataListing to delete.
-     */
-    where: DataListingWhereUniqueInput
-  }
-
-  /**
-   * DataListing deleteMany
-   */
-  export type DataListingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which DataListings to delete
-     */
-    where?: DataListingWhereInput
-    /**
-     * Limit how many DataListings to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * DataListing without action
-   */
-  export type DataListingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the DataListing
-     */
-    select?: DataListingSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the DataListing
-     */
-    omit?: DataListingOmit<ExtArgs> | null
-  }
-
-
-  /**
    * Model DataPass
    */
 
@@ -16778,6 +14767,2228 @@ export namespace Prisma {
 
 
   /**
+   * Model DataSeller
+   */
+
+  export type AggregateDataSeller = {
+    _count: DataSellerCountAggregateOutputType | null
+    _min: DataSellerMinAggregateOutputType | null
+    _max: DataSellerMaxAggregateOutputType | null
+  }
+
+  export type DataSellerMinAggregateOutputType = {
+    sellerAddress: string | null
+    listingId: string | null
+    totalRevenue: string | null
+    unclaimedRevenue: string | null
+    accountAddress: string | null
+    updatedAt: Date | null
+  }
+
+  export type DataSellerMaxAggregateOutputType = {
+    sellerAddress: string | null
+    listingId: string | null
+    totalRevenue: string | null
+    unclaimedRevenue: string | null
+    accountAddress: string | null
+    updatedAt: Date | null
+  }
+
+  export type DataSellerCountAggregateOutputType = {
+    sellerAddress: number
+    listingId: number
+    totalRevenue: number
+    unclaimedRevenue: number
+    accountAddress: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DataSellerMinAggregateInputType = {
+    sellerAddress?: true
+    listingId?: true
+    totalRevenue?: true
+    unclaimedRevenue?: true
+    accountAddress?: true
+    updatedAt?: true
+  }
+
+  export type DataSellerMaxAggregateInputType = {
+    sellerAddress?: true
+    listingId?: true
+    totalRevenue?: true
+    unclaimedRevenue?: true
+    accountAddress?: true
+    updatedAt?: true
+  }
+
+  export type DataSellerCountAggregateInputType = {
+    sellerAddress?: true
+    listingId?: true
+    totalRevenue?: true
+    unclaimedRevenue?: true
+    accountAddress?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DataSellerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataSeller to aggregate.
+     */
+    where?: DataSellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataSellers to fetch.
+     */
+    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DataSellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataSellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataSellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DataSellers
+    **/
+    _count?: true | DataSellerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DataSellerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DataSellerMaxAggregateInputType
+  }
+
+  export type GetDataSellerAggregateType<T extends DataSellerAggregateArgs> = {
+        [P in keyof T & keyof AggregateDataSeller]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDataSeller[P]>
+      : GetScalarType<T[P], AggregateDataSeller[P]>
+  }
+
+
+
+
+  export type DataSellerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataSellerWhereInput
+    orderBy?: DataSellerOrderByWithAggregationInput | DataSellerOrderByWithAggregationInput[]
+    by: DataSellerScalarFieldEnum[] | DataSellerScalarFieldEnum
+    having?: DataSellerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DataSellerCountAggregateInputType | true
+    _min?: DataSellerMinAggregateInputType
+    _max?: DataSellerMaxAggregateInputType
+  }
+
+  export type DataSellerGroupByOutputType = {
+    sellerAddress: string
+    listingId: string | null
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt: Date
+    _count: DataSellerCountAggregateOutputType | null
+    _min: DataSellerMinAggregateOutputType | null
+    _max: DataSellerMaxAggregateOutputType | null
+  }
+
+  type GetDataSellerGroupByPayload<T extends DataSellerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DataSellerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DataSellerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DataSellerGroupByOutputType[P]>
+            : GetScalarType<T[P], DataSellerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DataSellerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sellerAddress?: boolean
+    listingId?: boolean
+    totalRevenue?: boolean
+    unclaimedRevenue?: boolean
+    accountAddress?: boolean
+    updatedAt?: boolean
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+    proofs?: boolean | DataSeller$proofsArgs<ExtArgs>
+    _count?: boolean | DataSellerCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dataSeller"]>
+
+  export type DataSellerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sellerAddress?: boolean
+    listingId?: boolean
+    totalRevenue?: boolean
+    unclaimedRevenue?: boolean
+    accountAddress?: boolean
+    updatedAt?: boolean
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+  }, ExtArgs["result"]["dataSeller"]>
+
+  export type DataSellerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    sellerAddress?: boolean
+    listingId?: boolean
+    totalRevenue?: boolean
+    unclaimedRevenue?: boolean
+    accountAddress?: boolean
+    updatedAt?: boolean
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+  }, ExtArgs["result"]["dataSeller"]>
+
+  export type DataSellerSelectScalar = {
+    sellerAddress?: boolean
+    listingId?: boolean
+    totalRevenue?: boolean
+    unclaimedRevenue?: boolean
+    accountAddress?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DataSellerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sellerAddress" | "listingId" | "totalRevenue" | "unclaimedRevenue" | "accountAddress" | "updatedAt", ExtArgs["result"]["dataSeller"]>
+  export type DataSellerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+    proofs?: boolean | DataSeller$proofsArgs<ExtArgs>
+    _count?: boolean | DataSellerCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DataSellerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+  }
+  export type DataSellerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    listing?: boolean | DataSeller$listingArgs<ExtArgs>
+  }
+
+  export type $DataSellerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DataSeller"
+    objects: {
+      listing: Prisma.$DataListingPayload<ExtArgs> | null
+      proofs: Prisma.$SellerProofPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      sellerAddress: string
+      listingId: string | null
+      totalRevenue: string
+      unclaimedRevenue: string
+      accountAddress: string
+      updatedAt: Date
+    }, ExtArgs["result"]["dataSeller"]>
+    composites: {}
+  }
+
+  type DataSellerGetPayload<S extends boolean | null | undefined | DataSellerDefaultArgs> = $Result.GetResult<Prisma.$DataSellerPayload, S>
+
+  type DataSellerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DataSellerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DataSellerCountAggregateInputType | true
+    }
+
+  export interface DataSellerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataSeller'], meta: { name: 'DataSeller' } }
+    /**
+     * Find zero or one DataSeller that matches the filter.
+     * @param {DataSellerFindUniqueArgs} args - Arguments to find a DataSeller
+     * @example
+     * // Get one DataSeller
+     * const dataSeller = await prisma.dataSeller.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DataSellerFindUniqueArgs>(args: SelectSubset<T, DataSellerFindUniqueArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DataSeller that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DataSellerFindUniqueOrThrowArgs} args - Arguments to find a DataSeller
+     * @example
+     * // Get one DataSeller
+     * const dataSeller = await prisma.dataSeller.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DataSellerFindUniqueOrThrowArgs>(args: SelectSubset<T, DataSellerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataSeller that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerFindFirstArgs} args - Arguments to find a DataSeller
+     * @example
+     * // Get one DataSeller
+     * const dataSeller = await prisma.dataSeller.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DataSellerFindFirstArgs>(args?: SelectSubset<T, DataSellerFindFirstArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataSeller that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerFindFirstOrThrowArgs} args - Arguments to find a DataSeller
+     * @example
+     * // Get one DataSeller
+     * const dataSeller = await prisma.dataSeller.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DataSellerFindFirstOrThrowArgs>(args?: SelectSubset<T, DataSellerFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DataSellers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DataSellers
+     * const dataSellers = await prisma.dataSeller.findMany()
+     * 
+     * // Get first 10 DataSellers
+     * const dataSellers = await prisma.dataSeller.findMany({ take: 10 })
+     * 
+     * // Only select the `sellerAddress`
+     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.findMany({ select: { sellerAddress: true } })
+     * 
+     */
+    findMany<T extends DataSellerFindManyArgs>(args?: SelectSubset<T, DataSellerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DataSeller.
+     * @param {DataSellerCreateArgs} args - Arguments to create a DataSeller.
+     * @example
+     * // Create one DataSeller
+     * const DataSeller = await prisma.dataSeller.create({
+     *   data: {
+     *     // ... data to create a DataSeller
+     *   }
+     * })
+     * 
+     */
+    create<T extends DataSellerCreateArgs>(args: SelectSubset<T, DataSellerCreateArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DataSellers.
+     * @param {DataSellerCreateManyArgs} args - Arguments to create many DataSellers.
+     * @example
+     * // Create many DataSellers
+     * const dataSeller = await prisma.dataSeller.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DataSellerCreateManyArgs>(args?: SelectSubset<T, DataSellerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DataSellers and returns the data saved in the database.
+     * @param {DataSellerCreateManyAndReturnArgs} args - Arguments to create many DataSellers.
+     * @example
+     * // Create many DataSellers
+     * const dataSeller = await prisma.dataSeller.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DataSellers and only return the `sellerAddress`
+     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.createManyAndReturn({
+     *   select: { sellerAddress: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DataSellerCreateManyAndReturnArgs>(args?: SelectSubset<T, DataSellerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DataSeller.
+     * @param {DataSellerDeleteArgs} args - Arguments to delete one DataSeller.
+     * @example
+     * // Delete one DataSeller
+     * const DataSeller = await prisma.dataSeller.delete({
+     *   where: {
+     *     // ... filter to delete one DataSeller
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DataSellerDeleteArgs>(args: SelectSubset<T, DataSellerDeleteArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DataSeller.
+     * @param {DataSellerUpdateArgs} args - Arguments to update one DataSeller.
+     * @example
+     * // Update one DataSeller
+     * const dataSeller = await prisma.dataSeller.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DataSellerUpdateArgs>(args: SelectSubset<T, DataSellerUpdateArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DataSellers.
+     * @param {DataSellerDeleteManyArgs} args - Arguments to filter DataSellers to delete.
+     * @example
+     * // Delete a few DataSellers
+     * const { count } = await prisma.dataSeller.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DataSellerDeleteManyArgs>(args?: SelectSubset<T, DataSellerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataSellers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DataSellers
+     * const dataSeller = await prisma.dataSeller.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DataSellerUpdateManyArgs>(args: SelectSubset<T, DataSellerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataSellers and returns the data updated in the database.
+     * @param {DataSellerUpdateManyAndReturnArgs} args - Arguments to update many DataSellers.
+     * @example
+     * // Update many DataSellers
+     * const dataSeller = await prisma.dataSeller.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DataSellers and only return the `sellerAddress`
+     * const dataSellerWithSellerAddressOnly = await prisma.dataSeller.updateManyAndReturn({
+     *   select: { sellerAddress: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DataSellerUpdateManyAndReturnArgs>(args: SelectSubset<T, DataSellerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DataSeller.
+     * @param {DataSellerUpsertArgs} args - Arguments to update or create a DataSeller.
+     * @example
+     * // Update or create a DataSeller
+     * const dataSeller = await prisma.dataSeller.upsert({
+     *   create: {
+     *     // ... data to create a DataSeller
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DataSeller we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DataSellerUpsertArgs>(args: SelectSubset<T, DataSellerUpsertArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DataSellers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerCountArgs} args - Arguments to filter DataSellers to count.
+     * @example
+     * // Count the number of DataSellers
+     * const count = await prisma.dataSeller.count({
+     *   where: {
+     *     // ... the filter for the DataSellers we want to count
+     *   }
+     * })
+    **/
+    count<T extends DataSellerCountArgs>(
+      args?: Subset<T, DataSellerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DataSellerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DataSeller.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DataSellerAggregateArgs>(args: Subset<T, DataSellerAggregateArgs>): Prisma.PrismaPromise<GetDataSellerAggregateType<T>>
+
+    /**
+     * Group by DataSeller.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataSellerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DataSellerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DataSellerGroupByArgs['orderBy'] }
+        : { orderBy?: DataSellerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DataSellerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataSellerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DataSeller model
+   */
+  readonly fields: DataSellerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DataSeller.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DataSellerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    listing<T extends DataSeller$listingArgs<ExtArgs> = {}>(args?: Subset<T, DataSeller$listingArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    proofs<T extends DataSeller$proofsArgs<ExtArgs> = {}>(args?: Subset<T, DataSeller$proofsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SellerProofPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DataSeller model
+   */
+  interface DataSellerFieldRefs {
+    readonly sellerAddress: FieldRef<"DataSeller", 'String'>
+    readonly listingId: FieldRef<"DataSeller", 'String'>
+    readonly totalRevenue: FieldRef<"DataSeller", 'String'>
+    readonly unclaimedRevenue: FieldRef<"DataSeller", 'String'>
+    readonly accountAddress: FieldRef<"DataSeller", 'String'>
+    readonly updatedAt: FieldRef<"DataSeller", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DataSeller findUnique
+   */
+  export type DataSellerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter, which DataSeller to fetch.
+     */
+    where: DataSellerWhereUniqueInput
+  }
+
+  /**
+   * DataSeller findUniqueOrThrow
+   */
+  export type DataSellerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter, which DataSeller to fetch.
+     */
+    where: DataSellerWhereUniqueInput
+  }
+
+  /**
+   * DataSeller findFirst
+   */
+  export type DataSellerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter, which DataSeller to fetch.
+     */
+    where?: DataSellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataSellers to fetch.
+     */
+    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataSellers.
+     */
+    cursor?: DataSellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataSellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataSellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataSellers.
+     */
+    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
+  }
+
+  /**
+   * DataSeller findFirstOrThrow
+   */
+  export type DataSellerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter, which DataSeller to fetch.
+     */
+    where?: DataSellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataSellers to fetch.
+     */
+    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataSellers.
+     */
+    cursor?: DataSellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataSellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataSellers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataSellers.
+     */
+    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
+  }
+
+  /**
+   * DataSeller findMany
+   */
+  export type DataSellerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter, which DataSellers to fetch.
+     */
+    where?: DataSellerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataSellers to fetch.
+     */
+    orderBy?: DataSellerOrderByWithRelationInput | DataSellerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DataSellers.
+     */
+    cursor?: DataSellerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataSellers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataSellers.
+     */
+    skip?: number
+    distinct?: DataSellerScalarFieldEnum | DataSellerScalarFieldEnum[]
+  }
+
+  /**
+   * DataSeller create
+   */
+  export type DataSellerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DataSeller.
+     */
+    data: XOR<DataSellerCreateInput, DataSellerUncheckedCreateInput>
+  }
+
+  /**
+   * DataSeller createMany
+   */
+  export type DataSellerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DataSellers.
+     */
+    data: DataSellerCreateManyInput | DataSellerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataSeller createManyAndReturn
+   */
+  export type DataSellerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * The data used to create many DataSellers.
+     */
+    data: DataSellerCreateManyInput | DataSellerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DataSeller update
+   */
+  export type DataSellerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DataSeller.
+     */
+    data: XOR<DataSellerUpdateInput, DataSellerUncheckedUpdateInput>
+    /**
+     * Choose, which DataSeller to update.
+     */
+    where: DataSellerWhereUniqueInput
+  }
+
+  /**
+   * DataSeller updateMany
+   */
+  export type DataSellerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DataSellers.
+     */
+    data: XOR<DataSellerUpdateManyMutationInput, DataSellerUncheckedUpdateManyInput>
+    /**
+     * Filter which DataSellers to update
+     */
+    where?: DataSellerWhereInput
+    /**
+     * Limit how many DataSellers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataSeller updateManyAndReturn
+   */
+  export type DataSellerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * The data used to update DataSellers.
+     */
+    data: XOR<DataSellerUpdateManyMutationInput, DataSellerUncheckedUpdateManyInput>
+    /**
+     * Filter which DataSellers to update
+     */
+    where?: DataSellerWhereInput
+    /**
+     * Limit how many DataSellers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DataSeller upsert
+   */
+  export type DataSellerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DataSeller to update in case it exists.
+     */
+    where: DataSellerWhereUniqueInput
+    /**
+     * In case the DataSeller found by the `where` argument doesn't exist, create a new DataSeller with this data.
+     */
+    create: XOR<DataSellerCreateInput, DataSellerUncheckedCreateInput>
+    /**
+     * In case the DataSeller was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DataSellerUpdateInput, DataSellerUncheckedUpdateInput>
+  }
+
+  /**
+   * DataSeller delete
+   */
+  export type DataSellerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    /**
+     * Filter which DataSeller to delete.
+     */
+    where: DataSellerWhereUniqueInput
+  }
+
+  /**
+   * DataSeller deleteMany
+   */
+  export type DataSellerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataSellers to delete
+     */
+    where?: DataSellerWhereInput
+    /**
+     * Limit how many DataSellers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataSeller.listing
+   */
+  export type DataSeller$listingArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    where?: DataListingWhereInput
+  }
+
+  /**
+   * DataSeller.proofs
+   */
+  export type DataSeller$proofsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SellerProof
+     */
+    select?: SellerProofSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SellerProof
+     */
+    omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    where?: SellerProofWhereInput
+    orderBy?: SellerProofOrderByWithRelationInput | SellerProofOrderByWithRelationInput[]
+    cursor?: SellerProofWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SellerProofScalarFieldEnum | SellerProofScalarFieldEnum[]
+  }
+
+  /**
+   * DataSeller without action
+   */
+  export type DataSellerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DataListing
+   */
+
+  export type AggregateDataListing = {
+    _count: DataListingCountAggregateOutputType | null
+    _min: DataListingMinAggregateOutputType | null
+    _max: DataListingMaxAggregateOutputType | null
+  }
+
+  export type DataListingMinAggregateOutputType = {
+    listingId: string | null
+    sellerAddress: string | null
+    startDate: Date | null
+    endDate: Date | null
+    pricePerDay: string | null
+    accountAddress: string | null
+    isActive: boolean | null
+    updatedAt: Date | null
+  }
+
+  export type DataListingMaxAggregateOutputType = {
+    listingId: string | null
+    sellerAddress: string | null
+    startDate: Date | null
+    endDate: Date | null
+    pricePerDay: string | null
+    accountAddress: string | null
+    isActive: boolean | null
+    updatedAt: Date | null
+  }
+
+  export type DataListingCountAggregateOutputType = {
+    listingId: number
+    sellerAddress: number
+    startDate: number
+    endDate: number
+    pricePerDay: number
+    accountAddress: number
+    isActive: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DataListingMinAggregateInputType = {
+    listingId?: true
+    sellerAddress?: true
+    startDate?: true
+    endDate?: true
+    pricePerDay?: true
+    accountAddress?: true
+    isActive?: true
+    updatedAt?: true
+  }
+
+  export type DataListingMaxAggregateInputType = {
+    listingId?: true
+    sellerAddress?: true
+    startDate?: true
+    endDate?: true
+    pricePerDay?: true
+    accountAddress?: true
+    isActive?: true
+    updatedAt?: true
+  }
+
+  export type DataListingCountAggregateInputType = {
+    listingId?: true
+    sellerAddress?: true
+    startDate?: true
+    endDate?: true
+    pricePerDay?: true
+    accountAddress?: true
+    isActive?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DataListingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataListing to aggregate.
+     */
+    where?: DataListingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataListings to fetch.
+     */
+    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DataListingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataListings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataListings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DataListings
+    **/
+    _count?: true | DataListingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DataListingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DataListingMaxAggregateInputType
+  }
+
+  export type GetDataListingAggregateType<T extends DataListingAggregateArgs> = {
+        [P in keyof T & keyof AggregateDataListing]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDataListing[P]>
+      : GetScalarType<T[P], AggregateDataListing[P]>
+  }
+
+
+
+
+  export type DataListingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataListingWhereInput
+    orderBy?: DataListingOrderByWithAggregationInput | DataListingOrderByWithAggregationInput[]
+    by: DataListingScalarFieldEnum[] | DataListingScalarFieldEnum
+    having?: DataListingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DataListingCountAggregateInputType | true
+    _min?: DataListingMinAggregateInputType
+    _max?: DataListingMaxAggregateInputType
+  }
+
+  export type DataListingGroupByOutputType = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date
+    endDate: Date
+    pricePerDay: string
+    accountAddress: string
+    isActive: boolean
+    updatedAt: Date
+    _count: DataListingCountAggregateOutputType | null
+    _min: DataListingMinAggregateOutputType | null
+    _max: DataListingMaxAggregateOutputType | null
+  }
+
+  type GetDataListingGroupByPayload<T extends DataListingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DataListingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DataListingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DataListingGroupByOutputType[P]>
+            : GetScalarType<T[P], DataListingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DataListingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    listingId?: boolean
+    sellerAddress?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    pricePerDay?: boolean
+    accountAddress?: boolean
+    isActive?: boolean
+    updatedAt?: boolean
+    seller?: boolean | DataListing$sellerArgs<ExtArgs>
+  }, ExtArgs["result"]["dataListing"]>
+
+  export type DataListingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    listingId?: boolean
+    sellerAddress?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    pricePerDay?: boolean
+    accountAddress?: boolean
+    isActive?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["dataListing"]>
+
+  export type DataListingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    listingId?: boolean
+    sellerAddress?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    pricePerDay?: boolean
+    accountAddress?: boolean
+    isActive?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["dataListing"]>
+
+  export type DataListingSelectScalar = {
+    listingId?: boolean
+    sellerAddress?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    pricePerDay?: boolean
+    accountAddress?: boolean
+    isActive?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DataListingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"listingId" | "sellerAddress" | "startDate" | "endDate" | "pricePerDay" | "accountAddress" | "isActive" | "updatedAt", ExtArgs["result"]["dataListing"]>
+  export type DataListingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | DataListing$sellerArgs<ExtArgs>
+  }
+  export type DataListingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DataListingIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $DataListingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DataListing"
+    objects: {
+      seller: Prisma.$DataSellerPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      listingId: string
+      sellerAddress: string
+      startDate: Date
+      endDate: Date
+      pricePerDay: string
+      accountAddress: string
+      isActive: boolean
+      updatedAt: Date
+    }, ExtArgs["result"]["dataListing"]>
+    composites: {}
+  }
+
+  type DataListingGetPayload<S extends boolean | null | undefined | DataListingDefaultArgs> = $Result.GetResult<Prisma.$DataListingPayload, S>
+
+  type DataListingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DataListingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DataListingCountAggregateInputType | true
+    }
+
+  export interface DataListingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataListing'], meta: { name: 'DataListing' } }
+    /**
+     * Find zero or one DataListing that matches the filter.
+     * @param {DataListingFindUniqueArgs} args - Arguments to find a DataListing
+     * @example
+     * // Get one DataListing
+     * const dataListing = await prisma.dataListing.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DataListingFindUniqueArgs>(args: SelectSubset<T, DataListingFindUniqueArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DataListing that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DataListingFindUniqueOrThrowArgs} args - Arguments to find a DataListing
+     * @example
+     * // Get one DataListing
+     * const dataListing = await prisma.dataListing.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DataListingFindUniqueOrThrowArgs>(args: SelectSubset<T, DataListingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataListing that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingFindFirstArgs} args - Arguments to find a DataListing
+     * @example
+     * // Get one DataListing
+     * const dataListing = await prisma.dataListing.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DataListingFindFirstArgs>(args?: SelectSubset<T, DataListingFindFirstArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataListing that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingFindFirstOrThrowArgs} args - Arguments to find a DataListing
+     * @example
+     * // Get one DataListing
+     * const dataListing = await prisma.dataListing.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DataListingFindFirstOrThrowArgs>(args?: SelectSubset<T, DataListingFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DataListings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DataListings
+     * const dataListings = await prisma.dataListing.findMany()
+     * 
+     * // Get first 10 DataListings
+     * const dataListings = await prisma.dataListing.findMany({ take: 10 })
+     * 
+     * // Only select the `listingId`
+     * const dataListingWithListingIdOnly = await prisma.dataListing.findMany({ select: { listingId: true } })
+     * 
+     */
+    findMany<T extends DataListingFindManyArgs>(args?: SelectSubset<T, DataListingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DataListing.
+     * @param {DataListingCreateArgs} args - Arguments to create a DataListing.
+     * @example
+     * // Create one DataListing
+     * const DataListing = await prisma.dataListing.create({
+     *   data: {
+     *     // ... data to create a DataListing
+     *   }
+     * })
+     * 
+     */
+    create<T extends DataListingCreateArgs>(args: SelectSubset<T, DataListingCreateArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DataListings.
+     * @param {DataListingCreateManyArgs} args - Arguments to create many DataListings.
+     * @example
+     * // Create many DataListings
+     * const dataListing = await prisma.dataListing.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DataListingCreateManyArgs>(args?: SelectSubset<T, DataListingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DataListings and returns the data saved in the database.
+     * @param {DataListingCreateManyAndReturnArgs} args - Arguments to create many DataListings.
+     * @example
+     * // Create many DataListings
+     * const dataListing = await prisma.dataListing.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DataListings and only return the `listingId`
+     * const dataListingWithListingIdOnly = await prisma.dataListing.createManyAndReturn({
+     *   select: { listingId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DataListingCreateManyAndReturnArgs>(args?: SelectSubset<T, DataListingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DataListing.
+     * @param {DataListingDeleteArgs} args - Arguments to delete one DataListing.
+     * @example
+     * // Delete one DataListing
+     * const DataListing = await prisma.dataListing.delete({
+     *   where: {
+     *     // ... filter to delete one DataListing
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DataListingDeleteArgs>(args: SelectSubset<T, DataListingDeleteArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DataListing.
+     * @param {DataListingUpdateArgs} args - Arguments to update one DataListing.
+     * @example
+     * // Update one DataListing
+     * const dataListing = await prisma.dataListing.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DataListingUpdateArgs>(args: SelectSubset<T, DataListingUpdateArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DataListings.
+     * @param {DataListingDeleteManyArgs} args - Arguments to filter DataListings to delete.
+     * @example
+     * // Delete a few DataListings
+     * const { count } = await prisma.dataListing.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DataListingDeleteManyArgs>(args?: SelectSubset<T, DataListingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataListings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DataListings
+     * const dataListing = await prisma.dataListing.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DataListingUpdateManyArgs>(args: SelectSubset<T, DataListingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataListings and returns the data updated in the database.
+     * @param {DataListingUpdateManyAndReturnArgs} args - Arguments to update many DataListings.
+     * @example
+     * // Update many DataListings
+     * const dataListing = await prisma.dataListing.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DataListings and only return the `listingId`
+     * const dataListingWithListingIdOnly = await prisma.dataListing.updateManyAndReturn({
+     *   select: { listingId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DataListingUpdateManyAndReturnArgs>(args: SelectSubset<T, DataListingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DataListing.
+     * @param {DataListingUpsertArgs} args - Arguments to update or create a DataListing.
+     * @example
+     * // Update or create a DataListing
+     * const dataListing = await prisma.dataListing.upsert({
+     *   create: {
+     *     // ... data to create a DataListing
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DataListing we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DataListingUpsertArgs>(args: SelectSubset<T, DataListingUpsertArgs<ExtArgs>>): Prisma__DataListingClient<$Result.GetResult<Prisma.$DataListingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DataListings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingCountArgs} args - Arguments to filter DataListings to count.
+     * @example
+     * // Count the number of DataListings
+     * const count = await prisma.dataListing.count({
+     *   where: {
+     *     // ... the filter for the DataListings we want to count
+     *   }
+     * })
+    **/
+    count<T extends DataListingCountArgs>(
+      args?: Subset<T, DataListingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DataListingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DataListing.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DataListingAggregateArgs>(args: Subset<T, DataListingAggregateArgs>): Prisma.PrismaPromise<GetDataListingAggregateType<T>>
+
+    /**
+     * Group by DataListing.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataListingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DataListingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DataListingGroupByArgs['orderBy'] }
+        : { orderBy?: DataListingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DataListingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataListingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DataListing model
+   */
+  readonly fields: DataListingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DataListing.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DataListingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends DataListing$sellerArgs<ExtArgs> = {}>(args?: Subset<T, DataListing$sellerArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DataListing model
+   */
+  interface DataListingFieldRefs {
+    readonly listingId: FieldRef<"DataListing", 'String'>
+    readonly sellerAddress: FieldRef<"DataListing", 'String'>
+    readonly startDate: FieldRef<"DataListing", 'DateTime'>
+    readonly endDate: FieldRef<"DataListing", 'DateTime'>
+    readonly pricePerDay: FieldRef<"DataListing", 'String'>
+    readonly accountAddress: FieldRef<"DataListing", 'String'>
+    readonly isActive: FieldRef<"DataListing", 'Boolean'>
+    readonly updatedAt: FieldRef<"DataListing", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DataListing findUnique
+   */
+  export type DataListingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter, which DataListing to fetch.
+     */
+    where: DataListingWhereUniqueInput
+  }
+
+  /**
+   * DataListing findUniqueOrThrow
+   */
+  export type DataListingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter, which DataListing to fetch.
+     */
+    where: DataListingWhereUniqueInput
+  }
+
+  /**
+   * DataListing findFirst
+   */
+  export type DataListingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter, which DataListing to fetch.
+     */
+    where?: DataListingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataListings to fetch.
+     */
+    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataListings.
+     */
+    cursor?: DataListingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataListings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataListings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataListings.
+     */
+    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
+  }
+
+  /**
+   * DataListing findFirstOrThrow
+   */
+  export type DataListingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter, which DataListing to fetch.
+     */
+    where?: DataListingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataListings to fetch.
+     */
+    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataListings.
+     */
+    cursor?: DataListingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataListings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataListings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataListings.
+     */
+    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
+  }
+
+  /**
+   * DataListing findMany
+   */
+  export type DataListingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter, which DataListings to fetch.
+     */
+    where?: DataListingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataListings to fetch.
+     */
+    orderBy?: DataListingOrderByWithRelationInput | DataListingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DataListings.
+     */
+    cursor?: DataListingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataListings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataListings.
+     */
+    skip?: number
+    distinct?: DataListingScalarFieldEnum | DataListingScalarFieldEnum[]
+  }
+
+  /**
+   * DataListing create
+   */
+  export type DataListingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DataListing.
+     */
+    data: XOR<DataListingCreateInput, DataListingUncheckedCreateInput>
+  }
+
+  /**
+   * DataListing createMany
+   */
+  export type DataListingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DataListings.
+     */
+    data: DataListingCreateManyInput | DataListingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataListing createManyAndReturn
+   */
+  export type DataListingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * The data used to create many DataListings.
+     */
+    data: DataListingCreateManyInput | DataListingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataListing update
+   */
+  export type DataListingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DataListing.
+     */
+    data: XOR<DataListingUpdateInput, DataListingUncheckedUpdateInput>
+    /**
+     * Choose, which DataListing to update.
+     */
+    where: DataListingWhereUniqueInput
+  }
+
+  /**
+   * DataListing updateMany
+   */
+  export type DataListingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DataListings.
+     */
+    data: XOR<DataListingUpdateManyMutationInput, DataListingUncheckedUpdateManyInput>
+    /**
+     * Filter which DataListings to update
+     */
+    where?: DataListingWhereInput
+    /**
+     * Limit how many DataListings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataListing updateManyAndReturn
+   */
+  export type DataListingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * The data used to update DataListings.
+     */
+    data: XOR<DataListingUpdateManyMutationInput, DataListingUncheckedUpdateManyInput>
+    /**
+     * Filter which DataListings to update
+     */
+    where?: DataListingWhereInput
+    /**
+     * Limit how many DataListings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataListing upsert
+   */
+  export type DataListingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DataListing to update in case it exists.
+     */
+    where: DataListingWhereUniqueInput
+    /**
+     * In case the DataListing found by the `where` argument doesn't exist, create a new DataListing with this data.
+     */
+    create: XOR<DataListingCreateInput, DataListingUncheckedCreateInput>
+    /**
+     * In case the DataListing was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DataListingUpdateInput, DataListingUncheckedUpdateInput>
+  }
+
+  /**
+   * DataListing delete
+   */
+  export type DataListingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+    /**
+     * Filter which DataListing to delete.
+     */
+    where: DataListingWhereUniqueInput
+  }
+
+  /**
+   * DataListing deleteMany
+   */
+  export type DataListingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataListings to delete
+     */
+    where?: DataListingWhereInput
+    /**
+     * Limit how many DataListings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataListing.seller
+   */
+  export type DataListing$sellerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataSeller
+     */
+    select?: DataSellerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataSeller
+     */
+    omit?: DataSellerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataSellerInclude<ExtArgs> | null
+    where?: DataSellerWhereInput
+  }
+
+  /**
+   * DataListing without action
+   */
+  export type DataListingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataListing
+     */
+    select?: DataListingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataListing
+     */
+    omit?: DataListingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataListingInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model SellerProof
    */
 
@@ -16991,6 +17202,7 @@ export namespace Prisma {
     claimed?: boolean
     claimedAt?: boolean
     createdAt?: boolean
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProof"]>
 
   export type SellerProofSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17001,6 +17213,7 @@ export namespace Prisma {
     claimed?: boolean
     claimedAt?: boolean
     createdAt?: boolean
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProof"]>
 
   export type SellerProofSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -17011,6 +17224,7 @@ export namespace Prisma {
     claimed?: boolean
     claimedAt?: boolean
     createdAt?: boolean
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["sellerProof"]>
 
   export type SellerProofSelectScalar = {
@@ -17024,10 +17238,21 @@ export namespace Prisma {
   }
 
   export type SellerProofOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"sellerAddress" | "periodId" | "amount" | "proof" | "claimed" | "claimedAt" | "createdAt", ExtArgs["result"]["sellerProof"]>
+  export type SellerProofInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
+  }
+  export type SellerProofIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
+  }
+  export type SellerProofIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    seller?: boolean | DataSellerDefaultArgs<ExtArgs>
+  }
 
   export type $SellerProofPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SellerProof"
-    objects: {}
+    objects: {
+      seller: Prisma.$DataSellerPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       sellerAddress: string
       periodId: bigint
@@ -17430,6 +17655,7 @@ export namespace Prisma {
    */
   export interface Prisma__SellerProofClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    seller<T extends DataSellerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DataSellerDefaultArgs<ExtArgs>>): Prisma__DataSellerClient<$Result.GetResult<Prisma.$DataSellerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17483,6 +17709,10 @@ export namespace Prisma {
      */
     omit?: SellerProofOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    /**
      * Filter, which SellerProof to fetch.
      */
     where: SellerProofWhereUniqueInput
@@ -17501,6 +17731,10 @@ export namespace Prisma {
      */
     omit?: SellerProofOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    /**
      * Filter, which SellerProof to fetch.
      */
     where: SellerProofWhereUniqueInput
@@ -17518,6 +17752,10 @@ export namespace Prisma {
      * Omit specific fields from the SellerProof
      */
     omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
     /**
      * Filter, which SellerProof to fetch.
      */
@@ -17567,6 +17805,10 @@ export namespace Prisma {
      */
     omit?: SellerProofOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    /**
      * Filter, which SellerProof to fetch.
      */
     where?: SellerProofWhereInput
@@ -17615,6 +17857,10 @@ export namespace Prisma {
      */
     omit?: SellerProofOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    /**
      * Filter, which SellerProofs to fetch.
      */
     where?: SellerProofWhereInput
@@ -17658,6 +17904,10 @@ export namespace Prisma {
      */
     omit?: SellerProofOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
+    /**
      * The data needed to create a SellerProof.
      */
     data: XOR<SellerProofCreateInput, SellerProofUncheckedCreateInput>
@@ -17691,6 +17941,10 @@ export namespace Prisma {
      */
     data: SellerProofCreateManyInput | SellerProofCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -17705,6 +17959,10 @@ export namespace Prisma {
      * Omit specific fields from the SellerProof
      */
     omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
     /**
      * The data needed to update a SellerProof.
      */
@@ -17757,6 +18015,10 @@ export namespace Prisma {
      * Limit how many SellerProofs to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -17771,6 +18033,10 @@ export namespace Prisma {
      * Omit specific fields from the SellerProof
      */
     omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
     /**
      * The filter to search for the SellerProof to update in case it exists.
      */
@@ -17797,6 +18063,10 @@ export namespace Prisma {
      * Omit specific fields from the SellerProof
      */
     omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
     /**
      * Filter which SellerProof to delete.
      */
@@ -17829,6 +18099,10 @@ export namespace Prisma {
      * Omit specific fields from the SellerProof
      */
     omit?: SellerProofOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SellerProofInclude<ExtArgs> | null
   }
 
 
@@ -17972,32 +18246,6 @@ export namespace Prisma {
   export type MarketplaceConfigScalarFieldEnum = (typeof MarketplaceConfigScalarFieldEnum)[keyof typeof MarketplaceConfigScalarFieldEnum]
 
 
-  export const DataSellerScalarFieldEnum: {
-    sellerAddress: 'sellerAddress',
-    listingId: 'listingId',
-    totalRevenue: 'totalRevenue',
-    unclaimedRevenue: 'unclaimedRevenue',
-    accountAddress: 'accountAddress',
-    updatedAt: 'updatedAt'
-  };
-
-  export type DataSellerScalarFieldEnum = (typeof DataSellerScalarFieldEnum)[keyof typeof DataSellerScalarFieldEnum]
-
-
-  export const DataListingScalarFieldEnum: {
-    listingId: 'listingId',
-    sellerAddress: 'sellerAddress',
-    startDate: 'startDate',
-    endDate: 'endDate',
-    pricePerDay: 'pricePerDay',
-    accountAddress: 'accountAddress',
-    isActive: 'isActive',
-    updatedAt: 'updatedAt'
-  };
-
-  export type DataListingScalarFieldEnum = (typeof DataListingScalarFieldEnum)[keyof typeof DataListingScalarFieldEnum]
-
-
   export const DataPassScalarFieldEnum: {
     passId: 'passId',
     buyerAddress: 'buyerAddress',
@@ -18027,6 +18275,32 @@ export namespace Prisma {
   };
 
   export type MerkleDistributorScalarFieldEnum = (typeof MerkleDistributorScalarFieldEnum)[keyof typeof MerkleDistributorScalarFieldEnum]
+
+
+  export const DataSellerScalarFieldEnum: {
+    sellerAddress: 'sellerAddress',
+    listingId: 'listingId',
+    totalRevenue: 'totalRevenue',
+    unclaimedRevenue: 'unclaimedRevenue',
+    accountAddress: 'accountAddress',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DataSellerScalarFieldEnum = (typeof DataSellerScalarFieldEnum)[keyof typeof DataSellerScalarFieldEnum]
+
+
+  export const DataListingScalarFieldEnum: {
+    listingId: 'listingId',
+    sellerAddress: 'sellerAddress',
+    startDate: 'startDate',
+    endDate: 'endDate',
+    pricePerDay: 'pricePerDay',
+    accountAddress: 'accountAddress',
+    isActive: 'isActive',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DataListingScalarFieldEnum = (typeof DataListingScalarFieldEnum)[keyof typeof DataListingScalarFieldEnum]
 
 
   export const SellerProofScalarFieldEnum: {
@@ -18934,130 +19208,6 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"MarketplaceConfig"> | Date | string
   }
 
-  export type DataSellerWhereInput = {
-    AND?: DataSellerWhereInput | DataSellerWhereInput[]
-    OR?: DataSellerWhereInput[]
-    NOT?: DataSellerWhereInput | DataSellerWhereInput[]
-    sellerAddress?: StringFilter<"DataSeller"> | string
-    listingId?: StringNullableFilter<"DataSeller"> | string | null
-    totalRevenue?: StringFilter<"DataSeller"> | string
-    unclaimedRevenue?: StringFilter<"DataSeller"> | string
-    accountAddress?: StringFilter<"DataSeller"> | string
-    updatedAt?: DateTimeFilter<"DataSeller"> | Date | string
-  }
-
-  export type DataSellerOrderByWithRelationInput = {
-    sellerAddress?: SortOrder
-    listingId?: SortOrderInput | SortOrder
-    totalRevenue?: SortOrder
-    unclaimedRevenue?: SortOrder
-    accountAddress?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataSellerWhereUniqueInput = Prisma.AtLeast<{
-    sellerAddress?: string
-    accountAddress?: string
-    AND?: DataSellerWhereInput | DataSellerWhereInput[]
-    OR?: DataSellerWhereInput[]
-    NOT?: DataSellerWhereInput | DataSellerWhereInput[]
-    listingId?: StringNullableFilter<"DataSeller"> | string | null
-    totalRevenue?: StringFilter<"DataSeller"> | string
-    unclaimedRevenue?: StringFilter<"DataSeller"> | string
-    updatedAt?: DateTimeFilter<"DataSeller"> | Date | string
-  }, "sellerAddress" | "accountAddress">
-
-  export type DataSellerOrderByWithAggregationInput = {
-    sellerAddress?: SortOrder
-    listingId?: SortOrderInput | SortOrder
-    totalRevenue?: SortOrder
-    unclaimedRevenue?: SortOrder
-    accountAddress?: SortOrder
-    updatedAt?: SortOrder
-    _count?: DataSellerCountOrderByAggregateInput
-    _max?: DataSellerMaxOrderByAggregateInput
-    _min?: DataSellerMinOrderByAggregateInput
-  }
-
-  export type DataSellerScalarWhereWithAggregatesInput = {
-    AND?: DataSellerScalarWhereWithAggregatesInput | DataSellerScalarWhereWithAggregatesInput[]
-    OR?: DataSellerScalarWhereWithAggregatesInput[]
-    NOT?: DataSellerScalarWhereWithAggregatesInput | DataSellerScalarWhereWithAggregatesInput[]
-    sellerAddress?: StringWithAggregatesFilter<"DataSeller"> | string
-    listingId?: StringNullableWithAggregatesFilter<"DataSeller"> | string | null
-    totalRevenue?: StringWithAggregatesFilter<"DataSeller"> | string
-    unclaimedRevenue?: StringWithAggregatesFilter<"DataSeller"> | string
-    accountAddress?: StringWithAggregatesFilter<"DataSeller"> | string
-    updatedAt?: DateTimeWithAggregatesFilter<"DataSeller"> | Date | string
-  }
-
-  export type DataListingWhereInput = {
-    AND?: DataListingWhereInput | DataListingWhereInput[]
-    OR?: DataListingWhereInput[]
-    NOT?: DataListingWhereInput | DataListingWhereInput[]
-    listingId?: StringFilter<"DataListing"> | string
-    sellerAddress?: StringFilter<"DataListing"> | string
-    startDate?: DateTimeFilter<"DataListing"> | Date | string
-    endDate?: DateTimeFilter<"DataListing"> | Date | string
-    pricePerDay?: StringFilter<"DataListing"> | string
-    accountAddress?: StringFilter<"DataListing"> | string
-    isActive?: BoolFilter<"DataListing"> | boolean
-    updatedAt?: DateTimeFilter<"DataListing"> | Date | string
-  }
-
-  export type DataListingOrderByWithRelationInput = {
-    listingId?: SortOrder
-    sellerAddress?: SortOrder
-    startDate?: SortOrder
-    endDate?: SortOrder
-    pricePerDay?: SortOrder
-    accountAddress?: SortOrder
-    isActive?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataListingWhereUniqueInput = Prisma.AtLeast<{
-    listingId?: string
-    accountAddress?: string
-    AND?: DataListingWhereInput | DataListingWhereInput[]
-    OR?: DataListingWhereInput[]
-    NOT?: DataListingWhereInput | DataListingWhereInput[]
-    sellerAddress?: StringFilter<"DataListing"> | string
-    startDate?: DateTimeFilter<"DataListing"> | Date | string
-    endDate?: DateTimeFilter<"DataListing"> | Date | string
-    pricePerDay?: StringFilter<"DataListing"> | string
-    isActive?: BoolFilter<"DataListing"> | boolean
-    updatedAt?: DateTimeFilter<"DataListing"> | Date | string
-  }, "listingId" | "accountAddress">
-
-  export type DataListingOrderByWithAggregationInput = {
-    listingId?: SortOrder
-    sellerAddress?: SortOrder
-    startDate?: SortOrder
-    endDate?: SortOrder
-    pricePerDay?: SortOrder
-    accountAddress?: SortOrder
-    isActive?: SortOrder
-    updatedAt?: SortOrder
-    _count?: DataListingCountOrderByAggregateInput
-    _max?: DataListingMaxOrderByAggregateInput
-    _min?: DataListingMinOrderByAggregateInput
-  }
-
-  export type DataListingScalarWhereWithAggregatesInput = {
-    AND?: DataListingScalarWhereWithAggregatesInput | DataListingScalarWhereWithAggregatesInput[]
-    OR?: DataListingScalarWhereWithAggregatesInput[]
-    NOT?: DataListingScalarWhereWithAggregatesInput | DataListingScalarWhereWithAggregatesInput[]
-    listingId?: StringWithAggregatesFilter<"DataListing"> | string
-    sellerAddress?: StringWithAggregatesFilter<"DataListing"> | string
-    startDate?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
-    endDate?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
-    pricePerDay?: StringWithAggregatesFilter<"DataListing"> | string
-    accountAddress?: StringWithAggregatesFilter<"DataListing"> | string
-    isActive?: BoolWithAggregatesFilter<"DataListing"> | boolean
-    updatedAt?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
-  }
-
   export type DataPassWhereInput = {
     AND?: DataPassWhereInput | DataPassWhereInput[]
     OR?: DataPassWhereInput[]
@@ -19211,6 +19361,139 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"MerkleDistributor"> | Date | string
   }
 
+  export type DataSellerWhereInput = {
+    AND?: DataSellerWhereInput | DataSellerWhereInput[]
+    OR?: DataSellerWhereInput[]
+    NOT?: DataSellerWhereInput | DataSellerWhereInput[]
+    sellerAddress?: StringFilter<"DataSeller"> | string
+    listingId?: StringNullableFilter<"DataSeller"> | string | null
+    totalRevenue?: StringFilter<"DataSeller"> | string
+    unclaimedRevenue?: StringFilter<"DataSeller"> | string
+    accountAddress?: StringFilter<"DataSeller"> | string
+    updatedAt?: DateTimeFilter<"DataSeller"> | Date | string
+    listing?: XOR<DataListingNullableScalarRelationFilter, DataListingWhereInput> | null
+    proofs?: SellerProofListRelationFilter
+  }
+
+  export type DataSellerOrderByWithRelationInput = {
+    sellerAddress?: SortOrder
+    listingId?: SortOrderInput | SortOrder
+    totalRevenue?: SortOrder
+    unclaimedRevenue?: SortOrder
+    accountAddress?: SortOrder
+    updatedAt?: SortOrder
+    listing?: DataListingOrderByWithRelationInput
+    proofs?: SellerProofOrderByRelationAggregateInput
+  }
+
+  export type DataSellerWhereUniqueInput = Prisma.AtLeast<{
+    sellerAddress?: string
+    listingId?: string
+    accountAddress?: string
+    AND?: DataSellerWhereInput | DataSellerWhereInput[]
+    OR?: DataSellerWhereInput[]
+    NOT?: DataSellerWhereInput | DataSellerWhereInput[]
+    totalRevenue?: StringFilter<"DataSeller"> | string
+    unclaimedRevenue?: StringFilter<"DataSeller"> | string
+    updatedAt?: DateTimeFilter<"DataSeller"> | Date | string
+    listing?: XOR<DataListingNullableScalarRelationFilter, DataListingWhereInput> | null
+    proofs?: SellerProofListRelationFilter
+  }, "sellerAddress" | "listingId" | "accountAddress">
+
+  export type DataSellerOrderByWithAggregationInput = {
+    sellerAddress?: SortOrder
+    listingId?: SortOrderInput | SortOrder
+    totalRevenue?: SortOrder
+    unclaimedRevenue?: SortOrder
+    accountAddress?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DataSellerCountOrderByAggregateInput
+    _max?: DataSellerMaxOrderByAggregateInput
+    _min?: DataSellerMinOrderByAggregateInput
+  }
+
+  export type DataSellerScalarWhereWithAggregatesInput = {
+    AND?: DataSellerScalarWhereWithAggregatesInput | DataSellerScalarWhereWithAggregatesInput[]
+    OR?: DataSellerScalarWhereWithAggregatesInput[]
+    NOT?: DataSellerScalarWhereWithAggregatesInput | DataSellerScalarWhereWithAggregatesInput[]
+    sellerAddress?: StringWithAggregatesFilter<"DataSeller"> | string
+    listingId?: StringNullableWithAggregatesFilter<"DataSeller"> | string | null
+    totalRevenue?: StringWithAggregatesFilter<"DataSeller"> | string
+    unclaimedRevenue?: StringWithAggregatesFilter<"DataSeller"> | string
+    accountAddress?: StringWithAggregatesFilter<"DataSeller"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DataSeller"> | Date | string
+  }
+
+  export type DataListingWhereInput = {
+    AND?: DataListingWhereInput | DataListingWhereInput[]
+    OR?: DataListingWhereInput[]
+    NOT?: DataListingWhereInput | DataListingWhereInput[]
+    listingId?: StringFilter<"DataListing"> | string
+    sellerAddress?: StringFilter<"DataListing"> | string
+    startDate?: DateTimeFilter<"DataListing"> | Date | string
+    endDate?: DateTimeFilter<"DataListing"> | Date | string
+    pricePerDay?: StringFilter<"DataListing"> | string
+    accountAddress?: StringFilter<"DataListing"> | string
+    isActive?: BoolFilter<"DataListing"> | boolean
+    updatedAt?: DateTimeFilter<"DataListing"> | Date | string
+    seller?: XOR<DataSellerNullableScalarRelationFilter, DataSellerWhereInput> | null
+  }
+
+  export type DataListingOrderByWithRelationInput = {
+    listingId?: SortOrder
+    sellerAddress?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    pricePerDay?: SortOrder
+    accountAddress?: SortOrder
+    isActive?: SortOrder
+    updatedAt?: SortOrder
+    seller?: DataSellerOrderByWithRelationInput
+  }
+
+  export type DataListingWhereUniqueInput = Prisma.AtLeast<{
+    listingId?: string
+    accountAddress?: string
+    AND?: DataListingWhereInput | DataListingWhereInput[]
+    OR?: DataListingWhereInput[]
+    NOT?: DataListingWhereInput | DataListingWhereInput[]
+    sellerAddress?: StringFilter<"DataListing"> | string
+    startDate?: DateTimeFilter<"DataListing"> | Date | string
+    endDate?: DateTimeFilter<"DataListing"> | Date | string
+    pricePerDay?: StringFilter<"DataListing"> | string
+    isActive?: BoolFilter<"DataListing"> | boolean
+    updatedAt?: DateTimeFilter<"DataListing"> | Date | string
+    seller?: XOR<DataSellerNullableScalarRelationFilter, DataSellerWhereInput> | null
+  }, "listingId" | "accountAddress">
+
+  export type DataListingOrderByWithAggregationInput = {
+    listingId?: SortOrder
+    sellerAddress?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    pricePerDay?: SortOrder
+    accountAddress?: SortOrder
+    isActive?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DataListingCountOrderByAggregateInput
+    _max?: DataListingMaxOrderByAggregateInput
+    _min?: DataListingMinOrderByAggregateInput
+  }
+
+  export type DataListingScalarWhereWithAggregatesInput = {
+    AND?: DataListingScalarWhereWithAggregatesInput | DataListingScalarWhereWithAggregatesInput[]
+    OR?: DataListingScalarWhereWithAggregatesInput[]
+    NOT?: DataListingScalarWhereWithAggregatesInput | DataListingScalarWhereWithAggregatesInput[]
+    listingId?: StringWithAggregatesFilter<"DataListing"> | string
+    sellerAddress?: StringWithAggregatesFilter<"DataListing"> | string
+    startDate?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
+    endDate?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
+    pricePerDay?: StringWithAggregatesFilter<"DataListing"> | string
+    accountAddress?: StringWithAggregatesFilter<"DataListing"> | string
+    isActive?: BoolWithAggregatesFilter<"DataListing"> | boolean
+    updatedAt?: DateTimeWithAggregatesFilter<"DataListing"> | Date | string
+  }
+
   export type SellerProofWhereInput = {
     AND?: SellerProofWhereInput | SellerProofWhereInput[]
     OR?: SellerProofWhereInput[]
@@ -19222,6 +19505,7 @@ export namespace Prisma {
     claimed?: BoolFilter<"SellerProof"> | boolean
     claimedAt?: DateTimeNullableFilter<"SellerProof"> | Date | string | null
     createdAt?: DateTimeFilter<"SellerProof"> | Date | string
+    seller?: XOR<DataSellerScalarRelationFilter, DataSellerWhereInput>
   }
 
   export type SellerProofOrderByWithRelationInput = {
@@ -19232,6 +19516,7 @@ export namespace Prisma {
     claimed?: SortOrder
     claimedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    seller?: DataSellerOrderByWithRelationInput
   }
 
   export type SellerProofWhereUniqueInput = Prisma.AtLeast<{
@@ -19246,6 +19531,7 @@ export namespace Prisma {
     claimed?: BoolFilter<"SellerProof"> | boolean
     claimedAt?: DateTimeNullableFilter<"SellerProof"> | Date | string | null
     createdAt?: DateTimeFilter<"SellerProof"> | Date | string
+    seller?: XOR<DataSellerScalarRelationFilter, DataSellerWhereInput>
   }, "sellerAddress_periodId">
 
   export type SellerProofOrderByWithAggregationInput = {
@@ -19997,146 +20283,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DataSellerCreateInput = {
-    sellerAddress: string
-    listingId?: string | null
-    totalRevenue: string
-    unclaimedRevenue: string
-    accountAddress: string
-    updatedAt?: Date | string
-  }
-
-  export type DataSellerUncheckedCreateInput = {
-    sellerAddress: string
-    listingId?: string | null
-    totalRevenue: string
-    unclaimedRevenue: string
-    accountAddress: string
-    updatedAt?: Date | string
-  }
-
-  export type DataSellerUpdateInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRevenue?: StringFieldUpdateOperationsInput | string
-    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataSellerUncheckedUpdateInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRevenue?: StringFieldUpdateOperationsInput | string
-    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataSellerCreateManyInput = {
-    sellerAddress: string
-    listingId?: string | null
-    totalRevenue: string
-    unclaimedRevenue: string
-    accountAddress: string
-    updatedAt?: Date | string
-  }
-
-  export type DataSellerUpdateManyMutationInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRevenue?: StringFieldUpdateOperationsInput | string
-    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataSellerUncheckedUpdateManyInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    listingId?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRevenue?: StringFieldUpdateOperationsInput | string
-    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataListingCreateInput = {
-    listingId: string
-    sellerAddress: string
-    startDate: Date | string
-    endDate: Date | string
-    pricePerDay: string
-    accountAddress: string
-    isActive?: boolean
-    updatedAt?: Date | string
-  }
-
-  export type DataListingUncheckedCreateInput = {
-    listingId: string
-    sellerAddress: string
-    startDate: Date | string
-    endDate: Date | string
-    pricePerDay: string
-    accountAddress: string
-    isActive?: boolean
-    updatedAt?: Date | string
-  }
-
-  export type DataListingUpdateInput = {
-    listingId?: StringFieldUpdateOperationsInput | string
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    pricePerDay?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataListingUncheckedUpdateInput = {
-    listingId?: StringFieldUpdateOperationsInput | string
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    pricePerDay?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataListingCreateManyInput = {
-    listingId: string
-    sellerAddress: string
-    startDate: Date | string
-    endDate: Date | string
-    pricePerDay: string
-    accountAddress: string
-    isActive?: boolean
-    updatedAt?: Date | string
-  }
-
-  export type DataListingUpdateManyMutationInput = {
-    listingId?: StringFieldUpdateOperationsInput | string
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    pricePerDay?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type DataListingUncheckedUpdateManyInput = {
-    listingId?: StringFieldUpdateOperationsInput | string
-    sellerAddress?: StringFieldUpdateOperationsInput | string
-    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    pricePerDay?: StringFieldUpdateOperationsInput | string
-    accountAddress?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
   export type DataPassCreateInput = {
     passId: string
     buyerAddress: string
@@ -20312,14 +20458,161 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type SellerProofCreateInput = {
+  export type DataSellerCreateInput = {
     sellerAddress: string
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+    listing?: DataListingCreateNestedOneWithoutSellerInput
+    proofs?: SellerProofCreateNestedManyWithoutSellerInput
+  }
+
+  export type DataSellerUncheckedCreateInput = {
+    sellerAddress: string
+    listingId?: string | null
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+    proofs?: SellerProofUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type DataSellerUpdateInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: DataListingUpdateOneWithoutSellerNestedInput
+    proofs?: SellerProofUpdateManyWithoutSellerNestedInput
+  }
+
+  export type DataSellerUncheckedUpdateInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    proofs?: SellerProofUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type DataSellerCreateManyInput = {
+    sellerAddress: string
+    listingId?: string | null
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+  }
+
+  export type DataSellerUpdateManyMutationInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataSellerUncheckedUpdateManyInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataListingCreateInput = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date | string
+    endDate: Date | string
+    pricePerDay: string
+    accountAddress: string
+    isActive?: boolean
+    updatedAt?: Date | string
+    seller?: DataSellerCreateNestedOneWithoutListingInput
+  }
+
+  export type DataListingUncheckedCreateInput = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date | string
+    endDate: Date | string
+    pricePerDay: string
+    accountAddress: string
+    isActive?: boolean
+    updatedAt?: Date | string
+    seller?: DataSellerUncheckedCreateNestedOneWithoutListingInput
+  }
+
+  export type DataListingUpdateInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: DataSellerUpdateOneWithoutListingNestedInput
+  }
+
+  export type DataListingUncheckedUpdateInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: DataSellerUncheckedUpdateOneWithoutListingNestedInput
+  }
+
+  export type DataListingCreateManyInput = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date | string
+    endDate: Date | string
+    pricePerDay: string
+    accountAddress: string
+    isActive?: boolean
+    updatedAt?: Date | string
+  }
+
+  export type DataListingUpdateManyMutationInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataListingUncheckedUpdateManyInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProofCreateInput = {
     periodId: bigint | number
     amount: bigint | number
     proof: JsonNullValueInput | InputJsonValue
     claimed?: boolean
     claimedAt?: Date | string | null
     createdAt?: Date | string
+    seller: DataSellerCreateNestedOneWithoutProofsInput
   }
 
   export type SellerProofUncheckedCreateInput = {
@@ -20333,13 +20626,13 @@ export namespace Prisma {
   }
 
   export type SellerProofUpdateInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
     periodId?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: BigIntFieldUpdateOperationsInput | bigint | number
     proof?: JsonNullValueInput | InputJsonValue
     claimed?: BoolFieldUpdateOperationsInput | boolean
     claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    seller?: DataSellerUpdateOneRequiredWithoutProofsNestedInput
   }
 
   export type SellerProofUncheckedUpdateInput = {
@@ -20363,7 +20656,6 @@ export namespace Prisma {
   }
 
   export type SellerProofUpdateManyMutationInput = {
-    sellerAddress?: StringFieldUpdateOperationsInput | string
     periodId?: BigIntFieldUpdateOperationsInput | bigint | number
     amount?: BigIntFieldUpdateOperationsInput | bigint | number
     proof?: JsonNullValueInput | InputJsonValue
@@ -21164,66 +21456,6 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type DataSellerCountOrderByAggregateInput = {
-    sellerAddress?: SortOrder
-    listingId?: SortOrder
-    totalRevenue?: SortOrder
-    unclaimedRevenue?: SortOrder
-    accountAddress?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataSellerMaxOrderByAggregateInput = {
-    sellerAddress?: SortOrder
-    listingId?: SortOrder
-    totalRevenue?: SortOrder
-    unclaimedRevenue?: SortOrder
-    accountAddress?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataSellerMinOrderByAggregateInput = {
-    sellerAddress?: SortOrder
-    listingId?: SortOrder
-    totalRevenue?: SortOrder
-    unclaimedRevenue?: SortOrder
-    accountAddress?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataListingCountOrderByAggregateInput = {
-    listingId?: SortOrder
-    sellerAddress?: SortOrder
-    startDate?: SortOrder
-    endDate?: SortOrder
-    pricePerDay?: SortOrder
-    accountAddress?: SortOrder
-    isActive?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataListingMaxOrderByAggregateInput = {
-    listingId?: SortOrder
-    sellerAddress?: SortOrder
-    startDate?: SortOrder
-    endDate?: SortOrder
-    pricePerDay?: SortOrder
-    accountAddress?: SortOrder
-    isActive?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type DataListingMinOrderByAggregateInput = {
-    listingId?: SortOrder
-    sellerAddress?: SortOrder
-    startDate?: SortOrder
-    endDate?: SortOrder
-    pricePerDay?: SortOrder
-    accountAddress?: SortOrder
-    isActive?: SortOrder
-    updatedAt?: SortOrder
-  }
-
   export type DataPassCountOrderByAggregateInput = {
     passId?: SortOrder
     buyerAddress?: SortOrder
@@ -21314,6 +21546,86 @@ export namespace Prisma {
   export type MerkleDistributorSumOrderByAggregateInput = {
     periodId?: SortOrder
   }
+
+  export type DataListingNullableScalarRelationFilter = {
+    is?: DataListingWhereInput | null
+    isNot?: DataListingWhereInput | null
+  }
+
+  export type SellerProofListRelationFilter = {
+    every?: SellerProofWhereInput
+    some?: SellerProofWhereInput
+    none?: SellerProofWhereInput
+  }
+
+  export type SellerProofOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DataSellerCountOrderByAggregateInput = {
+    sellerAddress?: SortOrder
+    listingId?: SortOrder
+    totalRevenue?: SortOrder
+    unclaimedRevenue?: SortOrder
+    accountAddress?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DataSellerMaxOrderByAggregateInput = {
+    sellerAddress?: SortOrder
+    listingId?: SortOrder
+    totalRevenue?: SortOrder
+    unclaimedRevenue?: SortOrder
+    accountAddress?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DataSellerMinOrderByAggregateInput = {
+    sellerAddress?: SortOrder
+    listingId?: SortOrder
+    totalRevenue?: SortOrder
+    unclaimedRevenue?: SortOrder
+    accountAddress?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DataSellerNullableScalarRelationFilter = {
+    is?: DataSellerWhereInput | null
+    isNot?: DataSellerWhereInput | null
+  }
+
+  export type DataListingCountOrderByAggregateInput = {
+    listingId?: SortOrder
+    sellerAddress?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    pricePerDay?: SortOrder
+    accountAddress?: SortOrder
+    isActive?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DataListingMaxOrderByAggregateInput = {
+    listingId?: SortOrder
+    sellerAddress?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    pricePerDay?: SortOrder
+    accountAddress?: SortOrder
+    isActive?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DataListingMinOrderByAggregateInput = {
+    listingId?: SortOrder
+    sellerAddress?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    pricePerDay?: SortOrder
+    accountAddress?: SortOrder
+    isActive?: SortOrder
+    updatedAt?: SortOrder
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -21336,6 +21648,11 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type DataSellerScalarRelationFilter = {
+    is?: DataSellerWhereInput
+    isNot?: DataSellerWhereInput
   }
 
   export type SellerProofSellerAddressPeriodIdCompoundUniqueInput = {
@@ -22016,6 +22333,110 @@ export namespace Prisma {
     delete?: FocusSessionWhereInput | boolean
     connect?: FocusSessionWhereUniqueInput
     update?: XOR<XOR<FocusSessionUpdateToOneWithWhereWithoutCommitmentsInput, FocusSessionUpdateWithoutCommitmentsInput>, FocusSessionUncheckedUpdateWithoutCommitmentsInput>
+  }
+
+  export type DataListingCreateNestedOneWithoutSellerInput = {
+    create?: XOR<DataListingCreateWithoutSellerInput, DataListingUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: DataListingCreateOrConnectWithoutSellerInput
+    connect?: DataListingWhereUniqueInput
+  }
+
+  export type SellerProofCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput> | SellerProofCreateWithoutSellerInput[] | SellerProofUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProofCreateOrConnectWithoutSellerInput | SellerProofCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProofCreateManySellerInputEnvelope
+    connect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+  }
+
+  export type SellerProofUncheckedCreateNestedManyWithoutSellerInput = {
+    create?: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput> | SellerProofCreateWithoutSellerInput[] | SellerProofUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProofCreateOrConnectWithoutSellerInput | SellerProofCreateOrConnectWithoutSellerInput[]
+    createMany?: SellerProofCreateManySellerInputEnvelope
+    connect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+  }
+
+  export type DataListingUpdateOneWithoutSellerNestedInput = {
+    create?: XOR<DataListingCreateWithoutSellerInput, DataListingUncheckedCreateWithoutSellerInput>
+    connectOrCreate?: DataListingCreateOrConnectWithoutSellerInput
+    upsert?: DataListingUpsertWithoutSellerInput
+    disconnect?: DataListingWhereInput | boolean
+    delete?: DataListingWhereInput | boolean
+    connect?: DataListingWhereUniqueInput
+    update?: XOR<XOR<DataListingUpdateToOneWithWhereWithoutSellerInput, DataListingUpdateWithoutSellerInput>, DataListingUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerProofUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput> | SellerProofCreateWithoutSellerInput[] | SellerProofUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProofCreateOrConnectWithoutSellerInput | SellerProofCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProofUpsertWithWhereUniqueWithoutSellerInput | SellerProofUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProofCreateManySellerInputEnvelope
+    set?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    disconnect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    delete?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    connect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    update?: SellerProofUpdateWithWhereUniqueWithoutSellerInput | SellerProofUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProofUpdateManyWithWhereWithoutSellerInput | SellerProofUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProofScalarWhereInput | SellerProofScalarWhereInput[]
+  }
+
+  export type SellerProofUncheckedUpdateManyWithoutSellerNestedInput = {
+    create?: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput> | SellerProofCreateWithoutSellerInput[] | SellerProofUncheckedCreateWithoutSellerInput[]
+    connectOrCreate?: SellerProofCreateOrConnectWithoutSellerInput | SellerProofCreateOrConnectWithoutSellerInput[]
+    upsert?: SellerProofUpsertWithWhereUniqueWithoutSellerInput | SellerProofUpsertWithWhereUniqueWithoutSellerInput[]
+    createMany?: SellerProofCreateManySellerInputEnvelope
+    set?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    disconnect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    delete?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    connect?: SellerProofWhereUniqueInput | SellerProofWhereUniqueInput[]
+    update?: SellerProofUpdateWithWhereUniqueWithoutSellerInput | SellerProofUpdateWithWhereUniqueWithoutSellerInput[]
+    updateMany?: SellerProofUpdateManyWithWhereWithoutSellerInput | SellerProofUpdateManyWithWhereWithoutSellerInput[]
+    deleteMany?: SellerProofScalarWhereInput | SellerProofScalarWhereInput[]
+  }
+
+  export type DataSellerCreateNestedOneWithoutListingInput = {
+    create?: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutListingInput
+    connect?: DataSellerWhereUniqueInput
+  }
+
+  export type DataSellerUncheckedCreateNestedOneWithoutListingInput = {
+    create?: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutListingInput
+    connect?: DataSellerWhereUniqueInput
+  }
+
+  export type DataSellerUpdateOneWithoutListingNestedInput = {
+    create?: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutListingInput
+    upsert?: DataSellerUpsertWithoutListingInput
+    disconnect?: DataSellerWhereInput | boolean
+    delete?: DataSellerWhereInput | boolean
+    connect?: DataSellerWhereUniqueInput
+    update?: XOR<XOR<DataSellerUpdateToOneWithWhereWithoutListingInput, DataSellerUpdateWithoutListingInput>, DataSellerUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DataSellerUncheckedUpdateOneWithoutListingNestedInput = {
+    create?: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutListingInput
+    upsert?: DataSellerUpsertWithoutListingInput
+    disconnect?: DataSellerWhereInput | boolean
+    delete?: DataSellerWhereInput | boolean
+    connect?: DataSellerWhereUniqueInput
+    update?: XOR<XOR<DataSellerUpdateToOneWithWhereWithoutListingInput, DataSellerUpdateWithoutListingInput>, DataSellerUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DataSellerCreateNestedOneWithoutProofsInput = {
+    create?: XOR<DataSellerCreateWithoutProofsInput, DataSellerUncheckedCreateWithoutProofsInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutProofsInput
+    connect?: DataSellerWhereUniqueInput
+  }
+
+  export type DataSellerUpdateOneRequiredWithoutProofsNestedInput = {
+    create?: XOR<DataSellerCreateWithoutProofsInput, DataSellerUncheckedCreateWithoutProofsInput>
+    connectOrCreate?: DataSellerCreateOrConnectWithoutProofsInput
+    upsert?: DataSellerUpsertWithoutProofsInput
+    connect?: DataSellerWhereUniqueInput
+    update?: XOR<XOR<DataSellerUpdateToOneWithWhereWithoutProofsInput, DataSellerUpdateWithoutProofsInput>, DataSellerUncheckedUpdateWithoutProofsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -23531,6 +23952,227 @@ export namespace Prisma {
     status?: EnumFocusSessionStatusFieldUpdateOperationsInput | $Enums.FocusSessionStatus
   }
 
+  export type DataListingCreateWithoutSellerInput = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date | string
+    endDate: Date | string
+    pricePerDay: string
+    accountAddress: string
+    isActive?: boolean
+    updatedAt?: Date | string
+  }
+
+  export type DataListingUncheckedCreateWithoutSellerInput = {
+    listingId: string
+    sellerAddress: string
+    startDate: Date | string
+    endDate: Date | string
+    pricePerDay: string
+    accountAddress: string
+    isActive?: boolean
+    updatedAt?: Date | string
+  }
+
+  export type DataListingCreateOrConnectWithoutSellerInput = {
+    where: DataListingWhereUniqueInput
+    create: XOR<DataListingCreateWithoutSellerInput, DataListingUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProofCreateWithoutSellerInput = {
+    periodId: bigint | number
+    amount: bigint | number
+    proof: JsonNullValueInput | InputJsonValue
+    claimed?: boolean
+    claimedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type SellerProofUncheckedCreateWithoutSellerInput = {
+    periodId: bigint | number
+    amount: bigint | number
+    proof: JsonNullValueInput | InputJsonValue
+    claimed?: boolean
+    claimedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type SellerProofCreateOrConnectWithoutSellerInput = {
+    where: SellerProofWhereUniqueInput
+    create: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProofCreateManySellerInputEnvelope = {
+    data: SellerProofCreateManySellerInput | SellerProofCreateManySellerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DataListingUpsertWithoutSellerInput = {
+    update: XOR<DataListingUpdateWithoutSellerInput, DataListingUncheckedUpdateWithoutSellerInput>
+    create: XOR<DataListingCreateWithoutSellerInput, DataListingUncheckedCreateWithoutSellerInput>
+    where?: DataListingWhereInput
+  }
+
+  export type DataListingUpdateToOneWithWhereWithoutSellerInput = {
+    where?: DataListingWhereInput
+    data: XOR<DataListingUpdateWithoutSellerInput, DataListingUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type DataListingUpdateWithoutSellerInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataListingUncheckedUpdateWithoutSellerInput = {
+    listingId?: StringFieldUpdateOperationsInput | string
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    startDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    endDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    pricePerDay?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProofUpsertWithWhereUniqueWithoutSellerInput = {
+    where: SellerProofWhereUniqueInput
+    update: XOR<SellerProofUpdateWithoutSellerInput, SellerProofUncheckedUpdateWithoutSellerInput>
+    create: XOR<SellerProofCreateWithoutSellerInput, SellerProofUncheckedCreateWithoutSellerInput>
+  }
+
+  export type SellerProofUpdateWithWhereUniqueWithoutSellerInput = {
+    where: SellerProofWhereUniqueInput
+    data: XOR<SellerProofUpdateWithoutSellerInput, SellerProofUncheckedUpdateWithoutSellerInput>
+  }
+
+  export type SellerProofUpdateManyWithWhereWithoutSellerInput = {
+    where: SellerProofScalarWhereInput
+    data: XOR<SellerProofUpdateManyMutationInput, SellerProofUncheckedUpdateManyWithoutSellerInput>
+  }
+
+  export type SellerProofScalarWhereInput = {
+    AND?: SellerProofScalarWhereInput | SellerProofScalarWhereInput[]
+    OR?: SellerProofScalarWhereInput[]
+    NOT?: SellerProofScalarWhereInput | SellerProofScalarWhereInput[]
+    sellerAddress?: StringFilter<"SellerProof"> | string
+    periodId?: BigIntFilter<"SellerProof"> | bigint | number
+    amount?: BigIntFilter<"SellerProof"> | bigint | number
+    proof?: JsonFilter<"SellerProof">
+    claimed?: BoolFilter<"SellerProof"> | boolean
+    claimedAt?: DateTimeNullableFilter<"SellerProof"> | Date | string | null
+    createdAt?: DateTimeFilter<"SellerProof"> | Date | string
+  }
+
+  export type DataSellerCreateWithoutListingInput = {
+    sellerAddress: string
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+    proofs?: SellerProofCreateNestedManyWithoutSellerInput
+  }
+
+  export type DataSellerUncheckedCreateWithoutListingInput = {
+    sellerAddress: string
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+    proofs?: SellerProofUncheckedCreateNestedManyWithoutSellerInput
+  }
+
+  export type DataSellerCreateOrConnectWithoutListingInput = {
+    where: DataSellerWhereUniqueInput
+    create: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+  }
+
+  export type DataSellerUpsertWithoutListingInput = {
+    update: XOR<DataSellerUpdateWithoutListingInput, DataSellerUncheckedUpdateWithoutListingInput>
+    create: XOR<DataSellerCreateWithoutListingInput, DataSellerUncheckedCreateWithoutListingInput>
+    where?: DataSellerWhereInput
+  }
+
+  export type DataSellerUpdateToOneWithWhereWithoutListingInput = {
+    where?: DataSellerWhereInput
+    data: XOR<DataSellerUpdateWithoutListingInput, DataSellerUncheckedUpdateWithoutListingInput>
+  }
+
+  export type DataSellerUpdateWithoutListingInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    proofs?: SellerProofUpdateManyWithoutSellerNestedInput
+  }
+
+  export type DataSellerUncheckedUpdateWithoutListingInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    proofs?: SellerProofUncheckedUpdateManyWithoutSellerNestedInput
+  }
+
+  export type DataSellerCreateWithoutProofsInput = {
+    sellerAddress: string
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+    listing?: DataListingCreateNestedOneWithoutSellerInput
+  }
+
+  export type DataSellerUncheckedCreateWithoutProofsInput = {
+    sellerAddress: string
+    listingId?: string | null
+    totalRevenue: string
+    unclaimedRevenue: string
+    accountAddress: string
+    updatedAt?: Date | string
+  }
+
+  export type DataSellerCreateOrConnectWithoutProofsInput = {
+    where: DataSellerWhereUniqueInput
+    create: XOR<DataSellerCreateWithoutProofsInput, DataSellerUncheckedCreateWithoutProofsInput>
+  }
+
+  export type DataSellerUpsertWithoutProofsInput = {
+    update: XOR<DataSellerUpdateWithoutProofsInput, DataSellerUncheckedUpdateWithoutProofsInput>
+    create: XOR<DataSellerCreateWithoutProofsInput, DataSellerUncheckedCreateWithoutProofsInput>
+    where?: DataSellerWhereInput
+  }
+
+  export type DataSellerUpdateToOneWithWhereWithoutProofsInput = {
+    where?: DataSellerWhereInput
+    data: XOR<DataSellerUpdateWithoutProofsInput, DataSellerUncheckedUpdateWithoutProofsInput>
+  }
+
+  export type DataSellerUpdateWithoutProofsInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    listing?: DataListingUpdateOneWithoutSellerNestedInput
+  }
+
+  export type DataSellerUncheckedUpdateWithoutProofsInput = {
+    sellerAddress?: StringFieldUpdateOperationsInput | string
+    listingId?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRevenue?: StringFieldUpdateOperationsInput | string
+    unclaimedRevenue?: StringFieldUpdateOperationsInput | string
+    accountAddress?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type FocusSessionCreateManyUserInput = {
     id?: string
     startTime?: Date | string
@@ -23911,6 +24553,42 @@ export namespace Prisma {
 
   export type RoutineAppUncheckedUpdateManyWithoutAppInput = {
     routineId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SellerProofCreateManySellerInput = {
+    periodId: bigint | number
+    amount: bigint | number
+    proof: JsonNullValueInput | InputJsonValue
+    claimed?: boolean
+    claimedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type SellerProofUpdateWithoutSellerInput = {
+    periodId?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    proof?: JsonNullValueInput | InputJsonValue
+    claimed?: BoolFieldUpdateOperationsInput | boolean
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProofUncheckedUpdateWithoutSellerInput = {
+    periodId?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    proof?: JsonNullValueInput | InputJsonValue
+    claimed?: BoolFieldUpdateOperationsInput | boolean
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SellerProofUncheckedUpdateManyWithoutSellerInput = {
+    periodId?: BigIntFieldUpdateOperationsInput | bigint | number
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    proof?: JsonNullValueInput | InputJsonValue
+    claimed?: BoolFieldUpdateOperationsInput | boolean
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -1,9 +1,9 @@
 import { PublicKey, Connection } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
-import { PrismaClient } from '@prisma/client';
 import { marketplacePDAs, MARKETPLACE_PROGRAM_ID } from '@blockit/shared';
 import type { DataMarketplace } from '../../../programs/target/types/data_marketplace';
 import IDL from '../../../programs/target/idl/data_marketplace.json';
+import { prisma } from '../config';
 
 export interface DataAccessRequest {
   buyer: string;
@@ -21,14 +21,12 @@ export interface DataAccessResponse {
 }
 
 export class DataPassService {
-  private prisma: PrismaClient;
   private program: Program<DataMarketplace>;
   private accessCache: Map<string, { expires: number; result: DataAccessResponse }> = new Map();
 
-  constructor(prisma: PrismaClient, connection: Connection) {
-    this.prisma = prisma;
+  constructor( connection: Connection) {
     const provider = new AnchorProvider(connection, {} as any, { commitment: 'confirmed' });
-    this.program = new Program(IDL as DataMarketplace, MARKETPLACE_PROGRAM_ID, provider);
+    this.program = new Program(IDL as DataMarketplace, provider);
   }
 
   /**
@@ -71,18 +69,30 @@ export class DataPassService {
         
         // Check if date is within pass range
         if (passData.startDate.lte(requestedDate) && passData.endDate.gte(requestedDate)) {
-          // Get the snapshot to verify seller was eligible
-          const snapshot = await this.prisma.listingSnapshot.findUnique({
+          // Get the merkle distributor that contains the eligible sellers
+          // Convert the byte array to base58 string (Solana's standard encoding)
+          const merkleRootBytes = Buffer.from(passData.eligibilityMerkleRoot);
+          const merkleRoot = new PublicKey(merkleRootBytes).toBase58();
+          
+          // Find the merkle distributor with this root
+          const distributor = await prisma.merkleDistributor.findFirst({
             where: {
-              merkleRoot: Buffer.from(passData.snapshotMerkleRoot)
+              merkleRoot: merkleRoot
             }
           });
 
-          if (snapshot) {
-            const listings = snapshot.listings as any[];
-            const sellerInSnapshot = listings.some(l => l.seller === request.seller);
+          if (distributor) {
+            // Check if the seller has a proof for this period
+            const sellerProof = await prisma.sellerProof.findUnique({
+              where: {
+                sellerAddress_periodId: {
+                  sellerAddress: request.seller,
+                  periodId: distributor.periodId
+                }
+              }
+            });
             
-            if (sellerInSnapshot) {
+            if (sellerProof) {
               // Generate access token
               const accessToken = this.generateAccessToken({
                 buyer: request.buyer,
@@ -160,16 +170,32 @@ export class DataPassService {
         
         // Check if pass overlaps with requested period
         if (passData.startDate.lte(endTimestamp) && passData.endDate.gte(startTimestamp)) {
-          // Get sellers from the snapshot
-          const snapshot = await this.prisma.listingSnapshot.findUnique({
+          // Get the merkle distributor that contains the eligible sellers
+          // Convert the byte array to base58 string (Solana's standard encoding)
+          const merkleRootBytes = Buffer.from(passData.eligibilityMerkleRoot);
+          const merkleRoot = new PublicKey(merkleRootBytes).toBase58();
+          
+          // Find the merkle distributor with this root
+          const distributor = await prisma.merkleDistributor.findFirst({
             where: {
-              merkleRoot: Buffer.from(passData.snapshotMerkleRoot)
+              merkleRoot: merkleRoot
             }
           });
 
-          if (snapshot) {
-            const listings = snapshot.listings as any[];
-            listings.forEach(l => eligibleSellers.add(l.seller));
+          if (distributor) {
+            // Get all sellers who have proofs for this period
+            const sellerProofs = await prisma.sellerProof.findMany({
+              where: {
+                periodId: distributor.periodId
+              },
+              select: {
+                sellerAddress: true
+              }
+            });
+            
+            sellerProofs.forEach(proof => {
+              eligibleSellers.add(proof.sellerAddress);
+            });
           }
         }
       }
@@ -179,7 +205,7 @@ export class DataPassService {
       }
 
       // Get app usage data from eligible sellers
-      const users = await this.prisma.user.findMany({
+      const users = await prisma.user.findMany({
         where: {
           walletAddress: {
             in: Array.from(eligibleSellers)
@@ -194,7 +220,7 @@ export class DataPassService {
       const userIds = users.map(u => u.id);
       const walletToId = new Map(users.map(u => [u.walletAddress, u.id]));
 
-      const appUsage = await this.prisma.appUsage.findMany({
+      const appUsage = await prisma.appUsage.findMany({
         where: {
           userId: {
             in: userIds

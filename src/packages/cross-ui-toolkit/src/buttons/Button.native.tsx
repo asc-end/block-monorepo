@@ -32,7 +32,7 @@ export function Button(props: ButtonProps): React.ReactElement {
     const nativeStyles = useMemo(() => StyleSheet.create({
         container: {
             position: 'relative' as const,
-            opacity: disabled ? 0.5 : 1,
+            opacity: disabled ? 0.5 : loading ? 0.7 : 1,
         },
         button: {
             backgroundColor: style?.backgroundColor ?? variantStyle.backgroundColor,
