@@ -1,5 +1,6 @@
 import { Stack, router } from 'expo-router';
 import { Box, useTheme, Pressable, Text } from '@blockit/cross-ui-toolkit';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AnalyticsLayout() {
   const { currentColors } = useTheme();
@@ -23,20 +24,22 @@ export default function AnalyticsLayout() {
           name="index"
           options={{
             headerTitle: "Analytics",
+            headerLeft: () => (
+              <Pressable 
+                onPress={() => router.push("/settings")}
+                className="ml-4 mr-3"
+              >
+                <Ionicons name="menu" size={20} color={currentColors.text.soft} />
+              </Pressable>
+            ),
             headerRight: () => (
               <Pressable 
-                onPress={() => router.push("/(tabs)/analytics/sell-data")}
+                onPress={() => router.push("/sell-data")}
                 className="mr-4"
               >
                 <Text style={{ color: currentColors.primary[500], fontSize: 14 }}>Sell my data ✨</Text>
               </Pressable>
             ),
-          }}
-        />
-        <Stack.Screen
-          name="sell-data"
-          options={{
-            headerTitle: "Sell my data ✨",
           }}
         />
         <Stack.Screen

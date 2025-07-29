@@ -3,7 +3,7 @@ import { View, Text, Switch, TouchableOpacity, ScrollView, Platform, Alert, Appe
 import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@blockit/cross-ui-toolkit';
-import { useAppBlocker } from '../../../context/AppBlockerContext';
+import { useAppBlocker } from '@/context/AppBlockerContext';
 import AppBlockerModule from 'expo-app-blocker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

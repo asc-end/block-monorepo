@@ -10,10 +10,10 @@ export default function TabLayout() {
   const handleTabPress = (tabName: string) => {
     // Get the current tab from segments
     const currentTab = segments[1]; // segments[0] is '(tabs)', segments[1] is the current tab
-    
+
     // If switching to a different tab, navigate to its root
     if (currentTab !== tabName) {
-      if(router.canDismiss()) {
+      if (router.canDismiss()) {
         router.dismissAll()
       }
       router.push(`/(tabs)/${tabName}`);
@@ -60,16 +60,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="history"
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+            <Ionicons name="time-outline" size={size} color={color} />
           ),
         }}
         listeners={{
           tabPress: (e) => {
             e.preventDefault();
-            handleTabPress('settings');
+            handleTabPress('history');
           },
         }}
       />
@@ -101,6 +101,7 @@ export default function TabLayout() {
           },
         }}
       />
+
     </Tabs>
   );
 }

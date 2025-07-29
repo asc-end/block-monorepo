@@ -4,7 +4,7 @@ import { router, Stack } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useTheme, ThemeProvider, Pressable, Text } from '@blockit/cross-ui-toolkit';
+import { useTheme, ThemeProvider, Pressable, Text, Box } from '@blockit/cross-ui-toolkit';
 import { PrivyProvider, useEmbeddedSolanaWallet, usePrivy, usePrivyClient } from "@privy-io/expo";
 import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
@@ -35,7 +35,7 @@ function validateEnvironment(): void {
   if (missingVars.length > 0) {
     const errorDetails = missingVars.map(v => `• ${v.displayName} (${v.key})`).join('\n');
     const errorMsg = `Missing required environment variables:\n${errorDetails}`;
-    
+
     console.error(errorMsg);
     throw new Error('Environment validation failed. Please ensure all required environment variables are set in your .env file.');
   }
@@ -60,7 +60,7 @@ function AppContent() {
   const privyClient = usePrivyClient();
   const { wallets } = useEmbeddedSolanaWallet();
   const { syncNow } = useAppUsageSync();
-  
+
   const getAccessToken = async () => {
     if (!privyClient) return null;
     return privyClient.getAccessToken();
@@ -85,18 +85,36 @@ function AppContent() {
       {isReady && !user ? (
         <Connect />
       ) : (
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen
-            name="(tabs)"
-            options={{
+        <Box className="flex-1" style={{ backgroundColor: currentColors.background }}>
+
+          <Stack
+            screenOptions={{
               headerShown: false,
             }}
-          />
-        </Stack>
+          >
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="settings"
+              options={{
+                headerShown: false,
+                animation: "ios_from_left",
+              }}
+            />
+            <Stack.Screen
+              name="sell-data"
+              options={{
+                headerShown: false,
+                animation: "ios_from_right",
+              }}
+            />
+          </Stack>
+        </Box>
+
       )}
     </>
   );

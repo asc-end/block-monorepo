@@ -23,20 +23,6 @@ export default function SettingsLayout() {
           name="index"
           options={{
             headerTitle: "Settings",
-            headerRight: () => (
-              <Pressable 
-                onPress={() => router.push("/(tabs)/settings/sell-data")}
-                className="mr-4"
-              >
-                <Text style={{ color: currentColors.primary[500], fontSize: 14 }}>Sell my data ✨</Text>
-              </Pressable>
-            ),
-          }}
-        />
-        <Stack.Screen
-          name="sell-data"
-          options={{
-            headerTitle: "Sell my data ✨",
           }}
         />
       </Stack>
