@@ -16,3 +16,5 @@ export * from './scrollView/ScrollView';
 export * from './textInput/TextInput';
 export * from './numberInput/NumberInput';
 export * from './toggle';
+export * from './gradient';
+export * from './gradient/Gradient';

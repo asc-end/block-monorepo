@@ -3,7 +3,7 @@ import { ImageSourcePropType, Image as RNImage, ImageProps as RNImageProps } fro
 import { ImageProps, ImageVariant, imageStyles } from '.';
 
 export function Image(props: ImageProps & RNImageProps): React.ReactElement {
-  const { variant = 'default', style, src, ...rest } = props;
+  const { variant = 'default', style, src, className, ...rest } = props;
   const variantStyle = imageStyles[variant as ImageVariant];
 
   // Handle different types of URIs for React Native
@@ -14,10 +14,12 @@ export function Image(props: ImageProps & RNImageProps): React.ReactElement {
     }
   }
 
+  console.log("src", fixedSrc);
   return (
     <RNImage 
       source={fixedSrc} 
       style={[variantStyle, style]} 
+      className={className}
       {...rest} 
     />
   );

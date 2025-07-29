@@ -3,8 +3,8 @@ import AppBlockerModule from 'expo-app-blocker';
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Platform, Alert, AppState } from 'react-native';
 import { usePrivyClient } from '@privy-io/expo';
+import { RoutineBlockingService, useConfigStore } from '@blockit/ui';
 import type { Routine } from '@blockit/shared';
-import { RoutineBlockingService, configStore } from '@blockit/ui';
 
 interface InstalledApp {
     packageName: string; // or bundleId for iOS
@@ -41,6 +41,7 @@ const AppBlockerContext = createContext<AppBlockerContextType | null>(null);
 export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [installedApps, setInstalledApps] = useState<InstalledApp[]>([]);
     const [routines, setRoutines] = useState<Routine[]>([]);
+    const configStore = useConfigStore();
     const [routineBlockedApps, setRoutineBlockedApps] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [hasPermissions, setHasPermissions] = useState(false);
@@ -98,6 +99,7 @@ export const AppBlockerProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             routineBlockingServiceRef.current.stop();
         }
 
+        console.log('configStore.config?.apiUrl', configStore.config?.apiUrl);
         routineBlockingServiceRef.current = new RoutineBlockingService({
             apiUrl: configStore.config?.apiUrl || 'http://localhost:3001',
             getAuthToken,

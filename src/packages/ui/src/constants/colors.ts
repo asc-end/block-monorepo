@@ -1,29 +1,43 @@
-export const colors = {
-  // Primary colors
+const globalColors = {
   primary: {
-    50: '#F8F3FF',
-    100: '#EDE0FF',
-    200: '#DCC2FF',
-    300: '#C29CFF', // Main primary color
-    400: '#B185FF',
-    500: '#9F6EFF',
-    600: '#8E57FF',
-    700: '#7C40FF',
-    800: '#6B29FF',
-    900: '#5A12FF',
+    '50': '#eef8ff',
+    '100': '#d9efff',
+    '200': '#bce4ff',
+    '300': '#8ed5ff',
+    '400': '#59bbff',
+    '500': '#3aa0ff',
+    '600': '#1b7df5',
+    '700': '#1466e1',
+    '800': '#1752b6',
+    '900': '#19478f',
+    '950': '#142c57',
   },
 
+  pop: {
+    "yellow": "#FFB600",
+    "magenta": "#E500A4",
+    "purple": "#A500F2",
+    "violet": "#6A00F4",
+    "indigo": "#2D00F7",
+    "red": "#F20061",
+  },
+} as const;
+
+export const colors = {
+  // Primary colors - Vibrant purple gradient
+
+  ...globalColors,
   secondary: {
-    50: '#F0FDFF',
-    100: '#E0FAFF',
-    200: '#BAF2FF',
-    300: '#7EE4F7', // Main secondary color
-    400: '#47D4ED',
-    500: '#22C3E6',
-    600: '#0EA5E9',
-    700: '#0284C7',
-    800: '#0369A1',
-    900: '#0C4A6E',
+    50: '#FFF0F7',
+    100: '#FFE0ED',
+    200: '#FFC5DB',
+    300: '#FF9EC4',
+    400: '#FF6AAC',
+    500: '#E500A4', // Main secondary color - bright magenta
+    600: '#C90092',
+    700: '#A60078',
+    800: '#85005F',
+    900: '#6B004D',
   },
 
   // Neutral colors (based on background and card colors)
@@ -40,21 +54,21 @@ export const colors = {
     900: '#6C7BCE',
   },
 
-  // Semantic colors
+  // Semantic colors - Bright and vibrant
   success: {
-    light: '#E8FDF2',
-    main: '#98F6C9',
-    dark: '#6EE7A7',
+    light: '#E0FFF8',
+    main: '#00E5CA',
+    dark: '#00B8A3',
   },
   warning: {
-    light: '#FFFBE5',
-    main: '#FFE580',
-    dark: '#E6CF73',
+    light: '#FFF5E0',
+    main: '#FFB600', // Bright yellow
+    dark: '#FF9500',
   },
   error: {
-    light: '#FFE5EC',
-    main: '#FF6A94',
-    dark: '#E5457A',
+    light: '#FFE0E7',
+    main: '#F20061', // Bright pink
+    dark: '#CC0052',
   },
 
   // Common colors
@@ -79,31 +93,19 @@ export const colors = {
 
 // Dark theme colors
 export const darkColors = {
-  // Primary colors (brighter and more vibrant for dark mode)
-  primary: {
-    50: '#4A2B7A',
-    100: '#5A3B8A',
-    200: '#6A4B9A',
-    300: '#8B5FE6', // Main primary color - much brighter
-    400: '#9B6FF6',
-    500: '#AB7FFF',
-    600: '#BB8FFF',
-    700: '#CB9FFF',
-    800: '#DBAFFF',
-    900: '#EBBFFF',
-  },
-
+  // Primary colors - Vibrant purple gradient for dark mode
+  ...globalColors,
   secondary: {
-    50: '#0F5A8A',
-    100: '#1570A6',
-    200: '#1B86C2',
-    300: '#22A8E6', // Main secondary color - brighter cyan
-    400: '#3BB8F0',
-    500: '#54C8FA',
-    600: '#6DD8FF',
-    700: '#86E8FF',
-    800: '#9FF8FF',
-    900: '#B8FFFF',
+    50: '#6B004D',
+    100: '#85005F',
+    200: '#A60078',
+    300: '#E500A4', // Main secondary color - bright magenta
+    400: '#FF6AAC',
+    500: '#FF9EC4',
+    600: '#FFC5DB',
+    700: '#FFE0ED',
+    800: '#FFF0F7',
+    900: '#FFF8FB',
   },
 
   // Neutral colors for dark mode (blue-toned like light mode)
@@ -120,21 +122,21 @@ export const darkColors = {
     900: '#2D315D',
   },
 
-  // Semantic colors (brighter and more vibrant)
+  // Semantic colors - Bright and vibrant for dark mode
   success: {
-    light: '#2A5540',
-    main: '#4AE084',
-    dark: '#6AFF9A',
+    light: '#00B8A3',
+    main: '#00E5CA',
+    dark: '#33FFE5',
   },
   warning: {
-    light: '#5C5A2A',
-    main: '#FFD84A',
-    dark: '#FFEA6A',
+    light: '#FF9500',
+    main: '#FFB600', // Bright yellow
+    dark: '#FFCC33',
   },
   error: {
-    light: '#5C2A3A',
-    main: '#FF6A8A',
-    dark: '#FF8AAA',
+    light: '#CC0052',
+    main: '#F20061', // Bright pink
+    dark: '#FF3377',
   },
 
   // Common colors
@@ -162,22 +164,34 @@ export type ColorPalette = typeof colors;
 export type DarkColorPalette = typeof darkColors;
 
 // Union type that allows both light and dark themes
-export type ThemeColors = ColorPalette | DarkColorPalette;
+// export type ThemeColors = ColorPalette | DarkColorPalette;
 
 // Helper type for color keys
 export type ColorKey = keyof ColorPalette;
 export type ColorShade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 export type SemanticColorShade = 'light' | 'main' | 'dark';
-export type TextColorShade = 'main' | 'soft';
+export type TextColorShade = 'main' | 'soft' | 'verySoft';
 export type SurfaceShade = 'card' | 'elevated';
 
 // Type for accessing nested color values
-export type NestedColorValue = {
-  [K in ColorKey]: K extends 'surface' 
-    ? { [S in SurfaceShade]: string }
-    : K extends 'text'
-    ? { [T in TextColorShade]: string }
-    : K extends 'success' | 'warning' | 'error'
-    ? { [S in SemanticColorShade]: string }
-    : { [S in ColorShade]: string }
+export type ThemeColors = {
+  primary: { [K in ColorShade]: string };
+  pop: { 
+    "yellow": string;
+    "magenta": string;
+    "purple": string;
+    "violet": string;
+    "indigo": string;
+    "red": string;
+  };
+  surface: { [S in SurfaceShade]: string };
+  text: { [T in TextColorShade]: string };
+  success: { [S in SemanticColorShade]: string };
+  warning: { [S in SemanticColorShade]: string };
+  error: { [S in SemanticColorShade]: string };
+  background: string;
+  transparent: string;
+  white: string;
+  black: string;
+  [key: string]: any; // fallback for other keys if needed
 };

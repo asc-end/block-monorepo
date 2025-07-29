@@ -124,18 +124,16 @@ export function NumberInput(props: NumberInputProps): React.ReactElement {
       )}
       <input
         ref={inputRef}
-        type="number"
+        type="text"
+        inputMode={allowDecimals ? "decimal" : "numeric"}
         style={{ ...inputStyle, boxShadow: colors.focusBoxShadow, width: '100%' }}
         className="p-2 focus:outline-none w-full"
         placeholder={placeholder}
-        value={value ?? ''}
+        value={textValue}
         onChange={handleChange}
         disabled={disabled}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        min={min}
-        max={max}
-        step={step}
         {...rest}
       />
       {helperText && (

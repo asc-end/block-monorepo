@@ -52,7 +52,6 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
       {!searchQuery && (
         <ScrollView
           horizontal
-          className=' h-40'
           showsHorizontalScrollIndicator={false}
           style={{ marginBottom: 12, minHeight: 40 }}
         >
@@ -94,7 +93,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
               className="rounded-xl bg-transparent select-none w-12 h-12 flex items-center justify-center"
               hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
             >
-              <Text style={{ fontSize: 32, textAlign: 'center' }}>
+              <Text style={{ fontSize: 32, lineHeight: 40, textAlign: 'center' }}>
                 {entry.emoji}
               </Text>
             </Pressable>

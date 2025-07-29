@@ -1,87 +1,130 @@
 import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity, ScrollView, Platform, Alert, Appearance } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, ScrollView, Platform, Alert, Appearance, Animated, Pressable } from 'react-native';
 import { useColorScheme } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@blockit/cross-ui-toolkit';
-import { useAppBlocker } from '../context/AppBlockerContext';
+import { useAppBlocker } from '../../../context/AppBlockerContext';
 import AppBlockerModule from 'expo-app-blocker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SettingItem = ({ 
-  title, 
-  description, 
-  icon, 
-  onPress, 
-  value, 
+const SettingItem = ({
+  title,
+  description,
+  icon,
+  onPress,
+  value,
   showToggle = false,
   showValue = false,
-  valueText
-}: { 
-  title: string; 
-  description?: string; 
-  icon: string; 
+  valueText,
+  isLast = false
+}: {
+  title: string;
+  description?: string;
+  icon: string;
   onPress?: () => void;
   value?: boolean;
   showToggle?: boolean;
   showValue?: boolean;
   valueText?: string;
+  isLast?: boolean;
 }) => {
   const { currentColors } = useTheme();
-  
+  const scaleValue = React.useRef(new Animated.Value(1)).current;
+  const colorScheme = useColorScheme();
+
+  const handlePressIn = () => {
+    Animated.timing(scaleValue, {
+      toValue: 0.97,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.timing(scaleValue, {
+      toValue: 1,
+      duration: 100,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <TouchableOpacity 
-      className="flex-row items-center p-4 border-b border-black/10"
-      style={{ backgroundColor: currentColors.background }}
+    <Pressable
       onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={!onPress}
     >
-      <View className="w-10 h-10 rounded-full bg-black/5 justify-center items-center mr-3">
-        <Ionicons name={icon as any} size={24} color={currentColors.primary[500]} />
-      </View>
-      <View className="flex-1">
-        <Text className="text-base font-semibold mb-1" style={{ color: currentColors.text.main }}>
-          {title}
-        </Text>
-        {description && (
-          <Text className="text-sm" style={{ color: currentColors.text.soft }}>
-            {description}
+      <Animated.View
+        className="flex-row items-center mx-5 py-4"
+        style={{
+          backgroundColor: currentColors.background,
+          transform: [{ scale: scaleValue }],
+          borderBottomWidth: isLast ? 1 : 0,
+          borderBottomColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+        }}
+      >
+        <View
+          className="w-12 h-12 rounded-xl justify-center items-center mr-4"
+          style={{
+            backgroundColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+          }}
+        >
+          <Ionicons name={icon as any} size={26} color={currentColors.primary[500]} />
+        </View>
+        <View className="flex-1"
+
+        >
+          <Text className="text-base font-semibold mb-0.5" style={{ color: currentColors.text.main }}>
+            {title}
           </Text>
+          {description && (
+            <Text className="text-sm opacity-70" style={{ color: currentColors.text.soft }}>
+              {description}
+            </Text>
+          )}
+        </View>
+        {showToggle && (
+          <Switch
+            value={value}
+            onValueChange={onPress}
+            trackColor={{ false: currentColors.neutral[200], true: currentColors.primary[400] }}
+            thumbColor={value ? currentColors.primary[600] : currentColors.neutral[400]}
+            ios_backgroundColor={currentColors.neutral[200]}
+          />
         )}
-      </View>
-      {showToggle && (
-        <Switch
-          value={value}
-          onValueChange={onPress}
-          trackColor={{ false: currentColors.neutral[200], true: currentColors.primary[300] }}
-          thumbColor={value ? currentColors.primary[500] : currentColors.neutral[400]}
-        />
-      )}
-      {showValue && valueText && (
-        <Text className="text-sm ml-2" style={{ color: currentColors.text.soft }}>
-          {valueText}
-        </Text>
-      )}
-    </TouchableOpacity>
+        {showValue && valueText && (
+          <View className="flex-row items-center ml-2">
+            <Text className="text-sm mr-2" style={{ color: currentColors.text.soft }}>
+              {valueText}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={currentColors.text.soft} />
+          </View>
+        )}
+      </Animated.View>
+    </Pressable>
   );
 };
 
-const SettingsSection = ({ 
-  title, 
-  children 
-}: { 
-  title: string; 
+const SettingsSection = ({
+  title,
+  children
+}: {
+  title: string;
   children: React.ReactNode;
 }) => {
   const { currentColors } = useTheme();
-  
+  const colorScheme = useColorScheme();
+
   return (
-    <View className="mb-6">
-      <Text className="text-sm font-semibold mb-2 uppercase" style={{ color: currentColors.text.soft }}>
+    <View className="mb-7">
+      <Text
+        className="text-xs font-bold mb-3 ml-5 uppercase tracking-wide"
+        style={{ color: currentColors.text.soft }}
+      >
         {title}
       </Text>
-      <View className="rounded-xl overflow-hidden" style={{ backgroundColor: currentColors.background }}>
-        {children}
-      </View>
+      {children}
     </View>
   );
 };
@@ -91,10 +134,10 @@ const SettingsScreen = () => {
   const colorScheme = useColorScheme();
   const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
   const [isBlockingNotifications, setIsBlockingNotifications] = useState(false);
-  const { 
-    hasPermissions, 
-    permissionsStatus, 
-    requestPermissions, 
+  const {
+    hasPermissions,
+    permissionsStatus,
+    requestPermissions,
     checkPermissions,
     installedApps,
     refreshApps,
@@ -117,7 +160,7 @@ const SettingsScreen = () => {
   const handleThemeChange = async (mode: 'auto' | 'light' | 'dark') => {
     setThemeMode(mode);
     await AsyncStorage.setItem('themeMode', mode);
-    
+
     if (mode === 'auto') {
       Appearance.setColorScheme(null);
     } else {
@@ -140,12 +183,13 @@ const SettingsScreen = () => {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       className="flex-1"
       style={{ backgroundColor: currentColors.background }}
-      contentContainerClassName="p-4"
+      contentContainerClassName="py-6"
+      showsVerticalScrollIndicator={false}
     >
-      <SettingsSection title="App Blocking Permissions">
+      <SettingsSection title="Permissions">
         <SettingItem
           title="Usage Stats Access"
           description="Required to monitor app usage"
@@ -184,15 +228,13 @@ const SettingsScreen = () => {
             }
           }}
         />
-      </SettingsSection>
-
-      <SettingsSection title="App Usage Settings">
         <SettingItem
           title="Usage Tracking"
           description="Monitor app usage and screen time"
           icon="analytics-outline"
           valueText={isUsageTrackingEnabled ? "Enabled" : "Disabled"}
           showValue
+          isLast
           onPress={async () => {
             try {
               await AppBlockerModule.openUsageStatsSettings();
@@ -215,17 +257,8 @@ const SettingsScreen = () => {
           icon="color-palette-outline"
           valueText={getThemeDisplayText()}
           showValue
+          isLast
           onPress={cycleTheme}
-        />
-      </SettingsSection>
-
-      <SettingsSection title="About">
-        <SettingItem
-          title="Version"
-          description="Current app version"
-          icon="information-circle-outline"
-          valueText="1.0.0"
-          showValue
         />
       </SettingsSection>
     </ScrollView>

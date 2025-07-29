@@ -8,7 +8,7 @@ import { useTheme, ThemeProvider, Pressable, Text } from '@blockit/cross-ui-tool
 import { PrivyProvider, useEmbeddedSolanaWallet, usePrivy, usePrivyClient } from "@privy-io/expo";
 import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
-import { colors, darkColors, useUserCreation, initializeConfig } from '@blockit/ui';
+import { colors, darkColors, useUserCreation, initializeConfig, QueryProvider } from '@blockit/ui';
 import { useColorScheme, View } from 'react-native';
 import { useEffect } from 'react';
 import { AppBlockerProvider } from '../context/AppBlockerContext';
@@ -21,8 +21,8 @@ type EnvVar = {
 }
 
 const requiredEnvVars: EnvVar[] = [
-  { key: 'EXPO_PUBLIC_API_URL', displayName: 'API URL', defaultValue: 'http://192.168.1.29:3001' },
-  { key: 'EXPO_PUBLIC_WS_URL', displayName: 'WebSocket URL', defaultValue: 'ws://192.168.1.29:3001' },
+  { key: 'EXPO_PUBLIC_API_URL', displayName: 'API URL', defaultValue: 'http://192.168.1.59:3001' },
+  { key: 'EXPO_PUBLIC_WS_URL', displayName: 'WebSocket URL', defaultValue: 'ws://192.168.1.59:3001' },
   { key: 'EXPO_PUBLIC_PRIVY_APP_ID', displayName: 'Privy App ID' },
   { key: 'EXPO_PUBLIC_PRIVY_CLIENT_ID', displayName: 'Privy Client ID', defaultValue: 'client-WY5bqDh4x6Vb9rATJs8qc3MofR9LA2x1QWW7Moj6J3roS' }
 ];
@@ -45,8 +45,8 @@ validateEnvironment();
 
 // Initialize config store with environment variables
 const config = {
-  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.29:3001',
-  wsUrl: process.env.EXPO_PUBLIC_WS_URL || 'ws://192.168.1.29:3001',
+  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.59:3001',
+  wsUrl: process.env.EXPO_PUBLIC_WS_URL || 'ws://192.168.1.59:3001',
   privyAppId: process.env.EXPO_PUBLIC_PRIVY_APP_ID,
   privyClientId: process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID || 'client-WY5bqDh4x6Vb9rATJs8qc3MofR9LA2x1QWW7Moj6J3roS',
   environment: 'development' as const
@@ -79,92 +79,25 @@ function AppContent() {
     getAccessToken,
     walletAddress: wallets?.[0]?.address
   });
-  if (isReady && !user) return <Connect />
-
   return (
     <>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerTintColor: currentColors?.text.main,
-          headerShown: true,
-          headerShadowVisible: false,
-          headerStyle: {
-            backgroundColor: currentColors?.background,
-          },
-          contentStyle: {
-            backgroundColor: currentColors?.background,
-          },
-        }}
-      >
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: true,
-            headerTitle: "Blokit",
-            headerRight: () => (
-              <View className="flex flex-row">
-                <Pressable
-                  onPress={() => router.push("/settings")}
-                  className="mr-4"
-                >
-                  <Text style={{ color: currentColors?.primary[500] }}>Settings</Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => router.push("/stats")}
-                  className="mr-4"
-                >
-                  <Text style={{ color: currentColors?.primary[500] }}>Stats</Text>
-                </Pressable>
-              </View>
-            )
+      {isReady && !user ? (
+        <Connect />
+      ) : (
+        <Stack
+          screenOptions={{
+            headerShown: false,
           }}
-        />
-        {/* Create Routine */}
-        <Stack.Screen
-          name="create-routine"
-          options={{
-            headerShown: true,
-            headerTitle: "Create Routine",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/apps"
-          options={{
-            headerShown: true,
-            headerTitle: "Apps",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/calendar"
-          options={{
-            headerShown: true,
-            headerTitle: "Calendar",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/money"
-          options={{
-            headerShown: true,
-            headerTitle: "Money",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/time"
-          options={{
-            headerShown: true,
-            headerTitle: "Routine Time",
-          }}
-        />
-        <Stack.Screen
-          name="routine"
-          options={{
-            headerShown: true,
-            headerTitle: "Routine",
-          }}
-        />
-      </Stack>
-      
+        >
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack>
+      )}
     </>
   );
 }
@@ -180,12 +113,14 @@ export default function RootLayout() {
       clientId={config.privyClientId}
     >
       <PrivyElements />
-      <SafeAreaProvider>
+      <SafeAreaProvider style={{ backgroundColor: currentColors.background }}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider value={{ currentColors, isDarkMode }}>
-            <AppBlockerProvider>
-              <AppContent />
-            </AppBlockerProvider>
+            <QueryProvider>
+              <AppBlockerProvider>
+                <AppContent />
+              </AppBlockerProvider>
+            </QueryProvider>
           </ThemeProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>

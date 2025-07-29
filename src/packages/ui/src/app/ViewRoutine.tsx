@@ -189,7 +189,7 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
         <Box className="flex-1 flex flex-col px-4">
             {/* Emoji and Title */}
             <Box className="flex flex-col w-full justify-center items-center mt-4 mb-2">
-                <Text className="text-[90px] mb-2">{routine.emoji}</Text>
+                <Text className="text-[90px] mb-2" style={{ fontSize: 90, lineHeight: 120 }}>{routine.emoji}</Text>
                 <Text variant='h3'>{routine.name}</Text>
                 <Box 
                     className='px-3 py-1 rounded-full mt-2'

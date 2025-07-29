@@ -22,7 +22,7 @@ module.exports = {
       edgeToEdgeEnabled: true,
       adaptiveIcon: {
         foregroundImage: "./assets/icon.png",
-        backgroundColor: "#ffffff"
+        // backgroundColor: "#ffffff"
       },
       package: "com.ascendmarie.blockit",
       permissions: [
@@ -40,7 +40,60 @@ module.exports = {
       "expo-router",
       "expo-asset",
       "expo-secure-store",
-      "expo-web-browser"
+      ["expo-font",
+      {
+        // "fonts": [
+        //   "./assets/fonts/ClashDisplay-Bold.otf",
+        //   "./assets/fonts/ClashDisplay-ExtraLight.otf",
+        //   "./assets/fonts/ClashDisplay-Light.otf",
+        //   "./assets/fonts/ClashDisplay-Medium.otf",
+        //   "./assets/fonts/ClashDisplay-Regular.otf",
+        //   "./assets/fonts/ClashDisplay-Semibold.otf"
+        // ],
+        "android": {
+          "fonts": [
+            {
+              "fontFamily": "ClashDisplay",
+              "fontDefinitions": [
+                {
+                  "path": "./assets/fonts/ClashDisplay-ExtraLight.otf",
+                  "weight": 200
+                },
+                {
+                  "path": "./assets/fonts/ClashDisplay-Light.otf",
+                  "weight": 300
+                },
+                {
+                  "path": "./assets/fonts/ClashDisplay-Regular.otf",
+                  "weight": 400,
+                },
+                {
+                  "path": "./assets/fonts/ClashDisplay-Medium.otf",
+                  "weight": 500
+                },
+                {
+                  "path": "./assets/fonts/ClashDisplay-Semibold.otf",
+                  "weight": 600
+                },
+                {
+                  "path": "./assets/fonts/ClashDisplay-Bold.otf",
+                  "weight": 700
+                }
+              ]
+            }
+          ]
+        },
+        "ios": {
+          "fonts": [
+            "./assets/fonts/ClashDisplay-Bold.otf",
+            "./assets/fonts/ClashDisplay-ExtraLight.otf",
+            "./assets/fonts/ClashDisplay-Light.otf",
+            "./assets/fonts/ClashDisplay-Medium.otf",
+            "./assets/fonts/ClashDisplay-Regular.otf",
+            "./assets/fonts/ClashDisplay-SemiBold.otf"
+          ]
+        }
+      }]
     ],
     scheme: "blockit",
     extra: {

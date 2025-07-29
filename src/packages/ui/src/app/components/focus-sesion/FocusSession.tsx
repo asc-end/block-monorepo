@@ -253,7 +253,7 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
             <Alert visible={visible} title={options.title} message={options.message} buttons={options.buttons} onDismiss={hide} />
             
             <Drawer ref={durationModalRef}>
-                <Box style={{ backgroundColor: currentColors.surface.elevated }} className="p-4 rounded-t-xl">
+                <Box className="p-4 rounded-t-xl">
                     <Text variant="h6" className="mb-2">⏰ Set Focus Duration</Text>
                     <Text variant="body" style={{ color: currentColors.text.soft }} className="mb-4">
                         Choose how long you want your focus session to last.

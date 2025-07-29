@@ -52,11 +52,10 @@ export function RoutineItem({ routine, onPress }: RoutineItemProps) {
   return (
     <Pressable 
       onPress={() => onPress(routine.id)}
-      className='mb-2'
     >
-      <Box className='w-full p-3 bg-theme-card rounded-xl'>
+      <Box className='w-full p-3 rounded-lg' style={{ backgroundColor: currentColors.surface.card }}>
         <Box className='flex flex-row items-center'>
-          <Text style={{ fontSize: 24, marginRight: 8 }}>{routine.emoji}</Text>
+          <Text style={{ fontSize: 24, lineHeight: 32, marginRight: 8 }}>{routine.emoji}</Text>
           <Box className='flex-1 flex flex-col items-start'>
             <Text variant='body'>{routine.name}</Text>
             <Box className='flex flex-row items-center gap-2'>

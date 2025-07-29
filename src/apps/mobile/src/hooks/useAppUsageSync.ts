@@ -39,7 +39,7 @@ export const useAppUsageSync = () => {
     try {
       // Send each hourly usage record to the backend
       const promises = usageData.map(async (usage) => {
-        const { data } = await api().post('/app-usage/hourly', {
+        const { data } = await api().post('/app-usage/hourly-set', {
           ...usage,
           platform: 'mobile',
         });

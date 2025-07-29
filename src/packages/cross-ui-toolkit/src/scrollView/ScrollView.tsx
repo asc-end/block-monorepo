@@ -8,6 +8,7 @@ export interface ScrollViewProps extends BaseProps {
   scrollEnabled?: boolean;
   contentContainerStyle?: any;
   contentContainerClassName?: string;
+  scrollEventThrottle?: number;
 }
 
 export function ScrollView(props: ScrollViewProps) {

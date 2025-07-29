@@ -75,6 +75,55 @@ interface AppUsageStatsRequest extends Request {
     };
 }
 
+// Set hourly app usage time (replaces instead of incrementing)
+router.post('/hourly-set', authMiddleware, async (req: AppUsageRequest & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
+    try {
+        const userId = req.verifiedClaims?.userId;
+        if (!userId) return res.status(401).json({ error: 'User not authenticated' });
+
+        const { appName, timeSpent, platform, hourStart } = req.body;
+
+        if (!appName || typeof timeSpent !== 'number' || !platform || !hourStart) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Parse and validate hour start time
+        const hourStartDate = new Date(hourStart);
+        hourStartDate.setMinutes(0, 0, 0); // Ensure it's at the start of the hour
+
+        // Get canonical app name based on platform
+        const canonicalAppName = getCanonicalName(appName, platform)
+
+        // Upsert the app usage for this hour
+        // Use direct set instead of increment for absolute values
+        const appUsage = await prisma.appUsage.upsert({
+            where: {
+                userId_appName_platform_hourStart: {
+                    userId,
+                    appName: canonicalAppName,
+                    platform,
+                    hourStart: hourStartDate
+                }
+            },
+            update: {
+                timeSpent: timeSpent
+            },
+            create: {
+                userId,
+                appName: canonicalAppName,
+                platform,
+                timeSpent,
+                hourStart: hourStartDate
+            }
+        });
+
+        res.status(200).json(appUsage);
+    } catch (error) {
+        console.error('Error setting hourly app usage:', error);
+        res.status(500).json({ error: 'Failed to set hourly app usage' });
+    }
+});
+
 router.get('/stats', authMiddleware, async (req: AppUsageStatsRequest & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
     try {
         const userId = req.verifiedClaims?.userId;

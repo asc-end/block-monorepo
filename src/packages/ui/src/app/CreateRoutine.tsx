@@ -149,7 +149,7 @@ export function CreateRoutine(props: CreateRoutineProps) {
             {/* Emoji and Title */}
             <Box className="flex flex-col w-full justify-center items-center mt-4 mb-2">
                 <Pressable onPress={() => modalizeRef.current?.open()}>
-                    <Text className="text-[90px] mb-2">{routineEmoji}</Text>
+                    <Text className="text-[90px] mb-2" style={{ fontSize: 90, lineHeight: 120 }}>{routineEmoji}</Text>
                 </Pressable>
                 <TextInput
                     value={routineName}

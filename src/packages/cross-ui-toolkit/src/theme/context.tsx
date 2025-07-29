@@ -1,61 +1,34 @@
 import { createContext, useContext } from 'react';
 
-// Define the shape of the theme that ui-base expects
-// This matches the structure from @blockit/ui but doesn't import it
-export interface ThemeColors {
-  primary: {
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
+// Helper type for color keys
+export type ColorShade = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+export type SemanticColorShade = 'light' | 'main' | 'dark';
+export type TextColorShade = 'main' | 'soft' | 'verySoft';
+export type SurfaceShade = 'card' | 'elevated';
+
+// Type for accessing nested color values
+export type ThemeColors = {
+  primary: { [K in ColorShade]: string };
+  pop: { 
+    "yellow": string;
+    "magenta": string;
+    "purple": string;
+    "violet": string;
+    "indigo": string;
+    "red": string;
   };
-  secondary: {
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
-  };
-  success: {
-    light: string;
-    main: string;
-    dark: string;
-  };
-  warning: {
-    light: string;
-    main: string;
-    dark: string;
-  };
-  error: {
-    light: string;
-    main: string;
-    dark: string;
-  };
-  neutral: Record<string, string>;
-  text: {
-    main: string;
-    soft: string;
-    [key: string]: string;
-  };
+  surface: { [S in SurfaceShade]: string };
+  text: { [T in TextColorShade]: string };
+  success: { [S in SemanticColorShade]: string };
+  warning: { [S in SemanticColorShade]: string };
+  error: { [S in SemanticColorShade]: string };
   background: string;
-  surface: {
-    card: string;
-    [key: string]: string;
-  };
-  white: string,
-  black: string,
-}
+  transparent: string;
+  white: string;
+  black: string;
+  [key: string]: any; // fallback for other keys if needed
+};
+
 
 export interface ThemeContext {
   currentColors: ThemeColors;

@@ -1,16 +1,5 @@
-import { useNativeAppBlocking } from '@/hooks/useNativeAppBlocking';
-import { Home } from '@blockit/ui';
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { Redirect } from 'expo-router';
 
-export default function Page() {
-  const nativeAppBlocking = useNativeAppBlocking();
-
-  return (
-      <Home 
-        onViewRoutine={(routineId) => router.push(`/routine?routineId=${routineId}`)}
-        onCreateRoutine={() => router.push("create-routine")} 
-        nativeAppBlocking={nativeAppBlocking} 
-      />
-  );
+export default function Index() {
+  return <Redirect href="/(tabs)/home" />;
 }

@@ -1,35 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Text, useTheme } from '@blockit/cross-ui-toolkit';
-import { api } from '../../../stores/authStore';
-
-interface StatsData {
-  routinesCompleted: number;
-  routinesCanceled: number;
-  focusSessionsCompleted: number;
-  focusSessionsCanceled: number;
-  totalStaked: number;
-  totalLost: number;
-}
+import { useUserStats } from '../../../hooks/useUserStats';
 
 export function StatsSummary() {
   const { currentColors } = useTheme();
-  const [stats, setStats] = useState<StatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const { data } = await api().get<StatsData>('/users/stats');
-      setStats(data);
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: stats, isLoading, error } = useUserStats();
 
   const StatColumn = ({ 
     title, 
@@ -45,70 +20,39 @@ export function StatsSummary() {
     isMoney?: boolean;
   }) => (
     <Box 
-      className="flex-1 p-1 rounded-xl"
+      className="flex-1 p-1 rounded-xl flex flex-col items-center"
       style={{ 
-        backgroundColor: currentColors.surface.card,
+        backgroundColor: currentColors.surface.elevated,
         borderWidth: 1,
         borderColor: currentColors.neutral[200] + '20',
         minWidth: 0
       }}
     >
-      <Text 
-        variant="h6" 
-        className="mb-2"
-        style={{ 
-          color: currentColors.text.main,
-          fontWeight: '600'
-        }}
-      >
+      <Text variant="h6" className="mb-2"style={{ color: currentColors.text.main,fontWeight: '600'}}>
         {title}
       </Text>
-      <Box className="flex flex-col gap-1">
-        <Box className="flex flex-row items-center gap-1">
-          <Text 
-            variant="h5" 
-            style={{ 
-              color: currentColors.success.main,
-              fontWeight: '700'
-            }}
-          >
+      <Box className="flex flex-row gap-1 items-center">
+        <Box className="flex flex-col items-center gap-1 w-12">
+          <Text variant="caption" style={{  color: currentColors.text.soft, fontSize: 11}}>
+            total
+          </Text>
+          <Text variant="h5" style={{ fontSize: 20, lineHeight: 24, fontFamily: 'ClashDisplay', fontWeight: "600" }}>
             {completedValue}
           </Text>
-          <Text 
-            variant="caption" 
-            style={{ 
-              color: currentColors.text.soft,
-              fontSize: 11
-            }}
-          >
-            {isMoney ? "staked" : "completed"}
-          </Text>
         </Box>
-        <Box className="flex flex-row items-center gap-1">
-          <Text 
-            variant="h5" 
-            style={{ 
-              color: currentColors.error.main,
-              fontWeight: '700'
-            }}
-          >
-            {canceledValue}
+        <Box className="flex flex-col items-center gap-1 w-12">
+          <Text variant="caption" style={{  color: currentColors.text.soft, fontSize: 11}}>
+            lost
           </Text>
-          <Text 
-            variant="caption" 
-            style={{ 
-              color: currentColors.text.soft,
-              fontSize: 11
-            }}
-          >
-            {canceledLabel}
+          <Text variant="h5" style={{ fontSize: 20, lineHeight: 24, fontFamily: 'ClashDisplay', fontWeight: "400" }}>
+            {canceledValue}
           </Text>
         </Box>
       </Box>
     </Box>
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
         <Box className="flex flex-row gap-2 mb-5">
           {[1, 2, 3].map(i => (
@@ -122,7 +66,7 @@ export function StatsSummary() {
     );
   }
 
-  if (!stats) return null;
+  if (error || !stats) return null;
 
   return (
     <Box className="flex flex-row gap-2 mb-5">
