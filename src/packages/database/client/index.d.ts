@@ -89,9 +89,9 @@ export type SellerProof = $Result.DefaultSelection<Prisma.$SellerProofPayload>
  */
 export namespace $Enums {
   export const FocusSessionStatus: {
-  in_progress: 'in_progress',
-  canceled: 'canceled',
-  finished: 'finished'
+  active: 'active',
+  completed: 'completed',
+  canceled: 'canceled'
 };
 
 export type FocusSessionStatus = (typeof FocusSessionStatus)[keyof typeof FocusSessionStatus]
@@ -115,7 +115,6 @@ export type TimeMode = (typeof TimeMode)[keyof typeof TimeMode]
 
 export const RoutineStatus: {
   active: 'active',
-  paused: 'paused',
   completed: 'completed',
   canceled: 'canceled'
 };
@@ -2197,48 +2196,15 @@ export namespace Prisma {
 
 
   /**
-   * Count Type FocusSessionCountOutputType
-   */
-
-  export type FocusSessionCountOutputType = {
-    commitments: number
-  }
-
-  export type FocusSessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    commitments?: boolean | FocusSessionCountOutputTypeCountCommitmentsArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * FocusSessionCountOutputType without action
-   */
-  export type FocusSessionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the FocusSessionCountOutputType
-     */
-    select?: FocusSessionCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * FocusSessionCountOutputType without action
-   */
-  export type FocusSessionCountOutputTypeCountCommitmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CommitmentWhereInput
-  }
-
-
-  /**
    * Count Type RoutineCountOutputType
    */
 
   export type RoutineCountOutputType = {
     blockedApps: number
-    commitments: number
   }
 
   export type RoutineCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     blockedApps?: boolean | RoutineCountOutputTypeCountBlockedAppsArgs
-    commitments?: boolean | RoutineCountOutputTypeCountCommitmentsArgs
   }
 
   // Custom InputTypes
@@ -2257,13 +2223,6 @@ export namespace Prisma {
    */
   export type RoutineCountOutputTypeCountBlockedAppsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoutineAppWhereInput
-  }
-
-  /**
-   * RoutineCountOutputType without action
-   */
-  export type RoutineCountOutputTypeCountCommitmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: CommitmentWhereInput
   }
 
 
@@ -3727,8 +3686,7 @@ export namespace Prisma {
     duration?: boolean
     status?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    commitments?: boolean | FocusSession$commitmentsArgs<ExtArgs>
-    _count?: boolean | FocusSessionCountOutputTypeDefaultArgs<ExtArgs>
+    commitment?: boolean | FocusSession$commitmentArgs<ExtArgs>
   }, ExtArgs["result"]["focusSession"]>
 
   export type FocusSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3760,8 +3718,7 @@ export namespace Prisma {
   export type FocusSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "startTime" | "duration" | "status", ExtArgs["result"]["focusSession"]>
   export type FocusSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    commitments?: boolean | FocusSession$commitmentsArgs<ExtArgs>
-    _count?: boolean | FocusSessionCountOutputTypeDefaultArgs<ExtArgs>
+    commitment?: boolean | FocusSession$commitmentArgs<ExtArgs>
   }
   export type FocusSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3774,7 +3731,7 @@ export namespace Prisma {
     name: "FocusSession"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      commitments: Prisma.$CommitmentPayload<ExtArgs>[]
+      commitment: Prisma.$CommitmentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4177,7 +4134,7 @@ export namespace Prisma {
   export interface Prisma__FocusSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    commitments<T extends FocusSession$commitmentsArgs<ExtArgs> = {}>(args?: Subset<T, FocusSession$commitmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommitmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    commitment<T extends FocusSession$commitmentArgs<ExtArgs> = {}>(args?: Subset<T, FocusSession$commitmentArgs<ExtArgs>>): Prisma__CommitmentClient<$Result.GetResult<Prisma.$CommitmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4608,9 +4565,9 @@ export namespace Prisma {
   }
 
   /**
-   * FocusSession.commitments
+   * FocusSession.commitment
    */
-  export type FocusSession$commitmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FocusSession$commitmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Commitment
      */
@@ -4624,11 +4581,6 @@ export namespace Prisma {
      */
     include?: CommitmentInclude<ExtArgs> | null
     where?: CommitmentWhereInput
-    orderBy?: CommitmentOrderByWithRelationInput | CommitmentOrderByWithRelationInput[]
-    cursor?: CommitmentWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: CommitmentScalarFieldEnum | CommitmentScalarFieldEnum[]
   }
 
   /**
@@ -5769,12 +5721,10 @@ export namespace Prisma {
 
   export type RoutineAvgAggregateOutputType = {
     dailyLimit: number | null
-    stakeAmount: number | null
   }
 
   export type RoutineSumAggregateOutputType = {
     dailyLimit: number | null
-    stakeAmount: number | null
   }
 
   export type RoutineMinAggregateOutputType = {
@@ -5787,7 +5737,6 @@ export namespace Prisma {
     endTime: string | null
     dailyLimit: number | null
     endDate: Date | null
-    stakeAmount: number | null
     status: $Enums.RoutineStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5803,7 +5752,6 @@ export namespace Prisma {
     endTime: string | null
     dailyLimit: number | null
     endDate: Date | null
-    stakeAmount: number | null
     status: $Enums.RoutineStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5820,7 +5768,6 @@ export namespace Prisma {
     endTime: number
     dailyLimit: number
     endDate: number
-    stakeAmount: number
     status: number
     createdAt: number
     updatedAt: number
@@ -5830,12 +5777,10 @@ export namespace Prisma {
 
   export type RoutineAvgAggregateInputType = {
     dailyLimit?: true
-    stakeAmount?: true
   }
 
   export type RoutineSumAggregateInputType = {
     dailyLimit?: true
-    stakeAmount?: true
   }
 
   export type RoutineMinAggregateInputType = {
@@ -5848,7 +5793,6 @@ export namespace Prisma {
     endTime?: true
     dailyLimit?: true
     endDate?: true
-    stakeAmount?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5864,7 +5808,6 @@ export namespace Prisma {
     endTime?: true
     dailyLimit?: true
     endDate?: true
-    stakeAmount?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5881,7 +5824,6 @@ export namespace Prisma {
     endTime?: true
     dailyLimit?: true
     endDate?: true
-    stakeAmount?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -5985,7 +5927,6 @@ export namespace Prisma {
     endTime: string | null
     dailyLimit: number | null
     endDate: Date | null
-    stakeAmount: number
     status: $Enums.RoutineStatus
     createdAt: Date
     updatedAt: Date
@@ -6021,13 +5962,12 @@ export namespace Prisma {
     endTime?: boolean
     dailyLimit?: boolean
     endDate?: boolean
-    stakeAmount?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     blockedApps?: boolean | Routine$blockedAppsArgs<ExtArgs>
-    commitments?: boolean | Routine$commitmentsArgs<ExtArgs>
+    commitment?: boolean | Routine$commitmentArgs<ExtArgs>
     _count?: boolean | RoutineCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["routine"]>
 
@@ -6042,7 +5982,6 @@ export namespace Prisma {
     endTime?: boolean
     dailyLimit?: boolean
     endDate?: boolean
-    stakeAmount?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6060,7 +5999,6 @@ export namespace Prisma {
     endTime?: boolean
     dailyLimit?: boolean
     endDate?: boolean
-    stakeAmount?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6078,17 +6016,16 @@ export namespace Prisma {
     endTime?: boolean
     dailyLimit?: boolean
     endDate?: boolean
-    stakeAmount?: boolean
     status?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RoutineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "emoji" | "timeMode" | "selectedDays" | "startTime" | "endTime" | "dailyLimit" | "endDate" | "stakeAmount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["routine"]>
+  export type RoutineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "emoji" | "timeMode" | "selectedDays" | "startTime" | "endTime" | "dailyLimit" | "endDate" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["routine"]>
   export type RoutineInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     blockedApps?: boolean | Routine$blockedAppsArgs<ExtArgs>
-    commitments?: boolean | Routine$commitmentsArgs<ExtArgs>
+    commitment?: boolean | Routine$commitmentArgs<ExtArgs>
     _count?: boolean | RoutineCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RoutineIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6103,7 +6040,7 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       blockedApps: Prisma.$RoutineAppPayload<ExtArgs>[]
-      commitments: Prisma.$CommitmentPayload<ExtArgs>[]
+      commitment: Prisma.$CommitmentPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6116,7 +6053,6 @@ export namespace Prisma {
       endTime: string | null
       dailyLimit: number | null
       endDate: Date | null
-      stakeAmount: number
       status: $Enums.RoutineStatus
       createdAt: Date
       updatedAt: Date
@@ -6516,7 +6452,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     blockedApps<T extends Routine$blockedAppsArgs<ExtArgs> = {}>(args?: Subset<T, Routine$blockedAppsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoutineAppPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    commitments<T extends Routine$commitmentsArgs<ExtArgs> = {}>(args?: Subset<T, Routine$commitmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CommitmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    commitment<T extends Routine$commitmentArgs<ExtArgs> = {}>(args?: Subset<T, Routine$commitmentArgs<ExtArgs>>): Prisma__CommitmentClient<$Result.GetResult<Prisma.$CommitmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6556,7 +6492,6 @@ export namespace Prisma {
     readonly endTime: FieldRef<"Routine", 'String'>
     readonly dailyLimit: FieldRef<"Routine", 'Int'>
     readonly endDate: FieldRef<"Routine", 'DateTime'>
-    readonly stakeAmount: FieldRef<"Routine", 'Float'>
     readonly status: FieldRef<"Routine", 'RoutineStatus'>
     readonly createdAt: FieldRef<"Routine", 'DateTime'>
     readonly updatedAt: FieldRef<"Routine", 'DateTime'>
@@ -6980,9 +6915,9 @@ export namespace Prisma {
   }
 
   /**
-   * Routine.commitments
+   * Routine.commitment
    */
-  export type Routine$commitmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Routine$commitmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Commitment
      */
@@ -6996,11 +6931,6 @@ export namespace Prisma {
      */
     include?: CommitmentInclude<ExtArgs> | null
     where?: CommitmentWhereInput
-    orderBy?: CommitmentOrderByWithRelationInput | CommitmentOrderByWithRelationInput[]
-    cursor?: CommitmentWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: CommitmentScalarFieldEnum | CommitmentScalarFieldEnum[]
   }
 
   /**
@@ -18166,7 +18096,6 @@ export namespace Prisma {
     endTime: 'endTime',
     dailyLimit: 'dailyLimit',
     endDate: 'endDate',
-    stakeAmount: 'stakeAmount',
     status: 'status',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -18446,20 +18375,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'RoutineStatus'
    */
   export type EnumRoutineStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoutineStatus'>
@@ -18533,6 +18448,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -18621,7 +18550,7 @@ export namespace Prisma {
     duration?: IntFilter<"FocusSession"> | number
     status?: EnumFocusSessionStatusFilter<"FocusSession"> | $Enums.FocusSessionStatus
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    commitments?: CommitmentListRelationFilter
+    commitment?: XOR<CommitmentNullableScalarRelationFilter, CommitmentWhereInput> | null
   }
 
   export type FocusSessionOrderByWithRelationInput = {
@@ -18631,7 +18560,7 @@ export namespace Prisma {
     duration?: SortOrder
     status?: SortOrder
     user?: UserOrderByWithRelationInput
-    commitments?: CommitmentOrderByRelationAggregateInput
+    commitment?: CommitmentOrderByWithRelationInput
   }
 
   export type FocusSessionWhereUniqueInput = Prisma.AtLeast<{
@@ -18644,7 +18573,7 @@ export namespace Prisma {
     duration?: IntFilter<"FocusSession"> | number
     status?: EnumFocusSessionStatusFilter<"FocusSession"> | $Enums.FocusSessionStatus
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    commitments?: CommitmentListRelationFilter
+    commitment?: XOR<CommitmentNullableScalarRelationFilter, CommitmentWhereInput> | null
   }, "id">
 
   export type FocusSessionOrderByWithAggregationInput = {
@@ -18748,13 +18677,12 @@ export namespace Prisma {
     endTime?: StringNullableFilter<"Routine"> | string | null
     dailyLimit?: IntNullableFilter<"Routine"> | number | null
     endDate?: DateTimeNullableFilter<"Routine"> | Date | string | null
-    stakeAmount?: FloatFilter<"Routine"> | number
     status?: EnumRoutineStatusFilter<"Routine"> | $Enums.RoutineStatus
     createdAt?: DateTimeFilter<"Routine"> | Date | string
     updatedAt?: DateTimeFilter<"Routine"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     blockedApps?: RoutineAppListRelationFilter
-    commitments?: CommitmentListRelationFilter
+    commitment?: XOR<CommitmentNullableScalarRelationFilter, CommitmentWhereInput> | null
   }
 
   export type RoutineOrderByWithRelationInput = {
@@ -18768,13 +18696,12 @@ export namespace Prisma {
     endTime?: SortOrderInput | SortOrder
     dailyLimit?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
-    stakeAmount?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     blockedApps?: RoutineAppOrderByRelationAggregateInput
-    commitments?: CommitmentOrderByRelationAggregateInput
+    commitment?: CommitmentOrderByWithRelationInput
   }
 
   export type RoutineWhereUniqueInput = Prisma.AtLeast<{
@@ -18791,13 +18718,12 @@ export namespace Prisma {
     endTime?: StringNullableFilter<"Routine"> | string | null
     dailyLimit?: IntNullableFilter<"Routine"> | number | null
     endDate?: DateTimeNullableFilter<"Routine"> | Date | string | null
-    stakeAmount?: FloatFilter<"Routine"> | number
     status?: EnumRoutineStatusFilter<"Routine"> | $Enums.RoutineStatus
     createdAt?: DateTimeFilter<"Routine"> | Date | string
     updatedAt?: DateTimeFilter<"Routine"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     blockedApps?: RoutineAppListRelationFilter
-    commitments?: CommitmentListRelationFilter
+    commitment?: XOR<CommitmentNullableScalarRelationFilter, CommitmentWhereInput> | null
   }, "id">
 
   export type RoutineOrderByWithAggregationInput = {
@@ -18811,7 +18737,6 @@ export namespace Prisma {
     endTime?: SortOrderInput | SortOrder
     dailyLimit?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
-    stakeAmount?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -18836,7 +18761,6 @@ export namespace Prisma {
     endTime?: StringNullableWithAggregatesFilter<"Routine"> | string | null
     dailyLimit?: IntNullableWithAggregatesFilter<"Routine"> | number | null
     endDate?: DateTimeNullableWithAggregatesFilter<"Routine"> | Date | string | null
-    stakeAmount?: FloatWithAggregatesFilter<"Routine"> | number
     status?: EnumRoutineStatusWithAggregatesFilter<"Routine"> | $Enums.RoutineStatus
     createdAt?: DateTimeWithAggregatesFilter<"Routine"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Routine"> | Date | string
@@ -19081,6 +19005,8 @@ export namespace Prisma {
 
   export type CommitmentWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    routineId?: string
+    focusSessionId?: string
     AND?: CommitmentWhereInput | CommitmentWhereInput[]
     OR?: CommitmentWhereInput[]
     NOT?: CommitmentWhereInput | CommitmentWhereInput[]
@@ -19094,12 +19020,10 @@ export namespace Prisma {
     claimedAt?: DateTimeNullableFilter<"Commitment"> | Date | string | null
     forfeitedAt?: DateTimeNullableFilter<"Commitment"> | Date | string | null
     txSignature?: StringNullableFilter<"Commitment"> | string | null
-    routineId?: StringNullableFilter<"Commitment"> | string | null
-    focusSessionId?: StringNullableFilter<"Commitment"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     routine?: XOR<RoutineNullableScalarRelationFilter, RoutineWhereInput> | null
     focusSession?: XOR<FocusSessionNullableScalarRelationFilter, FocusSessionWhereInput> | null
-  }, "id">
+  }, "id" | "routineId" | "focusSessionId">
 
   export type CommitmentOrderByWithAggregationInput = {
     id?: SortOrder
@@ -19651,7 +19575,7 @@ export namespace Prisma {
     duration: number
     status: $Enums.FocusSessionStatus
     user: UserCreateNestedOneWithoutFocusSessionsInput
-    commitments?: CommitmentCreateNestedManyWithoutFocusSessionInput
+    commitment?: CommitmentCreateNestedOneWithoutFocusSessionInput
   }
 
   export type FocusSessionUncheckedCreateInput = {
@@ -19660,7 +19584,7 @@ export namespace Prisma {
     startTime?: Date | string
     duration: number
     status: $Enums.FocusSessionStatus
-    commitments?: CommitmentUncheckedCreateNestedManyWithoutFocusSessionInput
+    commitment?: CommitmentUncheckedCreateNestedOneWithoutFocusSessionInput
   }
 
   export type FocusSessionUpdateInput = {
@@ -19669,7 +19593,7 @@ export namespace Prisma {
     duration?: IntFieldUpdateOperationsInput | number
     status?: EnumFocusSessionStatusFieldUpdateOperationsInput | $Enums.FocusSessionStatus
     user?: UserUpdateOneRequiredWithoutFocusSessionsNestedInput
-    commitments?: CommitmentUpdateManyWithoutFocusSessionNestedInput
+    commitment?: CommitmentUpdateOneWithoutFocusSessionNestedInput
   }
 
   export type FocusSessionUncheckedUpdateInput = {
@@ -19678,7 +19602,7 @@ export namespace Prisma {
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     duration?: IntFieldUpdateOperationsInput | number
     status?: EnumFocusSessionStatusFieldUpdateOperationsInput | $Enums.FocusSessionStatus
-    commitments?: CommitmentUncheckedUpdateManyWithoutFocusSessionNestedInput
+    commitment?: CommitmentUncheckedUpdateOneWithoutFocusSessionNestedInput
   }
 
   export type FocusSessionCreateManyInput = {
@@ -19776,13 +19700,12 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRoutinesInput
     blockedApps?: RoutineAppCreateNestedManyWithoutRoutineInput
-    commitments?: CommitmentCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineUncheckedCreateInput = {
@@ -19796,12 +19719,11 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     blockedApps?: RoutineAppUncheckedCreateNestedManyWithoutRoutineInput
-    commitments?: CommitmentUncheckedCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentUncheckedCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineUpdateInput = {
@@ -19814,13 +19736,12 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRoutinesNestedInput
     blockedApps?: RoutineAppUpdateManyWithoutRoutineNestedInput
-    commitments?: CommitmentUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUpdateOneWithoutRoutineNestedInput
   }
 
   export type RoutineUncheckedUpdateInput = {
@@ -19834,12 +19755,11 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blockedApps?: RoutineAppUncheckedUpdateManyWithoutRoutineNestedInput
-    commitments?: CommitmentUncheckedUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUncheckedUpdateOneWithoutRoutineNestedInput
   }
 
   export type RoutineCreateManyInput = {
@@ -19853,7 +19773,6 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -19869,7 +19788,6 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19886,7 +19804,6 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20109,8 +20026,8 @@ export namespace Prisma {
     forfeitedAt?: Date | string | null
     txSignature?: string | null
     user: UserCreateNestedOneWithoutCommitmentsInput
-    routine?: RoutineCreateNestedOneWithoutCommitmentsInput
-    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentsInput
+    routine?: RoutineCreateNestedOneWithoutCommitmentInput
+    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentInput
   }
 
   export type CommitmentUncheckedCreateInput = {
@@ -20141,8 +20058,8 @@ export namespace Prisma {
     forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     txSignature?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutCommitmentsNestedInput
-    routine?: RoutineUpdateOneWithoutCommitmentsNestedInput
-    focusSession?: FocusSessionUpdateOneWithoutCommitmentsNestedInput
+    routine?: RoutineUpdateOneWithoutCommitmentNestedInput
+    focusSession?: FocusSessionUpdateOneWithoutCommitmentNestedInput
   }
 
   export type CommitmentUncheckedUpdateInput = {
@@ -20832,6 +20749,11 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type CommitmentNullableScalarRelationFilter = {
+    is?: CommitmentWhereInput | null
+    isNot?: CommitmentWhereInput | null
+  }
+
   export type FocusSessionCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -21001,17 +20923,6 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type EnumRoutineStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.RoutineStatus | EnumRoutineStatusFieldRefInput<$PrismaModel>
     in?: $Enums.RoutineStatus[] | ListEnumRoutineStatusFieldRefInput<$PrismaModel>
@@ -21045,7 +20956,6 @@ export namespace Prisma {
     endTime?: SortOrder
     dailyLimit?: SortOrder
     endDate?: SortOrder
-    stakeAmount?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21053,7 +20963,6 @@ export namespace Prisma {
 
   export type RoutineAvgOrderByAggregateInput = {
     dailyLimit?: SortOrder
-    stakeAmount?: SortOrder
   }
 
   export type RoutineMaxOrderByAggregateInput = {
@@ -21066,7 +20975,6 @@ export namespace Prisma {
     endTime?: SortOrder
     dailyLimit?: SortOrder
     endDate?: SortOrder
-    stakeAmount?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21082,7 +20990,6 @@ export namespace Prisma {
     endTime?: SortOrder
     dailyLimit?: SortOrder
     endDate?: SortOrder
-    stakeAmount?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -21090,7 +20997,6 @@ export namespace Prisma {
 
   export type RoutineSumOrderByAggregateInput = {
     dailyLimit?: SortOrder
-    stakeAmount?: SortOrder
   }
 
   export type EnumTimeModeWithAggregatesFilter<$PrismaModel = never> = {
@@ -21149,22 +21055,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type EnumRoutineStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -21948,18 +21838,16 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type CommitmentCreateNestedManyWithoutFocusSessionInput = {
-    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput> | CommitmentCreateWithoutFocusSessionInput[] | CommitmentUncheckedCreateWithoutFocusSessionInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput | CommitmentCreateOrConnectWithoutFocusSessionInput[]
-    createMany?: CommitmentCreateManyFocusSessionInputEnvelope
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
+  export type CommitmentCreateNestedOneWithoutFocusSessionInput = {
+    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput
+    connect?: CommitmentWhereUniqueInput
   }
 
-  export type CommitmentUncheckedCreateNestedManyWithoutFocusSessionInput = {
-    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput> | CommitmentCreateWithoutFocusSessionInput[] | CommitmentUncheckedCreateWithoutFocusSessionInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput | CommitmentCreateOrConnectWithoutFocusSessionInput[]
-    createMany?: CommitmentCreateManyFocusSessionInputEnvelope
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
+  export type CommitmentUncheckedCreateNestedOneWithoutFocusSessionInput = {
+    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput
+    connect?: CommitmentWhereUniqueInput
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -21982,32 +21870,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFocusSessionsInput, UserUpdateWithoutFocusSessionsInput>, UserUncheckedUpdateWithoutFocusSessionsInput>
   }
 
-  export type CommitmentUpdateManyWithoutFocusSessionNestedInput = {
-    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput> | CommitmentCreateWithoutFocusSessionInput[] | CommitmentUncheckedCreateWithoutFocusSessionInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput | CommitmentCreateOrConnectWithoutFocusSessionInput[]
-    upsert?: CommitmentUpsertWithWhereUniqueWithoutFocusSessionInput | CommitmentUpsertWithWhereUniqueWithoutFocusSessionInput[]
-    createMany?: CommitmentCreateManyFocusSessionInputEnvelope
-    set?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    disconnect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    delete?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    update?: CommitmentUpdateWithWhereUniqueWithoutFocusSessionInput | CommitmentUpdateWithWhereUniqueWithoutFocusSessionInput[]
-    updateMany?: CommitmentUpdateManyWithWhereWithoutFocusSessionInput | CommitmentUpdateManyWithWhereWithoutFocusSessionInput[]
-    deleteMany?: CommitmentScalarWhereInput | CommitmentScalarWhereInput[]
+  export type CommitmentUpdateOneWithoutFocusSessionNestedInput = {
+    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput
+    upsert?: CommitmentUpsertWithoutFocusSessionInput
+    disconnect?: CommitmentWhereInput | boolean
+    delete?: CommitmentWhereInput | boolean
+    connect?: CommitmentWhereUniqueInput
+    update?: XOR<XOR<CommitmentUpdateToOneWithWhereWithoutFocusSessionInput, CommitmentUpdateWithoutFocusSessionInput>, CommitmentUncheckedUpdateWithoutFocusSessionInput>
   }
 
-  export type CommitmentUncheckedUpdateManyWithoutFocusSessionNestedInput = {
-    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput> | CommitmentCreateWithoutFocusSessionInput[] | CommitmentUncheckedCreateWithoutFocusSessionInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput | CommitmentCreateOrConnectWithoutFocusSessionInput[]
-    upsert?: CommitmentUpsertWithWhereUniqueWithoutFocusSessionInput | CommitmentUpsertWithWhereUniqueWithoutFocusSessionInput[]
-    createMany?: CommitmentCreateManyFocusSessionInputEnvelope
-    set?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    disconnect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    delete?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    update?: CommitmentUpdateWithWhereUniqueWithoutFocusSessionInput | CommitmentUpdateWithWhereUniqueWithoutFocusSessionInput[]
-    updateMany?: CommitmentUpdateManyWithWhereWithoutFocusSessionInput | CommitmentUpdateManyWithWhereWithoutFocusSessionInput[]
-    deleteMany?: CommitmentScalarWhereInput | CommitmentScalarWhereInput[]
+  export type CommitmentUncheckedUpdateOneWithoutFocusSessionNestedInput = {
+    create?: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutFocusSessionInput
+    upsert?: CommitmentUpsertWithoutFocusSessionInput
+    disconnect?: CommitmentWhereInput | boolean
+    delete?: CommitmentWhereInput | boolean
+    connect?: CommitmentWhereUniqueInput
+    update?: XOR<XOR<CommitmentUpdateToOneWithWhereWithoutFocusSessionInput, CommitmentUpdateWithoutFocusSessionInput>, CommitmentUncheckedUpdateWithoutFocusSessionInput>
   }
 
   export type UserCreateNestedOneWithoutAppUsageInput = {
@@ -22045,11 +21925,10 @@ export namespace Prisma {
     connect?: RoutineAppWhereUniqueInput | RoutineAppWhereUniqueInput[]
   }
 
-  export type CommitmentCreateNestedManyWithoutRoutineInput = {
-    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput> | CommitmentCreateWithoutRoutineInput[] | CommitmentUncheckedCreateWithoutRoutineInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput | CommitmentCreateOrConnectWithoutRoutineInput[]
-    createMany?: CommitmentCreateManyRoutineInputEnvelope
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
+  export type CommitmentCreateNestedOneWithoutRoutineInput = {
+    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput
+    connect?: CommitmentWhereUniqueInput
   }
 
   export type RoutineAppUncheckedCreateNestedManyWithoutRoutineInput = {
@@ -22059,11 +21938,10 @@ export namespace Prisma {
     connect?: RoutineAppWhereUniqueInput | RoutineAppWhereUniqueInput[]
   }
 
-  export type CommitmentUncheckedCreateNestedManyWithoutRoutineInput = {
-    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput> | CommitmentCreateWithoutRoutineInput[] | CommitmentUncheckedCreateWithoutRoutineInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput | CommitmentCreateOrConnectWithoutRoutineInput[]
-    createMany?: CommitmentCreateManyRoutineInputEnvelope
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
+  export type CommitmentUncheckedCreateNestedOneWithoutRoutineInput = {
+    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput
+    connect?: CommitmentWhereUniqueInput
   }
 
   export type EnumTimeModeFieldUpdateOperationsInput = {
@@ -22089,14 +21967,6 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
-  }
-
-  export type FloatFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type EnumRoutineStatusFieldUpdateOperationsInput = {
@@ -22125,18 +21995,14 @@ export namespace Prisma {
     deleteMany?: RoutineAppScalarWhereInput | RoutineAppScalarWhereInput[]
   }
 
-  export type CommitmentUpdateManyWithoutRoutineNestedInput = {
-    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput> | CommitmentCreateWithoutRoutineInput[] | CommitmentUncheckedCreateWithoutRoutineInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput | CommitmentCreateOrConnectWithoutRoutineInput[]
-    upsert?: CommitmentUpsertWithWhereUniqueWithoutRoutineInput | CommitmentUpsertWithWhereUniqueWithoutRoutineInput[]
-    createMany?: CommitmentCreateManyRoutineInputEnvelope
-    set?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    disconnect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    delete?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    update?: CommitmentUpdateWithWhereUniqueWithoutRoutineInput | CommitmentUpdateWithWhereUniqueWithoutRoutineInput[]
-    updateMany?: CommitmentUpdateManyWithWhereWithoutRoutineInput | CommitmentUpdateManyWithWhereWithoutRoutineInput[]
-    deleteMany?: CommitmentScalarWhereInput | CommitmentScalarWhereInput[]
+  export type CommitmentUpdateOneWithoutRoutineNestedInput = {
+    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput
+    upsert?: CommitmentUpsertWithoutRoutineInput
+    disconnect?: CommitmentWhereInput | boolean
+    delete?: CommitmentWhereInput | boolean
+    connect?: CommitmentWhereUniqueInput
+    update?: XOR<XOR<CommitmentUpdateToOneWithWhereWithoutRoutineInput, CommitmentUpdateWithoutRoutineInput>, CommitmentUncheckedUpdateWithoutRoutineInput>
   }
 
   export type RoutineAppUncheckedUpdateManyWithoutRoutineNestedInput = {
@@ -22153,18 +22019,14 @@ export namespace Prisma {
     deleteMany?: RoutineAppScalarWhereInput | RoutineAppScalarWhereInput[]
   }
 
-  export type CommitmentUncheckedUpdateManyWithoutRoutineNestedInput = {
-    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput> | CommitmentCreateWithoutRoutineInput[] | CommitmentUncheckedCreateWithoutRoutineInput[]
-    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput | CommitmentCreateOrConnectWithoutRoutineInput[]
-    upsert?: CommitmentUpsertWithWhereUniqueWithoutRoutineInput | CommitmentUpsertWithWhereUniqueWithoutRoutineInput[]
-    createMany?: CommitmentCreateManyRoutineInputEnvelope
-    set?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    disconnect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    delete?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    connect?: CommitmentWhereUniqueInput | CommitmentWhereUniqueInput[]
-    update?: CommitmentUpdateWithWhereUniqueWithoutRoutineInput | CommitmentUpdateWithWhereUniqueWithoutRoutineInput[]
-    updateMany?: CommitmentUpdateManyWithWhereWithoutRoutineInput | CommitmentUpdateManyWithWhereWithoutRoutineInput[]
-    deleteMany?: CommitmentScalarWhereInput | CommitmentScalarWhereInput[]
+  export type CommitmentUncheckedUpdateOneWithoutRoutineNestedInput = {
+    create?: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
+    connectOrCreate?: CommitmentCreateOrConnectWithoutRoutineInput
+    upsert?: CommitmentUpsertWithoutRoutineInput
+    disconnect?: CommitmentWhereInput | boolean
+    delete?: CommitmentWhereInput | boolean
+    connect?: CommitmentWhereUniqueInput
+    update?: XOR<XOR<CommitmentUpdateToOneWithWhereWithoutRoutineInput, CommitmentUpdateWithoutRoutineInput>, CommitmentUncheckedUpdateWithoutRoutineInput>
   }
 
   export type AppCreatedomainsInput = {
@@ -22283,15 +22145,15 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type RoutineCreateNestedOneWithoutCommitmentsInput = {
-    create?: XOR<RoutineCreateWithoutCommitmentsInput, RoutineUncheckedCreateWithoutCommitmentsInput>
-    connectOrCreate?: RoutineCreateOrConnectWithoutCommitmentsInput
+  export type RoutineCreateNestedOneWithoutCommitmentInput = {
+    create?: XOR<RoutineCreateWithoutCommitmentInput, RoutineUncheckedCreateWithoutCommitmentInput>
+    connectOrCreate?: RoutineCreateOrConnectWithoutCommitmentInput
     connect?: RoutineWhereUniqueInput
   }
 
-  export type FocusSessionCreateNestedOneWithoutCommitmentsInput = {
-    create?: XOR<FocusSessionCreateWithoutCommitmentsInput, FocusSessionUncheckedCreateWithoutCommitmentsInput>
-    connectOrCreate?: FocusSessionCreateOrConnectWithoutCommitmentsInput
+  export type FocusSessionCreateNestedOneWithoutCommitmentInput = {
+    create?: XOR<FocusSessionCreateWithoutCommitmentInput, FocusSessionUncheckedCreateWithoutCommitmentInput>
+    connectOrCreate?: FocusSessionCreateOrConnectWithoutCommitmentInput
     connect?: FocusSessionWhereUniqueInput
   }
 
@@ -22315,24 +22177,24 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCommitmentsInput, UserUpdateWithoutCommitmentsInput>, UserUncheckedUpdateWithoutCommitmentsInput>
   }
 
-  export type RoutineUpdateOneWithoutCommitmentsNestedInput = {
-    create?: XOR<RoutineCreateWithoutCommitmentsInput, RoutineUncheckedCreateWithoutCommitmentsInput>
-    connectOrCreate?: RoutineCreateOrConnectWithoutCommitmentsInput
-    upsert?: RoutineUpsertWithoutCommitmentsInput
+  export type RoutineUpdateOneWithoutCommitmentNestedInput = {
+    create?: XOR<RoutineCreateWithoutCommitmentInput, RoutineUncheckedCreateWithoutCommitmentInput>
+    connectOrCreate?: RoutineCreateOrConnectWithoutCommitmentInput
+    upsert?: RoutineUpsertWithoutCommitmentInput
     disconnect?: RoutineWhereInput | boolean
     delete?: RoutineWhereInput | boolean
     connect?: RoutineWhereUniqueInput
-    update?: XOR<XOR<RoutineUpdateToOneWithWhereWithoutCommitmentsInput, RoutineUpdateWithoutCommitmentsInput>, RoutineUncheckedUpdateWithoutCommitmentsInput>
+    update?: XOR<XOR<RoutineUpdateToOneWithWhereWithoutCommitmentInput, RoutineUpdateWithoutCommitmentInput>, RoutineUncheckedUpdateWithoutCommitmentInput>
   }
 
-  export type FocusSessionUpdateOneWithoutCommitmentsNestedInput = {
-    create?: XOR<FocusSessionCreateWithoutCommitmentsInput, FocusSessionUncheckedCreateWithoutCommitmentsInput>
-    connectOrCreate?: FocusSessionCreateOrConnectWithoutCommitmentsInput
-    upsert?: FocusSessionUpsertWithoutCommitmentsInput
+  export type FocusSessionUpdateOneWithoutCommitmentNestedInput = {
+    create?: XOR<FocusSessionCreateWithoutCommitmentInput, FocusSessionUncheckedCreateWithoutCommitmentInput>
+    connectOrCreate?: FocusSessionCreateOrConnectWithoutCommitmentInput
+    upsert?: FocusSessionUpsertWithoutCommitmentInput
     disconnect?: FocusSessionWhereInput | boolean
     delete?: FocusSessionWhereInput | boolean
     connect?: FocusSessionWhereUniqueInput
-    update?: XOR<XOR<FocusSessionUpdateToOneWithWhereWithoutCommitmentsInput, FocusSessionUpdateWithoutCommitmentsInput>, FocusSessionUncheckedUpdateWithoutCommitmentsInput>
+    update?: XOR<XOR<FocusSessionUpdateToOneWithWhereWithoutCommitmentInput, FocusSessionUpdateWithoutCommitmentInput>, FocusSessionUncheckedUpdateWithoutCommitmentInput>
   }
 
   export type DataListingCreateNestedOneWithoutSellerInput = {
@@ -22685,22 +22547,6 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
   export type NestedEnumRoutineStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.RoutineStatus | EnumRoutineStatusFieldRefInput<$PrismaModel>
     in?: $Enums.RoutineStatus[] | ListEnumRoutineStatusFieldRefInput<$PrismaModel>
@@ -22813,7 +22659,7 @@ export namespace Prisma {
     startTime?: Date | string
     duration: number
     status: $Enums.FocusSessionStatus
-    commitments?: CommitmentCreateNestedManyWithoutFocusSessionInput
+    commitment?: CommitmentCreateNestedOneWithoutFocusSessionInput
   }
 
   export type FocusSessionUncheckedCreateWithoutUserInput = {
@@ -22821,7 +22667,7 @@ export namespace Prisma {
     startTime?: Date | string
     duration: number
     status: $Enums.FocusSessionStatus
-    commitments?: CommitmentUncheckedCreateNestedManyWithoutFocusSessionInput
+    commitment?: CommitmentUncheckedCreateNestedOneWithoutFocusSessionInput
   }
 
   export type FocusSessionCreateOrConnectWithoutUserInput = {
@@ -22870,12 +22716,11 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     blockedApps?: RoutineAppCreateNestedManyWithoutRoutineInput
-    commitments?: CommitmentCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineUncheckedCreateWithoutUserInput = {
@@ -22888,12 +22733,11 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     blockedApps?: RoutineAppUncheckedCreateNestedManyWithoutRoutineInput
-    commitments?: CommitmentUncheckedCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentUncheckedCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineCreateOrConnectWithoutUserInput = {
@@ -22947,8 +22791,8 @@ export namespace Prisma {
     claimedAt?: Date | string | null
     forfeitedAt?: Date | string | null
     txSignature?: string | null
-    routine?: RoutineCreateNestedOneWithoutCommitmentsInput
-    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentsInput
+    routine?: RoutineCreateNestedOneWithoutCommitmentInput
+    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentInput
   }
 
   export type CommitmentUncheckedCreateWithoutUserInput = {
@@ -23061,7 +22905,6 @@ export namespace Prisma {
     endTime?: StringNullableFilter<"Routine"> | string | null
     dailyLimit?: IntNullableFilter<"Routine"> | number | null
     endDate?: DateTimeNullableFilter<"Routine"> | Date | string | null
-    stakeAmount?: FloatFilter<"Routine"> | number
     status?: EnumRoutineStatusFilter<"Routine"> | $Enums.RoutineStatus
     createdAt?: DateTimeFilter<"Routine"> | Date | string
     updatedAt?: DateTimeFilter<"Routine"> | Date | string
@@ -23175,7 +23018,7 @@ export namespace Prisma {
     forfeitedAt?: Date | string | null
     txSignature?: string | null
     user: UserCreateNestedOneWithoutCommitmentsInput
-    routine?: RoutineCreateNestedOneWithoutCommitmentsInput
+    routine?: RoutineCreateNestedOneWithoutCommitmentInput
   }
 
   export type CommitmentUncheckedCreateWithoutFocusSessionInput = {
@@ -23196,11 +23039,6 @@ export namespace Prisma {
   export type CommitmentCreateOrConnectWithoutFocusSessionInput = {
     where: CommitmentWhereUniqueInput
     create: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
-  }
-
-  export type CommitmentCreateManyFocusSessionInputEnvelope = {
-    data: CommitmentCreateManyFocusSessionInput | CommitmentCreateManyFocusSessionInput[]
-    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutFocusSessionsInput = {
@@ -23240,20 +23078,45 @@ export namespace Prisma {
     commitments?: CommitmentUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type CommitmentUpsertWithWhereUniqueWithoutFocusSessionInput = {
-    where: CommitmentWhereUniqueInput
+  export type CommitmentUpsertWithoutFocusSessionInput = {
     update: XOR<CommitmentUpdateWithoutFocusSessionInput, CommitmentUncheckedUpdateWithoutFocusSessionInput>
     create: XOR<CommitmentCreateWithoutFocusSessionInput, CommitmentUncheckedCreateWithoutFocusSessionInput>
+    where?: CommitmentWhereInput
   }
 
-  export type CommitmentUpdateWithWhereUniqueWithoutFocusSessionInput = {
-    where: CommitmentWhereUniqueInput
+  export type CommitmentUpdateToOneWithWhereWithoutFocusSessionInput = {
+    where?: CommitmentWhereInput
     data: XOR<CommitmentUpdateWithoutFocusSessionInput, CommitmentUncheckedUpdateWithoutFocusSessionInput>
   }
 
-  export type CommitmentUpdateManyWithWhereWithoutFocusSessionInput = {
-    where: CommitmentScalarWhereInput
-    data: XOR<CommitmentUpdateManyMutationInput, CommitmentUncheckedUpdateManyWithoutFocusSessionInput>
+  export type CommitmentUpdateWithoutFocusSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userPubkey?: StringFieldUpdateOperationsInput | string
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorityPubkey?: StringFieldUpdateOperationsInput | string
+    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutCommitmentsNestedInput
+    routine?: RoutineUpdateOneWithoutCommitmentNestedInput
+  }
+
+  export type CommitmentUncheckedUpdateWithoutFocusSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userPubkey?: StringFieldUpdateOperationsInput | string
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorityPubkey?: StringFieldUpdateOperationsInput | string
+    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    routineId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateWithoutAppUsageInput = {
@@ -23385,7 +23248,7 @@ export namespace Prisma {
     forfeitedAt?: Date | string | null
     txSignature?: string | null
     user: UserCreateNestedOneWithoutCommitmentsInput
-    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentsInput
+    focusSession?: FocusSessionCreateNestedOneWithoutCommitmentInput
   }
 
   export type CommitmentUncheckedCreateWithoutRoutineInput = {
@@ -23406,11 +23269,6 @@ export namespace Prisma {
   export type CommitmentCreateOrConnectWithoutRoutineInput = {
     where: CommitmentWhereUniqueInput
     create: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
-  }
-
-  export type CommitmentCreateManyRoutineInputEnvelope = {
-    data: CommitmentCreateManyRoutineInput | CommitmentCreateManyRoutineInput[]
-    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutRoutinesInput = {
@@ -23474,20 +23332,45 @@ export namespace Prisma {
     appId?: StringFilter<"RoutineApp"> | string
   }
 
-  export type CommitmentUpsertWithWhereUniqueWithoutRoutineInput = {
-    where: CommitmentWhereUniqueInput
+  export type CommitmentUpsertWithoutRoutineInput = {
     update: XOR<CommitmentUpdateWithoutRoutineInput, CommitmentUncheckedUpdateWithoutRoutineInput>
     create: XOR<CommitmentCreateWithoutRoutineInput, CommitmentUncheckedCreateWithoutRoutineInput>
+    where?: CommitmentWhereInput
   }
 
-  export type CommitmentUpdateWithWhereUniqueWithoutRoutineInput = {
-    where: CommitmentWhereUniqueInput
+  export type CommitmentUpdateToOneWithWhereWithoutRoutineInput = {
+    where?: CommitmentWhereInput
     data: XOR<CommitmentUpdateWithoutRoutineInput, CommitmentUncheckedUpdateWithoutRoutineInput>
   }
 
-  export type CommitmentUpdateManyWithWhereWithoutRoutineInput = {
-    where: CommitmentScalarWhereInput
-    data: XOR<CommitmentUpdateManyMutationInput, CommitmentUncheckedUpdateManyWithoutRoutineInput>
+  export type CommitmentUpdateWithoutRoutineInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userPubkey?: StringFieldUpdateOperationsInput | string
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorityPubkey?: StringFieldUpdateOperationsInput | string
+    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutCommitmentsNestedInput
+    focusSession?: FocusSessionUpdateOneWithoutCommitmentNestedInput
+  }
+
+  export type CommitmentUncheckedUpdateWithoutRoutineInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    userPubkey?: StringFieldUpdateOperationsInput | string
+    amount?: BigIntFieldUpdateOperationsInput | bigint | number
+    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorityPubkey?: StringFieldUpdateOperationsInput | string
+    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
+    focusSessionId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type RoutineAppCreateWithoutAppInput = {
@@ -23534,12 +23417,11 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRoutinesInput
-    commitments?: CommitmentCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineUncheckedCreateWithoutBlockedAppsInput = {
@@ -23553,11 +23435,10 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
-    commitments?: CommitmentUncheckedCreateNestedManyWithoutRoutineInput
+    commitment?: CommitmentUncheckedCreateNestedOneWithoutRoutineInput
   }
 
   export type RoutineCreateOrConnectWithoutBlockedAppsInput = {
@@ -23617,12 +23498,11 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRoutinesNestedInput
-    commitments?: CommitmentUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUpdateOneWithoutRoutineNestedInput
   }
 
   export type RoutineUncheckedUpdateWithoutBlockedAppsInput = {
@@ -23636,11 +23516,10 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    commitments?: CommitmentUncheckedUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUncheckedUpdateOneWithoutRoutineNestedInput
   }
 
   export type AppUpsertWithoutRoutinesInput = {
@@ -23779,7 +23658,7 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutCommitmentsInput, UserUncheckedCreateWithoutCommitmentsInput>
   }
 
-  export type RoutineCreateWithoutCommitmentsInput = {
+  export type RoutineCreateWithoutCommitmentInput = {
     id?: string
     name: string
     emoji?: string
@@ -23789,7 +23668,6 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23797,7 +23675,7 @@ export namespace Prisma {
     blockedApps?: RoutineAppCreateNestedManyWithoutRoutineInput
   }
 
-  export type RoutineUncheckedCreateWithoutCommitmentsInput = {
+  export type RoutineUncheckedCreateWithoutCommitmentInput = {
     id?: string
     userId: string
     name: string
@@ -23808,19 +23686,18 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
     blockedApps?: RoutineAppUncheckedCreateNestedManyWithoutRoutineInput
   }
 
-  export type RoutineCreateOrConnectWithoutCommitmentsInput = {
+  export type RoutineCreateOrConnectWithoutCommitmentInput = {
     where: RoutineWhereUniqueInput
-    create: XOR<RoutineCreateWithoutCommitmentsInput, RoutineUncheckedCreateWithoutCommitmentsInput>
+    create: XOR<RoutineCreateWithoutCommitmentInput, RoutineUncheckedCreateWithoutCommitmentInput>
   }
 
-  export type FocusSessionCreateWithoutCommitmentsInput = {
+  export type FocusSessionCreateWithoutCommitmentInput = {
     id?: string
     startTime?: Date | string
     duration: number
@@ -23828,7 +23705,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutFocusSessionsInput
   }
 
-  export type FocusSessionUncheckedCreateWithoutCommitmentsInput = {
+  export type FocusSessionUncheckedCreateWithoutCommitmentInput = {
     id?: string
     userId: string
     startTime?: Date | string
@@ -23836,9 +23713,9 @@ export namespace Prisma {
     status: $Enums.FocusSessionStatus
   }
 
-  export type FocusSessionCreateOrConnectWithoutCommitmentsInput = {
+  export type FocusSessionCreateOrConnectWithoutCommitmentInput = {
     where: FocusSessionWhereUniqueInput
-    create: XOR<FocusSessionCreateWithoutCommitmentsInput, FocusSessionUncheckedCreateWithoutCommitmentsInput>
+    create: XOR<FocusSessionCreateWithoutCommitmentInput, FocusSessionUncheckedCreateWithoutCommitmentInput>
   }
 
   export type UserUpsertWithoutCommitmentsInput = {
@@ -23878,18 +23755,18 @@ export namespace Prisma {
     task?: TaskUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type RoutineUpsertWithoutCommitmentsInput = {
-    update: XOR<RoutineUpdateWithoutCommitmentsInput, RoutineUncheckedUpdateWithoutCommitmentsInput>
-    create: XOR<RoutineCreateWithoutCommitmentsInput, RoutineUncheckedCreateWithoutCommitmentsInput>
+  export type RoutineUpsertWithoutCommitmentInput = {
+    update: XOR<RoutineUpdateWithoutCommitmentInput, RoutineUncheckedUpdateWithoutCommitmentInput>
+    create: XOR<RoutineCreateWithoutCommitmentInput, RoutineUncheckedCreateWithoutCommitmentInput>
     where?: RoutineWhereInput
   }
 
-  export type RoutineUpdateToOneWithWhereWithoutCommitmentsInput = {
+  export type RoutineUpdateToOneWithWhereWithoutCommitmentInput = {
     where?: RoutineWhereInput
-    data: XOR<RoutineUpdateWithoutCommitmentsInput, RoutineUncheckedUpdateWithoutCommitmentsInput>
+    data: XOR<RoutineUpdateWithoutCommitmentInput, RoutineUncheckedUpdateWithoutCommitmentInput>
   }
 
-  export type RoutineUpdateWithoutCommitmentsInput = {
+  export type RoutineUpdateWithoutCommitmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     emoji?: StringFieldUpdateOperationsInput | string
@@ -23899,7 +23776,6 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23907,7 +23783,7 @@ export namespace Prisma {
     blockedApps?: RoutineAppUpdateManyWithoutRoutineNestedInput
   }
 
-  export type RoutineUncheckedUpdateWithoutCommitmentsInput = {
+  export type RoutineUncheckedUpdateWithoutCommitmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -23918,25 +23794,24 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blockedApps?: RoutineAppUncheckedUpdateManyWithoutRoutineNestedInput
   }
 
-  export type FocusSessionUpsertWithoutCommitmentsInput = {
-    update: XOR<FocusSessionUpdateWithoutCommitmentsInput, FocusSessionUncheckedUpdateWithoutCommitmentsInput>
-    create: XOR<FocusSessionCreateWithoutCommitmentsInput, FocusSessionUncheckedCreateWithoutCommitmentsInput>
+  export type FocusSessionUpsertWithoutCommitmentInput = {
+    update: XOR<FocusSessionUpdateWithoutCommitmentInput, FocusSessionUncheckedUpdateWithoutCommitmentInput>
+    create: XOR<FocusSessionCreateWithoutCommitmentInput, FocusSessionUncheckedCreateWithoutCommitmentInput>
     where?: FocusSessionWhereInput
   }
 
-  export type FocusSessionUpdateToOneWithWhereWithoutCommitmentsInput = {
+  export type FocusSessionUpdateToOneWithWhereWithoutCommitmentInput = {
     where?: FocusSessionWhereInput
-    data: XOR<FocusSessionUpdateWithoutCommitmentsInput, FocusSessionUncheckedUpdateWithoutCommitmentsInput>
+    data: XOR<FocusSessionUpdateWithoutCommitmentInput, FocusSessionUncheckedUpdateWithoutCommitmentInput>
   }
 
-  export type FocusSessionUpdateWithoutCommitmentsInput = {
+  export type FocusSessionUpdateWithoutCommitmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     duration?: IntFieldUpdateOperationsInput | number
@@ -23944,7 +23819,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutFocusSessionsNestedInput
   }
 
-  export type FocusSessionUncheckedUpdateWithoutCommitmentsInput = {
+  export type FocusSessionUncheckedUpdateWithoutCommitmentInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24198,7 +24073,6 @@ export namespace Prisma {
     endTime?: string | null
     dailyLimit?: number | null
     endDate?: Date | string | null
-    stakeAmount?: number
     status?: $Enums.RoutineStatus
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -24234,7 +24108,7 @@ export namespace Prisma {
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     duration?: IntFieldUpdateOperationsInput | number
     status?: EnumFocusSessionStatusFieldUpdateOperationsInput | $Enums.FocusSessionStatus
-    commitments?: CommitmentUpdateManyWithoutFocusSessionNestedInput
+    commitment?: CommitmentUpdateOneWithoutFocusSessionNestedInput
   }
 
   export type FocusSessionUncheckedUpdateWithoutUserInput = {
@@ -24242,7 +24116,7 @@ export namespace Prisma {
     startTime?: DateTimeFieldUpdateOperationsInput | Date | string
     duration?: IntFieldUpdateOperationsInput | number
     status?: EnumFocusSessionStatusFieldUpdateOperationsInput | $Enums.FocusSessionStatus
-    commitments?: CommitmentUncheckedUpdateManyWithoutFocusSessionNestedInput
+    commitment?: CommitmentUncheckedUpdateOneWithoutFocusSessionNestedInput
   }
 
   export type FocusSessionUncheckedUpdateManyWithoutUserInput = {
@@ -24286,12 +24160,11 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blockedApps?: RoutineAppUpdateManyWithoutRoutineNestedInput
-    commitments?: CommitmentUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUpdateOneWithoutRoutineNestedInput
   }
 
   export type RoutineUncheckedUpdateWithoutUserInput = {
@@ -24304,12 +24177,11 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blockedApps?: RoutineAppUncheckedUpdateManyWithoutRoutineNestedInput
-    commitments?: CommitmentUncheckedUpdateManyWithoutRoutineNestedInput
+    commitment?: CommitmentUncheckedUpdateOneWithoutRoutineNestedInput
   }
 
   export type RoutineUncheckedUpdateManyWithoutUserInput = {
@@ -24322,7 +24194,6 @@ export namespace Prisma {
     endTime?: NullableStringFieldUpdateOperationsInput | string | null
     dailyLimit?: NullableIntFieldUpdateOperationsInput | number | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    stakeAmount?: FloatFieldUpdateOperationsInput | number
     status?: EnumRoutineStatusFieldUpdateOperationsInput | $Enums.RoutineStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24369,8 +24240,8 @@ export namespace Prisma {
     claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    routine?: RoutineUpdateOneWithoutCommitmentsNestedInput
-    focusSession?: FocusSessionUpdateOneWithoutCommitmentsNestedInput
+    routine?: RoutineUpdateOneWithoutCommitmentNestedInput
+    focusSession?: FocusSessionUpdateOneWithoutCommitmentNestedInput
   }
 
   export type CommitmentUncheckedUpdateWithoutUserInput = {
@@ -24403,83 +24274,8 @@ export namespace Prisma {
     focusSessionId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type CommitmentCreateManyFocusSessionInput = {
-    id: string
-    userId: string
-    userPubkey: string
-    amount: bigint | number
-    unlockTime: Date | string
-    createdAt: Date | string
-    authorityPubkey: string
-    status?: $Enums.CommitmentStatus
-    claimedAt?: Date | string | null
-    forfeitedAt?: Date | string | null
-    txSignature?: string | null
-    routineId?: string | null
-  }
-
-  export type CommitmentUpdateWithoutFocusSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneRequiredWithoutCommitmentsNestedInput
-    routine?: RoutineUpdateOneWithoutCommitmentsNestedInput
-  }
-
-  export type CommitmentUncheckedUpdateWithoutFocusSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    routineId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type CommitmentUncheckedUpdateManyWithoutFocusSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    routineId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
   export type RoutineAppCreateManyRoutineInput = {
     appId: string
-  }
-
-  export type CommitmentCreateManyRoutineInput = {
-    id: string
-    userId: string
-    userPubkey: string
-    amount: bigint | number
-    unlockTime: Date | string
-    createdAt: Date | string
-    authorityPubkey: string
-    status?: $Enums.CommitmentStatus
-    claimedAt?: Date | string | null
-    forfeitedAt?: Date | string | null
-    txSignature?: string | null
-    focusSessionId?: string | null
   }
 
   export type RoutineAppUpdateWithoutRoutineInput = {
@@ -24492,51 +24288,6 @@ export namespace Prisma {
 
   export type RoutineAppUncheckedUpdateManyWithoutRoutineInput = {
     appId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type CommitmentUpdateWithoutRoutineInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    user?: UserUpdateOneRequiredWithoutCommitmentsNestedInput
-    focusSession?: FocusSessionUpdateOneWithoutCommitmentsNestedInput
-  }
-
-  export type CommitmentUncheckedUpdateWithoutRoutineInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    focusSessionId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type CommitmentUncheckedUpdateManyWithoutRoutineInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    userPubkey?: StringFieldUpdateOperationsInput | string
-    amount?: BigIntFieldUpdateOperationsInput | bigint | number
-    unlockTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    authorityPubkey?: StringFieldUpdateOperationsInput | string
-    status?: EnumCommitmentStatusFieldUpdateOperationsInput | $Enums.CommitmentStatus
-    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    forfeitedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    txSignature?: NullableStringFieldUpdateOperationsInput | string | null
-    focusSessionId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type RoutineAppCreateManyAppInput = {

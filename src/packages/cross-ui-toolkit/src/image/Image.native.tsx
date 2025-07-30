@@ -14,7 +14,6 @@ export function Image(props: ImageProps & RNImageProps): React.ReactElement {
     }
   }
 
-  console.log("src", fixedSrc);
   return (
     <RNImage 
       source={fixedSrc} 

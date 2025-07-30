@@ -63,7 +63,6 @@ export function CreateRoutine(props: CreateRoutineProps) {
                 endTime: timeSettings.timeMode === 'blocking' ? timeSettings.endTime : undefined,
                 dailyLimit: timeSettings.timeMode === 'limit' ? timeSettings.duration : undefined,
                 endDate: endDate?.toISOString(),
-                stakeAmount,
                 blockedApps: blockedApps.map(app => ({
                     packageName: app.packageName,
                     appName: app.appName,

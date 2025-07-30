@@ -16,7 +16,6 @@ interface CreateRoutineBody {
   endTime?: string;
   dailyLimit?: number;
   endDate?: string;
-  stakeAmount: number;
   blockedApps: Array<{
     packageName: string;
     appName: string;
@@ -32,8 +31,6 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
   try {
     const userId = req.verifiedClaims?.userId;
     if (!userId) return res.status(401).json({ error: 'User not authenticated' });
-    console.log("create routine")
-    console.log("req.body", req.body)
     const {
       name,
       emoji,
@@ -43,7 +40,6 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
       endTime,
       dailyLimit,
       endDate,
-      stakeAmount,
       blockedApps
     }: CreateRoutineBody = req.body;
 
@@ -106,7 +102,6 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
         endTime,
         dailyLimit,
         endDate: endDate ? new Date(endDate) : null,
-        stakeAmount,
         blockedApps: {
           create: appConnections
         }
@@ -152,13 +147,11 @@ router.get('/current', authMiddleware, async (req: Request & { verifiedClaims?: 
       }
     });
 
-    // Get only active and paused routines
+    // Get only active routines
     const routines = await prisma.routine.findMany({
       where: {
         userId,
-        status: {
-          in: ['active', 'paused']
-        }
+        status: 'active'
       },
       include: {
         blockedApps: {
@@ -166,7 +159,7 @@ router.get('/current', authMiddleware, async (req: Request & { verifiedClaims?: 
             app: true
           }
         },
-        commitments: true
+        commitment: true
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -221,18 +214,18 @@ router.get('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTok
             app: true
           }
         },
-        commitments: true
+        commitment: true
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    // Serialize BigInt values in commitments if any routines have them
+    // Serialize BigInt values in commitment if any routines have them
     const serializedRoutines = routines.map(routine => ({
       ...routine,
-      commitments: routine.commitments.map(commitment => ({
-        ...commitment,
-        amount: commitment.amount.toString()
-      }))
+      commitment: routine.commitment ? {
+        ...routine.commitment,
+        amount: routine.commitment.amount.toString()
+      } : null
     }));
 
     res.json(serializedRoutines);
@@ -281,7 +274,7 @@ router.get('/:id', authMiddleware, async (req: Request & { verifiedClaims?: Auth
             app: true
           }
         },
-        commitments: true
+        commitment: true
       }
     });
 
@@ -289,13 +282,13 @@ router.get('/:id', authMiddleware, async (req: Request & { verifiedClaims?: Auth
       return res.status(404).json({ error: 'Routine not found' });
     }
 
-    // Serialize BigInt values in commitments
+    // Serialize BigInt values in commitment
     const serializedRoutine = {
       ...routine,
-      commitments: routine.commitments.map(commitment => ({
-        ...commitment,
-        amount: commitment.amount.toString()
-      }))
+      commitment: routine.commitment ? {
+        ...routine.commitment,
+        amount: routine.commitment.amount.toString()
+      } : null
     };
 
     res.json(serializedRoutine);
@@ -326,7 +319,7 @@ router.put('/:id/status', authMiddleware, async (req: Request & { verifiedClaims
     const routine = await prisma.routine.findFirst({
       where: { id, userId },
       include: {
-        commitments: true,
+        commitment: true,
         user: true
       }
     });
@@ -335,37 +328,29 @@ router.put('/:id/status', authMiddleware, async (req: Request & { verifiedClaims
 
     let txPassed = true
     // If canceling the routine, forfeit any active commitments
-    if (status === 'canceled' && routine.commitments.length > 0) {
-      for (const commitment of routine.commitments) {
-        if (commitment.status === 'active') {
-          try {
-            console.log(`Forfeiting commitment ${commitment.id} for routine ${id}`);
+    if (status === 'canceled' && routine.commitment && routine.commitment.status === 'active') {
+      try {
+        // Convert the commitment ID to the format expected by the contract
+        const commitmentIdNumber = parseInt(routine.commitment.id) || routine.commitment.id;
 
-            // Convert the commitment ID to the format expected by the contract
-            const commitmentIdNumber = parseInt(commitment.id) || commitment.id;
+        // Forfeit on-chain
+        const signature = await forfeitService.forfeitCommitment(
+          routine.user.walletAddress,
+          commitmentIdNumber
+        );
 
-            // Forfeit on-chain
-            const signature = await forfeitService.forfeitCommitment(
-              routine.user.walletAddress,
-              commitmentIdNumber
-            );
-
-            // Update commitment status in database
-            await prisma.commitment.update({
-              where: { id: commitment.id },
-              data: {
-                status: 'forfeited',
-                forfeitedAt: new Date(),
-                txSignature: signature
-              }
-            });
-
-            console.log(`Commitment ${commitment.id} forfeited successfully. Tx: ${signature}`);
-          } catch (error) {
-            txPassed = false
-            console.error(`Failed to forfeit commitment ${commitment.id}:`, error);
+        // Update commitment status in database
+        await prisma.commitment.update({
+          where: { id: routine.commitment.id },
+          data: {
+            status: 'forfeited',
+            forfeitedAt: new Date(),
+            txSignature: signature
           }
-        }
+        });
+      } catch (error) {
+        txPassed = false
+        console.error(`Failed to forfeit commitment ${routine.commitment.id}:`, error);
       }
     }
     if(!txPassed) throw new Error("Failed to forfeit commitment");
@@ -380,17 +365,17 @@ router.put('/:id/status', authMiddleware, async (req: Request & { verifiedClaims
             app: true
           }
         },
-        commitments: true
+        commitment: true
       }
     });
 
     // Serialize BigInt values in commitments
     const serializedRoutine = {
       ...updatedRoutine,
-      commitments: updatedRoutine.commitments.map(commitment => ({
-        ...commitment,
-        amount: commitment.amount.toString()
-      }))
+      commitment: updatedRoutine.commitment ? {
+        ...updatedRoutine.commitment,
+        amount: updatedRoutine.commitment.amount.toString()
+      } : null
     };
 
     res.json(serializedRoutine);
@@ -417,7 +402,7 @@ router.delete('/:id', authMiddleware, async (req: Request & { verifiedClaims?: A
     const routine = await prisma.routine.findFirst({
       where: { id, userId },
       include: {
-        commitments: true
+        commitment: true
       }
     });
 
@@ -425,22 +410,16 @@ router.delete('/:id', authMiddleware, async (req: Request & { verifiedClaims?: A
       return res.status(404).json({ error: 'Routine not found' });
     }
 
-    // Only allow deletion if there's a stake amount but NO commitments
-    // (This means the commitment transaction failed)
-    if (routine.stakeAmount > 0 && routine.commitments.length === 0) {
+    // Only allow deletion if there's no commitment
+    if (!routine.commitment) {
       await prisma.routine.delete({
         where: { id }
       });
       res.status(204).send();
-    } else if (routine.stakeAmount === 0) {
-      // No stake amount, cannot delete
-      return res.status(400).json({
-        error: 'Cannot delete routine without stake amount'
-      });
     } else {
-      // Has commitments, cannot delete
+      // Has commitment, cannot delete
       return res.status(400).json({
-        error: 'Cannot delete routine with active commitments'
+        error: 'Cannot delete routine with active commitment'
       });
     }
   } catch (error) {

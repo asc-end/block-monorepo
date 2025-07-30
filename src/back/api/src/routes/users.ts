@@ -133,29 +133,32 @@ router.get('/stats', authMiddleware, async (req: Request & { verifiedClaims?: Au
     const focusSessionsCompleted = focusSessionStats.find(s => s.status === 'finished')?._count || 0;
     const focusSessionsCanceled = focusSessionStats.find(s => s.status === 'canceled')?._count || 0;
 
-    // Calculate total staked amount
-    const totalStakedResult = await prisma.routine.aggregate({
-      where: { userId },
-      _sum: {
-        stakeAmount: true
-      }
-    });
-    const totalStaked = totalStakedResult._sum.stakeAmount || 0;
-
-    // Calculate total lost (from canceled routines with stakes)
-    const totalLostResult = await prisma.routine.aggregate({
+    // Calculate total staked amount from commitments
+    const totalStakedResult = await prisma.commitment.aggregate({
       where: { 
         userId,
-        status: 'canceled',
-        stakeAmount: {
-          gt: 0
-        }
+        OR: [
+          { routineId: { not: null } },
+          { focusSessionId: { not: null } }
+        ]
       },
       _sum: {
-        stakeAmount: true
+        amount: true
       }
     });
-    const totalLost = totalLostResult._sum.stakeAmount || 0;
+    const totalStaked = totalStakedResult._sum.amount ? Number(totalStakedResult._sum.amount) / 1e9 : 0;
+
+    // Calculate total lost (from forfeited commitments)
+    const totalLostResult = await prisma.commitment.aggregate({
+      where: { 
+        userId,
+        status: 'forfeited'
+      },
+      _sum: {
+        amount: true
+      }
+    });
+    const totalLost = totalLostResult._sum.amount ? Number(totalLostResult._sum.amount) / 1e9 : 0;
 
     res.json({
       routinesCompleted,

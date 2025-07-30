@@ -4,21 +4,21 @@ import { formatTime } from "../lib/time";
 import { ChevronIcon } from "./icons/ChevronIcon";
 import { useTheme, Box, Text, Pressable, ScrollView } from "@blockit/cross-ui-toolkit";
 import { useAppUsage } from "../hooks/useAppUsage";
-import { StatsSummary } from "./components/stats/StatsSummary";
-import { Historical } from "./components/stats/Historical";
-import { CloseIcon } from "./icons";
 import { CalendarWithUsageData } from "./components/calendar";
+import { HourlyUsageChart } from "./components/stats";
 
 export type TimeRange = 'today' | 'week' | 'month';
 
 interface StatsProps {
   onDayChange?: () => Promise<void>;
-  onNavigateToHistorical?: () => void;
 }
 
-export function Stats({ onDayChange, onNavigateToHistorical }: StatsProps = {}) {
+export function Stats({ onDayChange }: StatsProps = {}) {
   const { currentColors } = useTheme();
-  const [selectedDate, setSelectedDate] = useState<string>();
+  // Initialize with today's date
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
 
   // Helper function to change date with sync
@@ -107,28 +107,30 @@ export function Stats({ onDayChange, onNavigateToHistorical }: StatsProps = {}) 
   }, [handleDateChange]);
 
   return (
-    <Box className="flex-1 flex flex-col p-4" style={{ backgroundColor: currentColors.background }}>
-      {/* Show error if there's one, but don't block the calendar */}
-      {appUsageError && (
-        <Box className="mb-4 p-3 rounded-lg" style={{
-          backgroundColor: currentColors.error.light + '20'
-        }}>
-          <Text style={{ color: currentColors.error.main }}>{appUsageError}</Text>
-        </Box>
-      )}
+    <Box className="flex-1" style={{ backgroundColor: currentColors.background }}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <Box className="p-4">
+          {/* Show error if there's one, but don't block the calendar */}
+          {appUsageError && (
+            <Box className="mb-4 p-3 rounded-lg" style={{
+              backgroundColor: currentColors.error.light + '20'
+            }}>
+              <Text style={{ color: currentColors.error.main }}>{appUsageError}</Text>
+            </Box>
+          )}
 
-      {/* Calendar with Usage Data */}
-      <Box className="mb-5">
-        <CalendarWithUsageData
-          usageData={calendarUsageData}
-          selectedDate={selectedDate}
-          onSelectDate={handleSelectDate}
-          disableFutureDates={true}
-        />
-      </Box>
+          {/* Calendar with Usage Data */}
+          <Box className="mb-5">
+            <CalendarWithUsageData
+              usageData={calendarUsageData}
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+              disableFutureDates={true}
+            />
+          </Box>
 
       {/* Show loading indicator for data if still loading */}
-      {appUsageLoading && !!selectedDate && (
+      {appUsageLoading && (
         <Box style={{
           marginBottom: 16,
           padding: 10,
@@ -139,24 +141,13 @@ export function Stats({ onDayChange, onNavigateToHistorical }: StatsProps = {}) 
         </Box>
       )}
 
-      {/* Stats Summary and historical */}
-      {!selectedDate && (
-        <Box className="rounded-2xl flex flex-col gap-4 flex-1">
-          <StatsSummary />
-          <Historical onSeeAll={onNavigateToHistorical} />
-        </Box>
-      )}
       {/* Selected Day Stats */}
-      {!appUsageLoading && appUsageData && selectedDate && (
+      {!appUsageLoading && appUsageData && (
         <Box className="mb-5 rounded-2xl flex flex-col gap-4">
           <Box className="flex flex-row justify-between items-center">
             <Text className="text-2xl font-bold" style={{ fontFamily: 'ClashDisplay', fontWeight: 600, fontSize: 24 }}>
               {formatDate(selectedDate)}
             </Text>
-            <Pressable className="px-4 py-2 rounded-lg flex flex-row items-center gap-2 " style={{ backgroundColor: currentColors.surface.card }} onPress={() => setSelectedDate(undefined)}>
-              <CloseIcon size={16} color={currentColors.text.main} />
-              <Text style={{ color: currentColors.text.main }}>Clear selection</Text>
-            </Pressable>
           </Box>
           {(() => {
             const totalDayTime = Object.entries(appUsageData[selectedDate] || {})
@@ -273,97 +264,7 @@ export function Stats({ onDayChange, onNavigateToHistorical }: StatsProps = {}) 
 
             // Only show chart if there's actual usage data
             if (totalDayUsage > 0) {
-              return (
-                <Box className="p-4 rounded-2xl" style={{ backgroundColor: currentColors.surface.card }}>
-                  <Text className="text-base font-semibold" style={{ color: currentColors.text.main }}>
-                    Hourly Usage
-                  </Text>
-
-                  {/* Chart area with Y-axis */}
-                  <Box className="flex flex-row gap-3">
-                    {/* Y-axis labels */}
-                    <Box className="flex flex-col justify-between h-[120px] py-1">
-                      {[100, 50, 0].map((percent) => {
-                        const value = (maxHourTime * percent) / 100;
-                        return (
-                          <Text
-                            key={percent}
-                            className="text-xs text-right leading-none"
-                            style={{
-                              color: currentColors.text.soft,
-                              minWidth: 20,
-                              fontSize: 9
-                            }}
-                          >
-                            {value > 0 ? formatTime(value) : '0'}
-                          </Text>
-                        );
-                      })}
-                    </Box>
-
-                    {/* Chart container */}
-                    <Box className="flex-1">
-                      {/* Chart bars with background grid */}
-                      <Box className="relative h-[120px] flex items-end">
-                        {/* Subtle grid line */}
-                        <Box
-                          className="absolute w-full"
-                          style={{
-                            bottom: '50%',
-                            height: 1,
-                            backgroundColor: currentColors.neutral[300],
-                            opacity: 0.15
-                          }}
-                        />
-
-                        {/* Chart bars */}
-                        <Box className="absolute inset-0 flex flex-row items-end justify-between px-0.5">
-                          {sortedHourlyData.map(({ hour, time }, index) => {
-                            const height = maxHourTime > 0 ? (time / maxHourTime) * 100 : 0;
-                            const isCurrentHour = new Date().getHours() === hour;
-                            const isPeakHour = time === maxHourTime && time > 0;
-
-                            return (
-                              <Box
-                                className="rounded-t-sm"
-                                style={{
-                                  height: `${Math.max(height, time > 0 ? 4 : 0)}%`,
-                                  width: 3,
-                                  backgroundColor: isPeakHour
-                                    ? currentColors.primary[600]
-                                    : isCurrentHour
-                                      ? currentColors.primary[500]
-                                      : currentColors.primary[400],
-                                  opacity: time > 0 ? (height > 15 ? 1 : 0.7) : 0.1
-                                }}
-                              />
-                            );
-                          })}
-                        </Box>
-                      </Box>
-
-                      {/* Hour labels */}
-                      <Box className="flex flex-row justify-between px-0.5 mt-2">
-                        {sortedHourlyData.filter((_, index) => index % 6 === 0).map(({ hour }) => {
-                          return (
-                            <Text
-                              key={hour}
-                              className="text-xs"
-                              style={{
-                                color: currentColors.text.soft,
-                                fontWeight: '400',
-                                fontSize: 9
-                              }}
-                            >
-                              {hour === 0 ? '12A' : hour === 12 ? '12P' : hour > 12 ? `${hour - 12}P` : `${hour}A`}
-                            </Text>
-                          );
-                        })}
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-              );
+              return <HourlyUsageChart hourlyData={sortedHourlyData} maxHourTime={maxHourTime} />;
             }
           })()}
 
@@ -517,6 +418,8 @@ export function Stats({ onDayChange, onNavigateToHistorical }: StatsProps = {}) 
           )}
         </Box>
       )}
-    </Box >
+        </Box>
+      </ScrollView>
+    </Box>
   );
 }

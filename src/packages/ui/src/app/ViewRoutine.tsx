@@ -131,11 +131,11 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
     };
 
     const formatCommitmentInfo = () => {
-        if (!routine.commitments || routine.commitments.length === 0) {
+        if (!routine.commitment) {
             return 'No on-chain commitment';
         }
         
-        const commitment = routine.commitments[0]; // Get the first commitment
+        const commitment = routine.commitment;
         const amountInSol = parseFloat(commitment.amount) / 1e9; // Convert lamports to SOL
         
         let statusText = '';
@@ -224,7 +224,7 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
                 />
                 <CardRow
                     label="Stake"
-                    value={formatStakeAmount(routine.stakeAmount)}
+                    value={routine.commitment ? formatStakeAmount(parseFloat(routine.commitment.amount) / 1e9) : 'No stake'}
                 />
                 <CardRow
                     label="On-chain Commitment"

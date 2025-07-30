@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput as RNTextInput, TextInputProps as RNTextInputProps, StyleSheet, View } from 'react-native';
+import { TextInput as RNTextInput, TextInputProps as RNTextInputProps, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { NumberInputProps, numberInputVariantConfig, numberInputSizeStyles, getNumberInputColors } from '.';
 import { Text } from '../text/Text';
 import { useTheme } from '../theme/context';
+import { Svg, Path } from 'react-native-svg';
 
 export function NumberInput(props: NumberInputProps & RNTextInputProps): React.ReactElement {
   const {
@@ -21,6 +22,7 @@ export function NumberInput(props: NumberInputProps & RNTextInputProps): React.R
     max,
     step = 1,
     allowDecimals = true,
+    showClearButton = true,
     ...rest
   } = props;
   const { currentColors } = useTheme();
@@ -107,16 +109,46 @@ export function NumberInput(props: NumberInputProps & RNTextInputProps): React.R
           {label}
         </Text>
       )}
-      <RNTextInput
-        style={[styles.input, { width: '100%' }, style]}
-        placeholder={placeholder}
-        value={textValue}
-        onChangeText={handleChangeText}
-        editable={!disabled}
-        placeholderTextColor={colors.placeholderColor}
-        keyboardType={allowDecimals ? 'decimal-pad' : 'number-pad'}
-        {...rest}
-      />
+      <View style={{ position: 'relative', width: '100%' }}>
+        <RNTextInput
+          style={[styles.input, { width: '100%', paddingRight: showClearButton && value !== undefined && value !== 0 ? 40 : styles.input.paddingHorizontal }, style]}
+          placeholder={placeholder}
+          value={textValue}
+          onChangeText={handleChangeText}
+          editable={!disabled}
+          placeholderTextColor={colors.placeholderColor}
+          keyboardType={allowDecimals ? 'decimal-pad' : 'number-pad'}
+          {...rest}
+        />
+        {showClearButton && value !== undefined && value !== 0 && !disabled && (
+          <TouchableOpacity
+            onPress={() => {
+              setTextValue('');
+              onChangeNumber?.(undefined);
+            }}
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 4,
+            }}
+          >
+            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+              <Path
+                d="M18 6L6 18M6 6L18 18"
+                stroke={colors.textColor}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={0.5}
+              />
+            </Svg>
+          </TouchableOpacity>
+        )}
+      </View>
       {helperText && (
         <Text variant="caption" style={styles.helperText}>
           {helperText}

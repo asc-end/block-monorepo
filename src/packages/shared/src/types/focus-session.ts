@@ -29,5 +29,12 @@ export type FocusSessionType = {
   id:string,
   startTime: string,
   status: "in_progress" | "canceled" | "finished",
-  userId: string
+  userId: string,
+  commitment?: {
+    id: string;
+    amount: string;
+    status: string;
+    unlockTime: string;
+    [key: string]: any;
+  }
 }

@@ -3,6 +3,7 @@ import { authMiddleware } from '../middleware/auth';
 import { AuthTokenClaims } from '@privy-io/server-auth';
 import { wsManager } from '../services/init';
 import { prisma } from '../config';
+import { forfeitService } from '../services/forfeitService';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
         const existingSession = await prisma.focusSession.findFirst({
             where: {
                 userId,
-                status: 'in_progress',
+                status: 'active',
             },
         });
 
@@ -28,17 +29,29 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
                 userId,
                 startTime: new Date(),
                 duration,
-                status: 'in_progress',
+                status: 'active',
             },
+            include: {
+                commitment: true
+            }
         });
+
+        // Serialize BigInt values for WebSocket and response
+        const serializedSession = {
+            ...session,
+            commitment: session.commitment ? {
+                ...session.commitment,
+                amount: session.commitment.amount.toString()
+            } : null
+        };
 
         // Emit WebSocket message to notify clients about the new focus session
         wsManager.sendMessageToUser(userId, {
             type: 'FOCUS_SESSION_UPDATED',
-            payload: { session, action: 'created' }
+            payload: { session: serializedSession, action: 'created' }
         });
 
-        res.json(session);
+        res.json(serializedSession);
     } catch (error) {
         console.error('Error creating focus session:', error);
         res.status(500).json({ error: 'Failed to create focus session' });
@@ -54,24 +67,74 @@ router.post('/:id/disable', authMiddleware, async (req: Request & { verifiedClai
             return res.status(401).json({ error: 'User not authenticated' });
         }
 
-        const session = await prisma.focusSession.update({
+        // First get the session with commitments
+        const sessionToCancel = await prisma.focusSession.findFirst({
             where: { 
                 id,
                 userId,
-                status: 'in_progress'
+                status: 'active'
             },
+            include: {
+                commitment: {
+                    where: { status: 'active' }
+                },
+                user: true
+            }
+        });
+
+        if (!sessionToCancel) {
+            return res.status(404).json({ error: 'Active session not found' });
+        }
+
+        // Update session status
+        const session = await prisma.focusSession.update({
+            where: { id },
             data: {
                 status: 'canceled',
             },
+            include: {
+                commitment: true
+            }
         });
+
+        // Forfeit the active commitment if it exists
+        if (sessionToCancel.commitment) {
+            try {
+                // Execute on-chain forfeit
+                const signature = await forfeitService.forfeitCommitment(
+                    sessionToCancel.user.walletAddress,
+                    sessionToCancel.commitment.id
+                );
+                
+                // Update commitment status in database
+                await prisma.commitment.update({
+                    where: { id: sessionToCancel.commitment.id },
+                    data: {
+                        status: 'forfeited',
+                        forfeitedAt: new Date()
+                    }
+                });
+            } catch (error) {
+                console.error(`Failed to forfeit commitment ${sessionToCancel.commitment.id}:`, error);
+            }
+        }
+
+        // Serialize BigInt values for WebSocket and response
+        const serializedSession = {
+            ...session,
+            commitment: session.commitment ? {
+                ...session.commitment,
+                amount: session.commitment.amount.toString()
+            } : null
+        };
 
         // Emit WebSocket message to notify clients about the disabled focus session
         wsManager.sendMessageToUser(userId, {
             type: 'FOCUS_SESSION_UPDATED',
-            payload: { session, action: 'disabled' }
+            payload: { session: serializedSession, action: 'disabled' }
         });
 
-        res.json(session);
+        res.json(serializedSession);
     } catch (error) {
         console.error('Error disabling focus session:', error);
         res.status(500).json({ error: 'Failed to disable focus session' });
@@ -89,20 +152,36 @@ router.post('/:id/complete', authMiddleware, async (req: Request & { verifiedCla
             where: { 
                 id,
                 userId,
-                status: 'in_progress'
+                status: 'active'
             },
             data: {
-                status: 'finished',
+                status: 'completed',
             },
+            include: {
+                commitment: true
+            }
         });
+
+        // Note: Just like routines, commitments will have an unlock time
+        // For focus sessions, the unlock time is startTime + duration
+        // Users can claim their commitments after the unlock time passes
+
+        // Serialize BigInt values for WebSocket and response
+        const serializedSession = {
+            ...session,
+            commitment: session.commitment ? {
+                ...session.commitment,
+                amount: session.commitment.amount.toString()
+            } : null
+        };
 
         // Emit WebSocket message to notify clients about the completed focus session
         wsManager.sendMessageToUser(userId, {
             type: 'FOCUS_SESSION_UPDATED',
-            payload: { session, action: 'completed' }
+            payload: { session: serializedSession, action: 'completed' }
         });
 
-        res.json(session);
+        res.json(serializedSession);
     } catch (error) {
         console.error('Error completing focus session:', error);
         res.status(500).json({ error: 'Failed to complete focus session' });
@@ -114,12 +193,47 @@ router.get('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTok
     try {
         const userId = req.verifiedClaims?.userId;
 
+        // First, update any expired active focus sessions to completed
+        const now = new Date();
+        const expiredSessions = await prisma.focusSession.findMany({
+            where: {
+                userId,
+                status: 'active',
+                startTime: {
+                    lte: new Date(now.getTime() - 24 * 60 * 60 * 1000) // Sessions older than 24 hours
+                }
+            }
+        });
+
+        // Update expired sessions to completed
+        for (const session of expiredSessions) {
+            const endTime = new Date(session.startTime.getTime() + session.duration * 60 * 1000);
+            if (endTime <= now) {
+                await prisma.focusSession.update({
+                    where: { id: session.id },
+                    data: { status: 'completed' }
+                });
+            }
+        }
+
         const sessions = await prisma.focusSession.findMany({
             where: { userId },
             orderBy: { startTime: 'desc' },
+            include: {
+                commitment: true
+            }
         });
 
-        res.json(sessions);
+        // Convert BigInt values to strings for JSON serialization
+        const serializedSessions = sessions.map(session => ({
+            ...session,
+            commitment: session.commitment ? {
+                ...session.commitment,
+                amount: session.commitment.amount.toString()
+            } : null
+        }));
+
+        res.json(serializedSessions);
     } catch (error) {
         console.error('Error fetching focus sessions:', error);
         res.status(500).json({ error: 'Failed to fetch focus sessions' });
@@ -134,11 +248,60 @@ router.get('/active', authMiddleware, async (req: Request & { verifiedClaims?: A
         const session = await prisma.focusSession.findFirst({
             where: {
                 userId,
-                status: 'in_progress',
+                status: 'active',
             },
+            include: {
+                commitment: true
+            }
         });
 
-        res.json(session);
+        if (!session) {
+            return res.json(null);
+        }
+
+        // Check if the session has expired
+        const now = new Date();
+        const endTime = new Date(session.startTime.getTime() + session.duration * 60 * 1000);
+        
+        if (endTime <= now) {
+            // Mark the session as completed
+            const updatedSession = await prisma.focusSession.update({
+                where: { id: session.id },
+                data: { status: 'completed' },
+                include: {
+                    commitment: true
+                }
+            });
+
+            // Emit WebSocket message to notify clients
+            const serializedSession = {
+                ...updatedSession,
+                commitment: updatedSession.commitment ? {
+                    ...updatedSession.commitment,
+                    amount: updatedSession.commitment.amount.toString()
+                } : null
+            };
+
+            if (userId) {
+                wsManager.sendMessageToUser(userId, {
+                    type: 'FOCUS_SESSION_UPDATED',
+                    payload: { session: serializedSession, action: 'completed' }
+                });
+            }
+
+            return res.json(null); // No active session anymore
+        }
+
+        // Convert BigInt values to strings for JSON serialization
+        const serializedSession = {
+            ...session,
+            commitment: session.commitment ? {
+                ...session.commitment,
+                amount: session.commitment.amount.toString()
+            } : null
+        };
+
+        res.json(serializedSession);
     } catch (error) {
         console.error('Error fetching active focus session:', error);
         res.status(500).json({ error: 'Failed to fetch active focus session' });

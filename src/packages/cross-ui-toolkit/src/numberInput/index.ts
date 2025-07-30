@@ -22,6 +22,7 @@ export interface NumberInputProps extends BaseProps {
   max?: number;
   step?: number;
   allowDecimals?: boolean;
+  showClearButton?: boolean;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }

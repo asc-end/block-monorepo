@@ -1,11 +1,14 @@
 import { ChevronIcon } from '../../icons/ChevronIcon';
 import { PlayIcon } from '../../icons/PlayIcon';
 import { Fragment, useEffect, useState, useRef } from 'react';
-import { useTheme, Pressable, Box, Text, Button, Alert, Drawer, useAlert } from '@blockit/cross-ui-toolkit';
+import { useTheme, Pressable, Box, Text, Button, Alert, Drawer, useAlert, NumberInput } from '@blockit/cross-ui-toolkit';
 import { useAuthStore, api } from '../../../stores/authStore';
 import { Timer } from '../Timer';
 import { useWebSocket } from '../../../hooks/useWebsocket';
 import type { FocusSession } from '@blockit/shared';
+import { createCommitmentWithRetry } from '@blockit/shared';
+import { SolIcon } from '../../icons/SolIcon';
+import { useUser } from '../../../hooks';
 
 interface PermissionStatus {
     usageStatsGranted: boolean;
@@ -25,21 +28,26 @@ interface NativeAppBlocking {
 
 interface FocusSessionProps {
     nativeAppBlocking?: NativeAppBlocking;
+    sendTransaction?: (tx: any) => Promise<{ signature: string } | null>;
+    onNavigateToSuccess?: (sessionId: string) => void;
 }
 
-export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
+export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToSuccess }: FocusSessionProps) {
     const { currentColors } = useTheme();
     const [duration, setDuration] = useState(30);
+    const [stakeAmount, setStakeAmount] = useState(0);
     const [activeSession, setActiveSession] = useState<FocusSession | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCreating, setIsCreating] = useState(false);
     const durationModalRef = useRef<any>(null);
+    const stakeModalRef = useRef<any>(null);
     const { visible, options, show, hide } = useAlert();
+    const { user } = useUser();
     const { token } = useAuthStore();
 
     useWebSocket({
         onFocusSessionUpdate: async (session, action) => {
-            console.log('Focus session update:', action, session);
-            
+
             if (action === 'created') {
                 setActiveSession(session);
                 // Start native blocking if available
@@ -64,7 +72,7 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
         try {
             const { data } = await api().get('/focus-session/active');
             setActiveSession(data);
-            
+
             // If there's an active session, start native blocking
             if (data) {
                 await nativeAppBlocking?.startBlocking();
@@ -78,23 +86,68 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
 
     const handleSession = async (action: 'start' | 'end' | 'complete') => {
         if (!token) return showError("You must be logged in.");
+        if (action === 'start' && stakeAmount > 0 && !user?.walletAddress) {
+            return showError("Please connect your wallet to stake SOL.");
+        }
 
         const apiURl = await api().getUri()
-        console.log("action", action, apiURl)
         try {
             if (action === 'start') {
+                setIsCreating(true);
                 const { data } = await api().post('/focus-session', { duration, notes: 'Focus session started' });
+                const sessionId = data.id;
+
+                // If there's a stake amount, create the on-chain commitment
+                if (stakeAmount > 0 && user?.walletAddress && sendTransaction) {
+                    try {
+                        // Calculate unlock time (current time + duration in minutes)
+                        const unlockTime = new Date(Date.now() + duration * 60 * 1000);
+
+                        const result = await createCommitmentWithRetry(user.walletAddress, stakeAmount, unlockTime);
+                        const signature = await sendTransaction(result.tx);
+
+                        if (!signature) throw new Error("Failed to create commitment");
+
+                        // Create commitment record in database
+                        const commitmentData = {
+                            focusSessionId: sessionId,
+                            userId: user.id,
+                            commitmentId: result.id.toString(),
+                            amount: stakeAmount, // Send as SOL, API will convert to lamports
+                            unlockTime: unlockTime.toISOString(),
+                            signature: signature.signature
+                        };
+
+                        await api().post('/commitments', commitmentData);
+                    } catch (commitmentError) {
+                        // Delete the session if commitment creation fails
+                        try {
+                            await api().post(`/focus-session/${sessionId}/disable`, {});
+                        } catch (deleteError) {
+                            console.error("Failed to delete session after commitment error:", deleteError);
+                        }
+                        throw commitmentError;
+                    }
+                }
+
                 setActiveSession(data);
+                setStakeAmount(0); // Reset stake amount
             } else if (activeSession) {
                 await api().post(`/focus-session/${activeSession.id}/${action === 'end' ? 'disable' : 'complete'}`, {});
+                const sessionId = activeSession.id;
                 setActiveSession(null);
                 if (action === 'complete') {
-                    show({ title: "Congratulations!", message: "Focus session completed!", buttons: [{ text: "Great!" }] });
+                    if (onNavigateToSuccess) {
+                        onNavigateToSuccess(sessionId);
+                    } else {
+                        show({ title: "Congratulations!", message: "Focus session completed!", buttons: [{ text: "Great!" }] });
+                    }
                 }
             }
         } catch (error) {
-            console.log(error)
             showError(`Failed to ${action} focus session.`);
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -112,8 +165,22 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
         return (
             <Fragment>
                 <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
-                    <Text variant='h5' className='text-start w-full'>Focus Session</Text>
-                    
+                    <Box className='flex flex-row justify-between items-center'>
+                        <Text variant='h5'>Focus Session</Text>
+                        {(!activeSession || (activeSession && activeSession.commitment && activeSession.commitment.amount)) && (
+                            <Pressable
+                                onPress={() => stakeModalRef.current?.open()}
+                                className='flex flex-row items-center gap-1 px-3 py-1 rounded-full'
+                                style={{ backgroundColor: stakeAmount && !activeSession ? currentColors.primary[200] : currentColors.neutral[200] }}
+                            >
+                                <SolIcon size={16} color={stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft} />
+                                <Text variant='caption' style={{ color: stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft }}>
+                                    {stakeAmount > 0 ? `${stakeAmount} SOL` : 'Stake'}
+                                </Text>
+                            </Pressable>
+                        )}
+                    </Box>
+
                     <Box style={{ backgroundColor: currentColors.warning?.light || '#fff3cd' }} className='p-4 rounded-xl'>
                         <Text variant='h6' className='mb-2'>🔒 Permissions Required</Text>
                         <Text variant='body' className='mb-3'>
@@ -128,8 +195,8 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                             </Text>
                         </Box>
                         <Box className="flex flex-row gap-2">
-                            <Button 
-                                title="Grant Permissions" 
+                            <Button
+                                title="Grant Permissions"
                                 variant="primary"
                                 style={{ flex: 1 }}
                                 onPress={async () => {
@@ -144,8 +211,8 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                                 }}
                             />
                             {nativeAppBlocking.refreshPermissions && (
-                                <Button 
-                                    title="🔄" 
+                                <Button
+                                    title="🔄"
                                     variant="outline"
                                     style={{ width: 50 }}
                                     onPress={nativeAppBlocking.refreshPermissions}
@@ -155,23 +222,34 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                     </Box>
 
                     {!isLoading && activeSession && (
-                        <Timer
-                            duration={activeSession.duration}
-                            isActive={!!activeSession}
-                            onComplete={() => handleSession('complete')}
-                            startTime={new Date(activeSession.startTime).toISOString()}
-                        />
+                        <>
+                            <Timer
+                                duration={activeSession.duration}
+                                isActive={!!activeSession}
+                                onComplete={() => handleSession('complete')}
+                                startTime={new Date(activeSession.startTime).toISOString()}
+                            />
+                            {activeSession.commitment && (
+                                <Box className="flex flex-row items-center justify-center gap-2 mt-2 p-2 rounded-lg" style={{ backgroundColor: currentColors.neutral[100] }}>
+                                    <SolIcon size={18} color={currentColors.primary[500]} />
+                                    <Text variant="caption" style={{ color: currentColors.text.main }}>
+                                        {(parseFloat(activeSession.commitment.amount) / 1e9).toFixed(2)} SOL staked
+                                    </Text>
+                                </Box>
+                            )}
+                        </>
                     )}
 
                     {!isLoading && (
                         <Button
-                            title={activeSession ? 'Give up' : 'Start'}
-                            leftIcon={activeSession ? 
+                            title={activeSession ? 'Give up' : isCreating ? 'Creating...' : 'Start'}
+                            leftIcon={activeSession ?
                                 <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
-                                <PlayIcon size={18} color="white" />
+                                !isCreating ? <PlayIcon size={18} color="white" /> : undefined
                             }
                             onPress={activeSession ? confirmEnd : () => handleSession('start')}
                             variant="primary"
+                            disabled={isCreating || (!activeSession && stakeAmount > 0 && !user?.walletAddress)}
                             style={activeSession ? {
                                 backgroundColor: currentColors.error.main,
                                 borderColor: currentColors.error.dark,
@@ -189,11 +267,37 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
     return (
         <Fragment>
             <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
-                <Text variant='h5' className='text-start w-full'>Focus Session</Text>
+                <Box className='flex flex-row justify-between items-center'>
+                    <Text variant='h5'>Focus Session</Text>
+                    {(!activeSession || activeSession.status && stakeAmount) && (
+                        <Pressable
+                            onPress={() => stakeModalRef.current?.open()}
+                            className='flex flex-row items-center gap-1 px-3 py-1 rounded-full'
+                            style={{ backgroundColor: stakeAmount > 0 ? currentColors.primary[200] : currentColors.neutral[200] }}
+                        >
+                            <SolIcon size={16} color={stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft} />
+                            <Text variant='caption' style={{ color: stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft }}>
+                                {stakeAmount > 0 ? `${stakeAmount} SOL` : 'Stake'}
+                            </Text>
+                        </Pressable>
+                    )}
+                    {(activeSession && activeSession.commitment && activeSession.commitment.amount) && (
+                        <Box
+                            className='flex flex-row items-center gap-1 px-3 py-1 rounded-full'
+                            style={{ backgroundColor: currentColors.neutral[200] }}
+                        >
+                            <SolIcon size={16} color={currentColors.text.soft} />
+                            <Text variant='caption' style={{ color: currentColors.text.soft }}>
+                                {`${(parseFloat(activeSession.commitment.amount) / 1e9).toFixed(2)} SOL`}
+                            </Text>
+                        </Box>
+                    )}
+
+                </Box>
 
                 {isLoading ? (
                     <>
-                        <Box 
+                        <Box
                             style={{ backgroundColor: currentColors.neutral[300], opacity: 0.5 }}
                             className='w-full p-4 rounded-xl flex flex-row justify-between items-center animate-pulse'
                         >
@@ -202,7 +306,7 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                                 <Box style={{ backgroundColor: currentColors.neutral[400] }} className='h-5 w-12 rounded' />
                             </Box>
                         </Box>
-                        <Box 
+                        <Box
                             style={{ backgroundColor: currentColors.neutral[300], opacity: 0.5 }}
                             className='w-full h-12 rounded-xl animate-pulse'
                         />
@@ -232,13 +336,14 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
 
                 {!isLoading && (
                     <Button
-                        title={activeSession ? 'Give up' : 'Start'}
-                        leftIcon={activeSession ? 
+                        title={activeSession ? 'Give up' : isCreating ? 'Creating...' : 'Start'}
+                        leftIcon={activeSession ?
                             <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
-                            <PlayIcon size={18} color="white" />
+                            !isCreating ? <PlayIcon size={18} color="white" /> : undefined
                         }
                         onPress={activeSession ? confirmEnd : () => handleSession('start')}
                         variant="primary"
+                        disabled={isCreating || (!activeSession && stakeAmount > 0 && !user?.walletAddress)}
                         style={activeSession ? {
                             backgroundColor: currentColors.error.main,
                             borderColor: currentColors.error.dark,
@@ -247,11 +352,10 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                     />
                 )}
 
-
             </Box>
 
             <Alert visible={visible} title={options.title} message={options.message} buttons={options.buttons} onDismiss={hide} />
-            
+
             <Drawer ref={durationModalRef}>
                 <Box className="p-4 rounded-t-xl">
                     <Text variant="h6" className="mb-2">⏰ Set Focus Duration</Text>
@@ -266,6 +370,47 @@ export function FocusSession({ nativeAppBlocking }: FocusSessionProps) {
                             onPress={() => duration < 180 && setDuration(duration + 5)} />
                     </Box>
                     <Button title="Set Duration" variant="primary" onPress={() => durationModalRef.current?.close()} />
+                </Box>
+            </Drawer>
+
+            <Drawer ref={stakeModalRef}>
+                <Box className="p-4 rounded-t-xl">
+                    <Box className="flex flex-row items-center gap-2 mb-2">
+                        <SolIcon size={24} color={currentColors.primary[500]} />
+                        <Text variant="h6">Set Stake Amount</Text>
+                    </Box>
+                    <Text variant="body" style={{ color: currentColors.text.soft }} className="mb-4">
+                        Stake SOL to commit to completing your focus session. If you give up, your stake will be forfeited.
+                    </Text>
+                    <Box className="mb-4">
+                        <NumberInput
+                            value={stakeAmount}
+                            onChangeNumber={(value) => setStakeAmount(value || 0)}
+                            min={0}
+                            max={100}
+                            step={0.01}
+                            allowDecimals={true}
+                            placeholder="0.00"
+                            variant="outline"
+                            size="lg"
+                            showClearButton={true}
+                        />
+                        <Box className="flex flex-row gap-2 justify-center flex-wrap mt-3">
+                            {[0.05, 0.1, 0.2, 0.5, 1].map((preset) => (
+                                <Pressable
+                                    key={preset}
+                                    className={`flex-1 p-2 rounded-lg flex items-center justify-center`}
+                                    style={{ backgroundColor: stakeAmount === preset ? currentColors.neutral[500] : currentColors.neutral[200] }}
+                                    onPress={() => setStakeAmount(preset)}
+                                >
+
+                                    <Text variant="body" style={{ color: currentColors.text.soft }}>
+                                        {preset} SOL
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </Box>
+                    </Box>
                 </Box>
             </Drawer>
         </Fragment>

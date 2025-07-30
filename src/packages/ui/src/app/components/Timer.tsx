@@ -46,11 +46,14 @@ export const Timer = memo(({ duration, isActive, onComplete, startTime }: TimerP
     };
 
     return (
-        <Box className='flex flex-row justify-between items-center'>
-            <Text>
+        <Box className='flex flex-row gap-1 items-center py-2'>
+            <Text className="text-lg" >
                 {formatTime(timeRemaining)}
             </Text>
-            <Text>
+            <Text className="text-sm" variant="caption">
+                /
+            </Text>
+            <Text className="text-sm" variant="caption">
                 {formatTime(duration * 60)}
             </Text>
         </Box>

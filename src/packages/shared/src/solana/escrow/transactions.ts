@@ -1,6 +1,6 @@
 import { BN, Program } from "@coral-xyz/anchor";
 import { EscrowProgram } from "./types";
-import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
+import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { getCommitmentPda } from "./pdas";
 import { getNextAvailableId } from "./queries";
 import { timeToUnix, unixToTime } from "..";
@@ -21,7 +21,7 @@ function getProgram(): EscrowProgram {
 }
 program = getProgram();
 
-export async function claimCommitmentTx(user: PublicKey, id: any) {
+export async function claimCommitmentIx(user: PublicKey, id: any) {
     const commitment = getCommitmentPda(program!, user, id);
 
     return await program!.methods
@@ -31,7 +31,14 @@ export async function claimCommitmentTx(user: PublicKey, id: any) {
             user,
             program: program!.programId,
         })
-        .transaction();
+        .instruction();
+}
+
+export async function claimCommitmentTx(user: PublicKey, id: any) {
+    const ix = await claimCommitmentIx(user, id);
+    const tx = new Transaction();
+    tx.add(ix);
+    return tx;
 }
 
 export async function createCommitmentTx(user: PublicKey | string, amount: any, unlockTime: any, id?: any, authority?: PublicKey) {

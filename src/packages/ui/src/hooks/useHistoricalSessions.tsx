@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../stores/authStore';
 import type { FocusSessionType } from '@blockit/shared';
 import type { Routine } from '@blockit/shared';
+import { BN } from '@coral-xyz/anchor';
 
 // Unified session type for display
 export interface HistoricalSession {
@@ -13,8 +14,9 @@ export interface HistoricalSession {
   endTime?: Date;
   duration?: number; // in minutes for focus sessions
   emoji?: string; // for routines
-  stakeAmount?: number; // for routines
+  stakeAmount?: number; // for routines or focus sessions (in SOL)
   createdAt: Date;
+  commitment?: any; // for accessing commitment data
 }
 
 interface UseHistoricalSessionsReturn {
@@ -59,8 +61,12 @@ export function useHistoricalSessions(): UseHistoricalSessionsReturn {
   // Add focus sessions
   if (focusSessions) {
     focusSessions.forEach(session => {
-      // Only include finished or canceled sessions
-      if (session.status === 'finished' || session.status === 'canceled') {
+      // Only include completed or canceled sessions
+      if (session.status === 'completed' || session.status === 'canceled') {
+        const stakeAmount = session.commitment
+          ? parseFloat(session.commitment.amount) / 1e9 // Convert lamports to SOL preserving decimals
+          : undefined;
+        
         sessions.push({
           id: session.id,
           type: 'focus',
@@ -68,6 +74,8 @@ export function useHistoricalSessions(): UseHistoricalSessionsReturn {
           status: session.status,
           startTime: new Date(session.startTime),
           duration: session.duration,
+          stakeAmount,
+          commitment: session.commitment,
           createdAt: new Date(session.startTime),
         });
       }
@@ -87,7 +95,7 @@ export function useHistoricalSessions(): UseHistoricalSessionsReturn {
           startTime: new Date(routine.createdAt),
           endTime: routine.endDate ? new Date(routine.endDate) : undefined,
           emoji: routine.emoji,
-          stakeAmount: routine.stakeAmount,
+          stakeAmount: routine.commitment ? parseFloat(routine.commitment.amount) / 1e9 : undefined,
           createdAt: new Date(routine.createdAt),
         });
       }

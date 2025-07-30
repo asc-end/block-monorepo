@@ -31,6 +31,8 @@ type HomeProps = {
   onCreateRoutine: () => void;
   onViewRoutine?: (routineId: string) => void;
   nativeAppBlocking?: NativeAppBlocking;
+  sendTransaction?: (tx: any) => Promise<{ signature: string } | null>;
+  onNavigateToSuccess?: (sessionId: string) => void;
 }
 
 // Loading skeleton component for app usage
@@ -95,7 +97,7 @@ const RoutineLoadingSkeleton = () => {
 };
 
 export function Home(props: HomeProps) {
-  const { onCreateRoutine, onViewRoutine, nativeAppBlocking } = props;
+  const { onCreateRoutine, onViewRoutine, nativeAppBlocking, sendTransaction, onNavigateToSuccess } = props;
   const { currentColors } = useTheme();
   const [showDetails, setShowDetails] = useState(false);
   const [routines, setRoutines] = useState<Routine[]>([]);
@@ -226,12 +228,13 @@ export function Home(props: HomeProps) {
             <Box
               className="w-full h-72 rounded-2xl mb-4 items-center justify-center overflow-hidden"
               style={{ 
-                backgroundColor: currentColors.surface.card,
+                // backgroundColor: currentColors.surface.card,
                 opacity: Math.max(0, 1 - scrollOffset / 100),
                 transform: `translateY(${scrollOffset * 0.5}px)`,
               }}
             >
               <Image 
+                className='opacity-0'
                 src="https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 style={{ 
                   width: '100%', 
@@ -242,7 +245,11 @@ export function Home(props: HomeProps) {
               />
             </Box>
             
-            <FocusSession nativeAppBlocking={nativeAppBlocking} />
+            <FocusSession 
+                nativeAppBlocking={nativeAppBlocking} 
+                sendTransaction={sendTransaction}
+                onNavigateToSuccess={onNavigateToSuccess}
+            />
           </Box>
 
           {/* Routines section */}

@@ -7,7 +7,8 @@ import {AUTHORITY} from "@blockit/shared"
 const router = express.Router();
 
 interface CreateCommitmentBody {
-  routineId: string;
+  routineId?: string;
+  focusSessionId?: string;
   userId: string;
   commitmentId: string;
   amount: number;
@@ -17,7 +18,7 @@ interface CreateCommitmentBody {
 
 /**
  * POST /commitments
- * Create a new commitment record linked to a routine
+ * Create a new commitment record linked to a routine or focus session
  */
 router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
   try {
@@ -26,6 +27,7 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
 
     const {
       routineId,
+      focusSessionId,
       userId,
       commitmentId,
       amount,
@@ -39,20 +41,40 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
     }
 
     // Validate required fields
-    if (!routineId || !commitmentId || !amount || !unlockTime || !signature) {
+    if (!commitmentId || !amount || !unlockTime || !signature) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Verify the routine exists and belongs to the user
-    const routine = await prisma.routine.findFirst({
-      where: {
-        id: routineId,
-        userId: authenticatedUserId
-      }
-    });
+    // Must have either routineId or focusSessionId
+    if (!routineId && !focusSessionId) {
+      return res.status(400).json({ error: 'Either routineId or focusSessionId is required' });
+    }
 
-    if (!routine) {
-      return res.status(404).json({ error: 'Routine not found or does not belong to user' });
+    // Verify the routine or focus session exists and belongs to the user
+    if (routineId) {
+      const routine = await prisma.routine.findFirst({
+        where: {
+          id: routineId,
+          userId: authenticatedUserId
+        }
+      });
+
+      if (!routine) {
+        return res.status(404).json({ error: 'Routine not found or does not belong to user' });
+      }
+    }
+
+    if (focusSessionId) {
+      const focusSession = await prisma.focusSession.findFirst({
+        where: {
+          id: focusSessionId,
+          userId: authenticatedUserId
+        }
+      });
+
+      if (!focusSession) {
+        return res.status(404).json({ error: 'Focus session not found or does not belong to user' });
+      }
     }
 
     // Get user's wallet address
@@ -76,7 +98,8 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
         authorityPubkey: AUTHORITY,
         status: 'active',
         txSignature: signature,
-        routineId
+        routineId,
+        focusSessionId
       }
     });
 

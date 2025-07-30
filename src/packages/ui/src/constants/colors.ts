@@ -12,7 +12,19 @@ const globalColors = {
     '900': '#19478f',
     '950': '#142c57',
   },
-
+  secondary: {
+    '50': '#f4f0ff',
+    '100': '#ebe4ff',
+    '200': '#d9cdff',
+    '300': '#bfa6ff',
+    '400': '#a173ff',
+    '500': '#873bff',
+    '600': '#7c14ff',
+    '700': '#6a00f4',
+    '800': '#5d01d6',
+    '900': '#4e03af',
+    '950': '#2e0077',
+  },
   pop: {
     "yellow": "#FFB600",
     "magenta": "#E500A4",
@@ -27,19 +39,6 @@ export const colors = {
   // Primary colors - Vibrant purple gradient
 
   ...globalColors,
-  secondary: {
-    50: '#FFF0F7',
-    100: '#FFE0ED',
-    200: '#FFC5DB',
-    300: '#FF9EC4',
-    400: '#FF6AAC',
-    500: '#E500A4', // Main secondary color - bright magenta
-    600: '#C90092',
-    700: '#A60078',
-    800: '#85005F',
-    900: '#6B004D',
-  },
-
   // Neutral colors (based on background and card colors)
   neutral: {
     50: '#FAFAFB',
@@ -95,18 +94,6 @@ export const colors = {
 export const darkColors = {
   // Primary colors - Vibrant purple gradient for dark mode
   ...globalColors,
-  secondary: {
-    50: '#6B004D',
-    100: '#85005F',
-    200: '#A60078',
-    300: '#E500A4', // Main secondary color - bright magenta
-    400: '#FF6AAC',
-    500: '#FF9EC4',
-    600: '#FFC5DB',
-    700: '#FFE0ED',
-    800: '#FFF0F7',
-    900: '#FFF8FB',
-  },
 
   // Neutral colors for dark mode (blue-toned like light mode)
   neutral: {
@@ -176,7 +163,8 @@ export type SurfaceShade = 'card' | 'elevated';
 // Type for accessing nested color values
 export type ThemeColors = {
   primary: { [K in ColorShade]: string };
-  pop: { 
+  secondary: { [K in ColorShade]: string };
+  pop: {
     "yellow": string;
     "magenta": string;
     "purple": string;

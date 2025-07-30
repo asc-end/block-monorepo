@@ -119,6 +119,9 @@ importers:
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       expo:
         specifier: ^53.0.20
         version: 53.0.20(@babel/core@7.27.4)(react-native-webview@13.13.5)(react-native@0.79.5)(react@19.0.0)
@@ -611,6 +614,9 @@ importers:
       '@privy-io/react-auth':
         specifier: ^2.14.2
         version: 2.14.2(@solana/web3.js@1.98.2)(@types/react@19.0.10)(bs58@6.0.0)(react-dom@19.0.0)(react@19.0.0)(typescript@5.8.3)
+      '@solana/web3.js':
+        specifier: ^1.98.2
+        version: 1.98.2(typescript@5.8.3)
       '@tanstack/react-query':
         specifier: ^5.83.0
         version: 5.83.0(react@19.0.0)
@@ -3854,7 +3860,7 @@ packages:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       '@types/yargs': 15.0.19
       chalk: 4.1.2
     dev: true
@@ -3865,7 +3871,7 @@ packages:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       '@types/yargs': 16.0.9
       chalk: 4.1.2
     dev: true
@@ -6140,7 +6146,7 @@ packages:
   /@types/express-serve-static-core@5.0.7:
     resolution: {integrity: sha512-R+33OsgWw7rOhD1emjU7dzCDHucJrgJXMA5PYCzJxVil0dsyx5iBEPHqpPfiKNJQb7lZ1vxwoLR4Z87bBUpeGQ==}
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.5
@@ -6169,13 +6175,13 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
     dev: true
 
   /@types/graceful-fs@4.1.9:
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
 
   /@types/hammerjs@2.0.46:
     resolution: {integrity: sha512-ynRvcq6wvqexJ9brDMS4BnBLzmr0e14d6ZJTEShTBWKymQiHwlAyGu0ZPEFI2Fh1U53F7tN9ufClWM5KvqkKOw==}
@@ -6196,7 +6202,7 @@ packages:
   /@types/http-proxy@1.17.16:
     resolution: {integrity: sha512-sdWoUajOB1cd0A8cRRQ1cfyWNbmFKLAqBB89Y8x5iYyG/mkJHc0YUH8pdWBy2omi9qtCpiIgGjuwO0dQST2l5w==}
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
     dev: true
 
   /@types/istanbul-lib-coverage@2.0.6:
@@ -6259,7 +6265,7 @@ packages:
   /@types/node-forge@1.3.13:
     resolution: {integrity: sha512-zePQJSW5QkwSHKRApqWCVKeKoSOt4xvEnLENZPjyvm9Ezdf/EyDeJM7jqLzOwjVICQQzvLZ63T55MKdJB5H6ww==}
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
     dev: true
 
   /@types/node@12.20.55:
@@ -6337,7 +6343,7 @@ packages:
     resolution: {integrity: sha512-z6F2D3cOStZvuk2SaP6YrwkNO65iTZcwA2ZkSABegdkAh/lf+Aa/YQndZVfmEXT5vgAp6zv06VQ3ejSVjAny4w==}
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
     dev: true
 
   /@types/serve-index@1.9.4:
@@ -6434,7 +6440,7 @@ packages:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
     requiresBuild: true
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
     dev: true
     optional: true
 
@@ -9188,7 +9194,7 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -9200,7 +9206,7 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 2.0.1
@@ -14246,7 +14252,7 @@ packages:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -14579,7 +14585,7 @@ packages:
     engines: {node: '>= 10.14.2'}
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       chalk: 4.1.2
       graceful-fs: 4.2.11
       is-ci: 2.0.0
@@ -14591,7 +14597,7 @@ packages:
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     dependencies:
       '@jest/types': 27.5.1
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -14675,7 +14681,7 @@ packages:
     dependencies:
       '@jest/test-result': 27.5.1
       '@jest/types': 27.5.1
-      '@types/node': 24.1.0
+      '@types/node': 20.11.19
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       jest-util: 27.5.1

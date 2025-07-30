@@ -9,6 +9,7 @@ export type SurfaceShade = 'card' | 'elevated';
 // Type for accessing nested color values
 export type ThemeColors = {
   primary: { [K in ColorShade]: string };
+  secondary: { [K in ColorShade]: string };
   pop: { 
     "yellow": string;
     "magenta": string;

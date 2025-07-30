@@ -157,7 +157,6 @@ exports.Prisma.RoutineScalarFieldEnum = {
   endTime: 'endTime',
   dailyLimit: 'dailyLimit',
   endDate: 'endDate',
-  stakeAmount: 'stakeAmount',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -299,9 +298,9 @@ exports.Prisma.JsonNullValueFilter = {
   AnyNull: Prisma.AnyNull
 };
 exports.FocusSessionStatus = exports.$Enums.FocusSessionStatus = {
-  in_progress: 'in_progress',
-  canceled: 'canceled',
-  finished: 'finished'
+  active: 'active',
+  completed: 'completed',
+  canceled: 'canceled'
 };
 
 exports.Platform = exports.$Enums.Platform = {
@@ -316,7 +315,6 @@ exports.TimeMode = exports.$Enums.TimeMode = {
 
 exports.RoutineStatus = exports.$Enums.RoutineStatus = {
   active: 'active',
-  paused: 'paused',
   completed: 'completed',
   canceled: 'canceled'
 };

@@ -42,10 +42,9 @@ export interface Routine {
   endTime?: string;
   dailyLimit?: number;
   endDate?: string;
-  stakeAmount: number;
   status: 'active' | 'paused' | 'completed' | 'canceled';
   blockedApps: RoutineApp[];
-  commitments?: Commitment[];
+  commitment?: Commitment;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,7 +58,6 @@ export interface CreateRoutineInput {
   endTime?: string;
   dailyLimit?: number;
   endDate?: string;
-  stakeAmount: number;
   blockedApps: Array<{
     packageName: string;
     appName: string;

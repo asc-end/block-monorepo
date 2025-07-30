@@ -20,6 +20,7 @@ export function NumberInput(props: NumberInputProps): React.ReactElement {
     max,
     step = 1,
     allowDecimals = true,
+    showClearButton = true,
     onFocus,
     onBlur,
     ...rest
@@ -122,20 +123,68 @@ export function NumberInput(props: NumberInputProps): React.ReactElement {
           {label}
         </Text>
       )}
-      <input
-        ref={inputRef}
-        type="text"
-        inputMode={allowDecimals ? "decimal" : "numeric"}
-        style={{ ...inputStyle, boxShadow: colors.focusBoxShadow, width: '100%' }}
-        className="p-2 focus:outline-none w-full"
-        placeholder={placeholder}
-        value={textValue}
-        onChange={handleChange}
-        disabled={disabled}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        {...rest}
-      />
+      <div style={{ position: 'relative', width: '100%' }}>
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode={allowDecimals ? "decimal" : "numeric"}
+          style={{ 
+            ...inputStyle, 
+            boxShadow: colors.focusBoxShadow, 
+            width: '100%',
+            paddingRight: showClearButton && value !== undefined && value !== 0 ? 40 : inputStyle.paddingRight
+          }}
+          className="p-2 focus:outline-none w-full"
+          placeholder={placeholder}
+          value={textValue}
+          onChange={handleChange}
+          disabled={disabled}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {...rest}
+        />
+        {showClearButton && value !== undefined && value !== 0 && !disabled && (
+          <button
+            type="button"
+            onClick={() => {
+              setTextValue('');
+              onChangeNumber?.(undefined);
+            }}
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: 0,
+              bottom: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 4,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke={colors.textColor}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.5"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
       {helperText && (
         <Text
           variant="caption"
