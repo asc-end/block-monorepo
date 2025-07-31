@@ -1,7 +1,7 @@
 import React from 'react';
 import { Success } from '@blockit/ui';
 import { useLocalSearchParams, router } from 'expo-router';
-import { useSolana } from '@/hooks/useSolana';
+import { useSolana } from '@/hooks/solana/useSolana';
 
 export default function SuccessScreen() {
   const { sessionId, claimMode } = useLocalSearchParams<{ sessionId?: string; claimMode?: 'single' | 'multiple' }>();

@@ -6,146 +6,17 @@ import { useTheme } from '@blockit/cross-ui-toolkit';
 import { useAppBlocker } from '@/context/AppBlockerContext';
 import AppBlockerModule from 'expo-app-blocker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const SettingItem = ({
-  title,
-  description,
-  icon,
-  onPress,
-  value,
-  showToggle = false,
-  showValue = false,
-  valueText,
-  isLast = false
-}: {
-  title: string;
-  description?: string;
-  icon: string;
-  onPress?: () => void;
-  value?: boolean;
-  showToggle?: boolean;
-  showValue?: boolean;
-  valueText?: string;
-  isLast?: boolean;
-}) => {
-  const { currentColors } = useTheme();
-  const scaleValue = React.useRef(new Animated.Value(1)).current;
-  const colorScheme = useColorScheme();
-
-  const handlePressIn = () => {
-    Animated.timing(scaleValue, {
-      toValue: 0.97,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.timing(scaleValue, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      disabled={!onPress}
-    >
-      <Animated.View
-        className="flex-row items-center mx-5 py-4"
-        style={{
-          backgroundColor: currentColors.background,
-          transform: [{ scale: scaleValue }],
-          borderBottomWidth: isLast ? 1 : 0,
-          borderBottomColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-        }}
-      >
-        <View
-          className="w-12 h-12 rounded-xl justify-center items-center mr-4"
-          style={{
-            backgroundColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-          }}
-        >
-          <Ionicons name={icon as any} size={26} color={currentColors.primary[500]} />
-        </View>
-        <View className="flex-1"
-
-        >
-          <Text className="text-base font-semibold mb-0.5" style={{ color: currentColors.text.main }}>
-            {title}
-          </Text>
-          {description && (
-            <Text className="text-sm opacity-70" style={{ color: currentColors.text.soft }}>
-              {description}
-            </Text>
-          )}
-        </View>
-        {showToggle && (
-          <Switch
-            value={value}
-            onValueChange={onPress}
-            trackColor={{ false: currentColors.neutral[200], true: currentColors.primary[400] }}
-            thumbColor={value ? currentColors.primary[600] : currentColors.neutral[400]}
-            ios_backgroundColor={currentColors.neutral[200]}
-          />
-        )}
-        {showValue && valueText && (
-          <View className="flex-row items-center ml-2">
-            <Text className="text-sm mr-2" style={{ color: currentColors.text.soft }}>
-              {valueText}
-            </Text>
-            <Ionicons name="chevron-forward" size={18} color={currentColors.text.soft} />
-          </View>
-        )}
-      </Animated.View>
-    </Pressable>
-  );
-};
-
-const SettingsSection = ({
-  title,
-  children
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => {
-  const { currentColors } = useTheme();
-  const colorScheme = useColorScheme();
-
-  return (
-    <View className="mb-7">
-      <Text
-        className="text-xs font-bold mb-3 ml-5 uppercase tracking-wide"
-        style={{ color: currentColors.text.soft }}
-      >
-        {title}
-      </Text>
-      {children}
-    </View>
-  );
-};
+import { useRouter } from 'expo-router';
+import { SettingItem, SettingsSection } from '../../components/Settings';
+import { usePrivy } from '@privy-io/expo';
 
 const SettingsScreen = () => {
   const { currentColors } = useTheme();
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  const { logout } = usePrivy();
   const [themeMode, setThemeMode] = useState<'auto' | 'light' | 'dark'>('auto');
-  const [isBlockingNotifications, setIsBlockingNotifications] = useState(false);
-  const {
-    hasPermissions,
-    permissionsStatus,
-    requestPermissions,
-    checkPermissions,
-    installedApps,
-    refreshApps,
-    uninstallEvents,
-    installationHistory,
-    loading,
-    isUsageTrackingEnabled
-  } = useAppBlocker();
+  const { permissionsStatus } = useAppBlocker();
 
   // Load theme preference on mount
   React.useEffect(() => {
@@ -183,12 +54,12 @@ const SettingsScreen = () => {
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      style={{ backgroundColor: currentColors.background }}
-      contentContainerClassName="py-6"
-      showsVerticalScrollIndicator={false}
-    >
+    <View className="flex-1" style={{ backgroundColor: currentColors.background }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="py-6"
+        showsVerticalScrollIndicator={false}
+      >
       <SettingsSection title="Permissions">
         <SettingItem
           title="Usage Stats Access"
@@ -228,26 +99,6 @@ const SettingsScreen = () => {
             }
           }}
         />
-        <SettingItem
-          title="Usage Tracking"
-          description="Monitor app usage and screen time"
-          icon="analytics-outline"
-          valueText={isUsageTrackingEnabled ? "Enabled" : "Disabled"}
-          showValue
-          isLast
-          onPress={async () => {
-            try {
-              await AppBlockerModule.openUsageStatsSettings();
-            } catch (error) {
-              console.error('Error opening usage stats settings:', error);
-              Alert.alert(
-                "Error",
-                "Unable to open settings. Please navigate to Settings > Privacy & Security > Analytics & Improvements manually.",
-                [{ text: "OK" }]
-              );
-            }
-          }}
-        />
       </SettingsSection>
 
       <SettingsSection title="Appearance">
@@ -261,7 +112,65 @@ const SettingsScreen = () => {
           onPress={cycleTheme}
         />
       </SettingsSection>
-    </ScrollView>
+
+      <SettingsSection title="Onboarding">
+        <SettingItem
+          title="Replay Onboarding"
+          description="View the onboarding tutorial again"
+          icon="refresh-outline"
+          isLast
+          onPress={async () => {
+            try {
+              await AsyncStorage.removeItem('@hasCompletedOnboarding');
+              router.replace('/onboarding');
+            } catch (error) {
+              console.error('Error resetting onboarding:', error);
+              Alert.alert('Error', 'Failed to reset onboarding');
+            }
+          }}
+        />
+      </SettingsSection>
+      </ScrollView>
+
+      <TouchableOpacity
+        className="mx-5 mb-8 py-4 rounded-xl"
+        style={{
+          backgroundColor: currentColors.secondary?.[500] || currentColors.primary[500],
+        }}
+        onPress={async () => {
+          Alert.alert(
+            'Disconnect Account',
+            'Are you sure you want to sign out?',
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel'
+              },
+              {
+                text: 'Disconnect',
+                style: 'destructive',
+                onPress: async () => {
+                  try {
+                    await logout();
+                    router.replace('/');
+                  } catch (error) {
+                    console.error('Error logging out:', error);
+                    Alert.alert('Error', 'Failed to disconnect. Please try again.');
+                  }
+                }
+              }
+            ]
+          );
+        }}
+      >
+        <View className="flex-row items-center justify-center">
+          <Ionicons name="log-out-outline" size={20} color="white" />
+          <Text className="text-white text-base font-semibold ml-2">
+            Disconnect
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
 

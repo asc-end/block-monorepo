@@ -2,7 +2,7 @@ import { useNativeAppBlocking } from '@/hooks/useNativeAppBlocking';
 import { Home } from '@blockit/ui';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
-import { useSolana } from '@/hooks/useSolana';
+import { useSolana } from '@/hooks/solana/useSolana';
 
 export default function Page() {
   const nativeAppBlocking = useNativeAppBlocking();

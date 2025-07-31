@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { CreateRoutine } from "@blockit/ui";
-import { useSolana } from "@/hooks/useSolana";
+import { useSolana } from "@/hooks/solana/useSolana";
 
 export default function CreateRoutinePage() {    
     const { signAndSendTransaction } = useSolana();

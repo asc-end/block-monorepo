@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@blockit/ui';
-import { useSolana } from './useSolana';
+import { useSolana } from './solana/useSolana';
 
 interface SellerProof {
   sellerAddress: string;

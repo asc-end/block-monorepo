@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const OAUTH_PROVIDERS = [
   { key: "github", icon: "github", label: "GitHub" },
-  { key: "farcaster", icon: "archway", label: "Farcaster" },
+  // { key: "farcaster", icon: "archway", label: "Farcaster" },
   { key: "twitter", icon: "twitter", label: "Twitter" },
   { key: "telegram", icon: "telegram", label: "Telegram" },
 ];
@@ -11,19 +11,20 @@ const OAUTH_PROVIDERS = [
 interface LoginProps {
   loginWithFarcaster: () => Promise<any>,
   useLoginWithEmail: () => {
-    sendCode: () => Promise<any>,
-    loginWithCode: () => Promise<any>,
+    sendCode: ({ email }: { email: string }) => Promise<any>,
+    loginWithCode: ({ code }: { code: string }) => Promise<any>,
   },
-  useLoginWithOAuth: ({onError}: {onError: (err: any) => void}) => {
+  useLoginWithOAuth: ({ onError }: { onError: (err: any) => void }) => {
     state: {
       status: string,
     },
-    login: ({provider}: {provider: string}) => Promise<void>,
+    login: ({ provider }: { provider: string }) => Promise<void>,
   }
+  solanaConnectButton: React.ReactNode,
 }
 
 export function Login(props: LoginProps) {
-  const {  loginWithFarcaster, useLoginWithOAuth, useLoginWithEmail } = props;
+  const { useLoginWithOAuth, useLoginWithEmail, solanaConnectButton } = props;
   const { sendCode, loginWithCode } = useLoginWithEmail();
 
   const { currentColors } = useTheme();
@@ -59,16 +60,12 @@ export function Login(props: LoginProps) {
             Connect with Email
           </Text>
         </Pressable>
-
-          <Box className="flex flex-row w-full flex-wrap justify-between" style={{ gap: 4 }}>
+        {solanaConnectButton && solanaConnectButton}
+        <Box className="flex flex-row w-full flex-wrap justify-between" style={{ gap: 4 }}>
           {OAUTH_PROVIDERS.map((provider) => (
             <Pressable
               key={provider.key}
-              onPress={() =>
-                provider.key === 'farcaster'
-                  ? loginWithFarcaster()
-                  : oauth.login({ provider: provider.key })
-              }
+              onPress={() => oauth.login({ provider: provider.key })}
               disabled={oauth.state.status === "loading"}
               className="flex flex-1 items-center justify-center py-3 rounded-xl shadow-lg active:opacity-90"
               style={{

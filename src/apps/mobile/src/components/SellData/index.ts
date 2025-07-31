@@ -3,3 +3,4 @@ export * from './PriceSelectorDrawer';
 export * from './RemoveListingDrawer';
 export * from './UpdateDateDrawer';
 export * from './UpdatePriceDrawer';
+export * from './GenesisHolderDrawer';
