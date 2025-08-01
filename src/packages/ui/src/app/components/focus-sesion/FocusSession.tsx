@@ -9,6 +9,7 @@ import type { FocusSession } from '@blockit/shared';
 import { createCommitmentWithRetry } from '@blockit/shared';
 import { SolIcon } from '../../icons/SolIcon';
 import { useUser } from '../../../hooks';
+import { Connection } from '@solana/web3.js';
 
 interface PermissionStatus {
     usageStatsGranted: boolean;
@@ -30,9 +31,10 @@ interface FocusSessionProps {
     nativeAppBlocking?: NativeAppBlocking;
     sendTransaction?: (tx: any) => Promise<{ signature: string } | null>;
     onNavigateToSuccess?: (sessionId: string) => void;
+    onNavigateToLose?: (sessionId: string) => void;
 }
 
-export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToSuccess }: FocusSessionProps) {
+export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToSuccess, onNavigateToLose }: FocusSessionProps) {
     const { currentColors } = useTheme();
     const [duration, setDuration] = useState(30);
     const [stakeAmount, setStakeAmount] = useState(0);
@@ -90,14 +92,14 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
             return showError("Please connect your wallet to stake SOL.");
         }
 
-        const apiURl = await api().getUri()
         try {
             if (action === 'start') {
                 setIsCreating(true);
-                const { data } = await api().post('/focus-session', { duration, notes: 'Focus session started' });
-                const sessionId = data.id;
-
-                // If there's a stake amount, create the on-chain commitment
+                setActiveSession(null)
+                
+                let sessionData: any = { duration, notes: 'Focus session started' };
+                
+                // If there's a stake amount, create the on-chain commitment FIRST
                 if (stakeAmount > 0 && user?.walletAddress && sendTransaction) {
                     try {
                         // Calculate unlock time (current time + duration in minutes)
@@ -105,32 +107,27 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
 
                         const result = await createCommitmentWithRetry(user.walletAddress, stakeAmount, unlockTime);
                         const signature = await sendTransaction(result.tx);
-
+                        console.log(signature)
                         if (!signature) throw new Error("Failed to create commitment");
 
-                        // Create commitment record in database
-                        const commitmentData = {
-                            focusSessionId: sessionId,
-                            userId: user.id,
+                        // Add commitment data to session creation
+                        sessionData.commitment = {
                             commitmentId: result.id.toString(),
                             amount: stakeAmount, // Send as SOL, API will convert to lamports
                             unlockTime: unlockTime.toISOString(),
                             signature: signature.signature
                         };
-
-                        await api().post('/commitments', commitmentData);
                     } catch (commitmentError) {
-                        // Delete the session if commitment creation fails
-                        try {
-                            await api().post(`/focus-session/${sessionId}/disable`, {});
-                        } catch (deleteError) {
-                            console.error("Failed to delete session after commitment error:", deleteError);
-                        }
                         throw commitmentError;
                     }
                 }
-
-                setActiveSession(data);
+                
+                // Now create the session (with commitment data if applicable)
+                const { data } = await api().post('/focus-session', sessionData);
+                
+                setActiveSession(data)
+                // The WebSocket will handle setting the active session
+                // Don't set it here to avoid race conditions
                 setStakeAmount(0); // Reset stake amount
             } else if (activeSession) {
                 await api().post(`/focus-session/${activeSession.id}/${action === 'end' ? 'disable' : 'complete'}`, {});
@@ -156,7 +153,17 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
         message: "Are you sure? You'll lose your progress.",
         buttons: [
             { text: "Cancel", style: "cancel" },
-            { text: "Stop", style: "destructive", onPress: () => handleSession('end') }
+            {
+                text: "Stop", style: "destructive", onPress: async () => {
+                    // If there's a commitment and onNavigateToLose is provided, navigate to lose screen
+                    if (activeSession?.commitment && onNavigateToLose) {
+                        handleSession("end")
+                        onNavigateToLose(activeSession.id);
+                    } else {
+                        await handleSession('end');
+                    }
+                }
+            }
         ]
     });
 
@@ -341,6 +348,7 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                             <Box className="w-[18px] h-[18px] bg-white rounded-[2px]" /> :
                             !isCreating ? <PlayIcon size={18} color="white" /> : undefined
                         }
+                        loading={isCreating}
                         onPress={activeSession ? confirmEnd : () => handleSession('start')}
                         variant="primary"
                         disabled={isCreating || (!activeSession && stakeAmount > 0 && !user?.walletAddress)}

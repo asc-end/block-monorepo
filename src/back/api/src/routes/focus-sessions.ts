@@ -4,13 +4,14 @@ import { AuthTokenClaims } from '@privy-io/server-auth';
 import { wsManager } from '../services/init';
 import { prisma } from '../config';
 import { forfeitService } from '../services/forfeitService';
+import { AUTHORITY } from '@blockit/shared';
 
 const router = Router();
 
 // Create a new focus session
 router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTokenClaims }, res: Response) => {
     try {
-        const { duration } = req.body;
+        const { duration, commitment } = req.body;
         const userId = req.verifiedClaims?.userId;
         if (!userId) return res.status(401).json({ error: 'User not authenticated' });
 
@@ -24,17 +25,74 @@ router.post('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTo
 
         if (existingSession) return res.status(400).json({ error: 'You already have an active focus session.' });
 
-        const session = await prisma.focusSession.create({
-            data: {
-                userId,
-                startTime: new Date(),
-                duration,
-                status: 'active',
-            },
-            include: {
-                commitment: true
+        // Create session with commitment if provided
+        let session;
+        if (commitment) {
+            // Validate commitment data
+            const { commitmentId, amount, unlockTime, signature } = commitment;
+            if (!commitmentId || !amount || !unlockTime || !signature) {
+                return res.status(400).json({ error: 'Invalid commitment data' });
             }
-        });
+
+            // Get user's wallet address
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { walletAddress: true }
+            });
+
+            if (!user?.walletAddress) {
+                return res.status(400).json({ error: 'User wallet address not found' });
+            }
+
+            // Create session and commitment in a transaction
+            session = await prisma.$transaction(async (tx) => {
+                const newSession = await tx.focusSession.create({
+                    data: {
+                        userId,
+                        startTime: new Date(),
+                        duration,
+                        status: 'active',
+                    }
+                });
+
+                await tx.commitment.create({
+                    data: {
+                        id: commitmentId,
+                        userPubkey: user.walletAddress,
+                        authorityPubkey: AUTHORITY,
+                        amount: BigInt(Math.floor(amount * 1e9)), // Convert SOL to lamports
+                        unlockTime: new Date(unlockTime),
+                        createdAt: new Date(),
+                        txSignature: signature,
+                        status: 'active',
+                        userId,
+                        focusSessionId: newSession.id
+                    }
+                });
+
+                return tx.focusSession.findUnique({
+                    where: { id: newSession.id },
+                    include: { commitment: true }
+                });
+            });
+        } else {
+            // Create session without commitment
+            session = await prisma.focusSession.create({
+                data: {
+                    userId,
+                    startTime: new Date(),
+                    duration,
+                    status: 'active',
+                },
+                include: {
+                    commitment: true
+                }
+            });
+        }
+
+        if (!session) {
+            return res.status(500).json({ error: 'Failed to create focus session' });
+        }
 
         // Serialize BigInt values for WebSocket and response
         const serializedSession = {
@@ -193,6 +251,7 @@ router.get('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTok
     try {
         const userId = req.verifiedClaims?.userId;
 
+        console.log(userId)
         // First, update any expired active focus sessions to completed
         const now = new Date();
         const expiredSessions = await prisma.focusSession.findMany({
@@ -204,6 +263,8 @@ router.get('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTok
                 }
             }
         });
+
+        console.log(expiredSessions)
 
         // Update expired sessions to completed
         for (const session of expiredSessions) {
@@ -223,6 +284,8 @@ router.get('/', authMiddleware, async (req: Request & { verifiedClaims?: AuthTok
                 commitment: true
             }
         });
+
+        console.log(sessions)
 
         // Convert BigInt values to strings for JSON serialization
         const serializedSessions = sessions.map(session => ({
