@@ -3,9 +3,16 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  resolve: {},
+  resolve: {
+    alias: {
+      buffer: 'buffer',
+    },
+  },
+  define: {
+    global: 'globalThis',
+  },
   optimizeDeps: {
-    include: ['@blockit/ui', '@blockit/cross-ui-toolkit', '@blockit/shared'], // optional
+    include: ['@blockit/ui', '@blockit/cross-ui-toolkit', '@blockit/shared', 'buffer'], // optional
   },
   server: {
     fs: {
