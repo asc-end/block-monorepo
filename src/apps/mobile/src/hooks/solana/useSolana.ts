@@ -49,7 +49,7 @@ export const useSolana = () => {
   }, [wallets, connection]);
 
   const signAndSendTransactionWithMwa = useCallback(
-    async (transaction: Transaction | VersionedTransaction): Promise<TransactionSignature> => {
+    async (transaction: Transaction | VersionedTransaction): Promise<{ signature: string }> => {
       console.log("Mwa sign and send transaction")
       // const connection = new Connection(SolanaAppConfig.clusters['devnet'].endpoint, 'confirmed');
       const minContextSlot = await connection.getMinimumLedgerSlot();
@@ -81,7 +81,7 @@ export const useSolana = () => {
       // console.log("Signed tx", signedTx)
       // const signature = await connection.sendRawTransaction(signedTx[0].serialize());
       // console.log("Signature", signature)
-      return signedTx
+      return { signature: signedTx }
     },
     [authorizeSession],
   )
@@ -110,7 +110,7 @@ export const useSolana = () => {
   return {
     connection,
     signAndSendTransaction,
-    walletAddress: wallets?.[0]?.address,
+    walletAddress: selectedAccount?.publicKey.toBase58() ?? wallets?.[0]?.address,
     connected: wallets && wallets.length > 0,
   };
 };
