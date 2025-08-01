@@ -53,7 +53,7 @@ export const getButtonStyles = (theme: ThemeColors, variant: ButtonVariant) => {
       },
     },
     secondary: {
-      backgroundColor: theme.secondary[300],
+      backgroundColor: theme.secondary[500],
       color: '#FFFFFF',
       borderWidth: 0,
       borderColor: theme.secondary[400],

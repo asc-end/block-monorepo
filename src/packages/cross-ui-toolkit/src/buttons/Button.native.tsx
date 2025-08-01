@@ -36,8 +36,9 @@ export function Button(props: ButtonProps): React.ReactElement {
         },
         button: {
             backgroundColor: style?.backgroundColor ?? variantStyle.backgroundColor,
-            borderWidth: variantStyle.borderWidth,
-            borderColor: style?.borderColor ?? variantStyle.borderColor,
+            
+            borderWidth: style?.borderWidth,
+            borderColor: style?.borderColor,
             borderRadius: sizeStyle.borderRadius,
             paddingHorizontal: sizeStyle.paddingHorizontal,
             paddingVertical: sizeStyle.paddingVertical,
@@ -57,7 +58,7 @@ export function Button(props: ButtonProps): React.ReactElement {
             left: 0,
             right: 0,
             bottom: -4,
-            backgroundColor: style?.shadowColor ?? variantStyle.shadowColor,
+            // backgroundColor: style?.shadowColor ?? variantStyle.shadowColor,
             borderRadius: sizeStyle.borderRadius,
             zIndex: 1,
             opacity: isPrimary && !disabled ? 1 : 0,
@@ -68,7 +69,7 @@ export function Button(props: ButtonProps): React.ReactElement {
             gap: 8,
         },
         text: {
-            color: variantStyle.color,
+            color: style?.color ?? variantStyle.color,
             fontSize: sizeStyle.fontSize,
             fontWeight: sizeStyle.fontWeight,
             letterSpacing: sizeStyle.letterSpacing,
@@ -92,7 +93,7 @@ export function Button(props: ButtonProps): React.ReactElement {
             <Pressable
                 style={[
                     nativeStyles.button,
-                    isPressed && nativeStyles.buttonPressed
+                    isPressed && nativeStyles.buttonPressed,
                 ]}
                 onPress={() => { onPress?.()}}
                 onPressIn={() => { setIsPressed(true); onPressIn?.()}}
