@@ -14,7 +14,8 @@ import {
     RemoveListingDrawer,
     UpdateDateDrawer,
     UpdatePriceDrawer,
-    GenesisHolderDrawer
+    GenesisHolderDrawer,
+    SuccessModal
 } from "./SellData/index";
 import { searchAssets } from "@/utils/verifyGenesisOwnership";
 import { useEmbeddedSolanaWallet } from "@privy-io/expo";
@@ -84,7 +85,7 @@ export function SellData() {
     const walletAddress = selectedAccount?.publicKey.toBase58() || wallets[0].address
 
     const { signAndSendTransaction } = useSolana();
-    const { data, isLoading } = useSellerDashboard();
+    const { data, isLoading, refetch } = useSellerDashboard();
     const scaleAnim = useRef(new Animated.Value(0.8)).current;
     const opacityAnim = useRef(new Animated.Value(0)).current;
 
@@ -127,59 +128,71 @@ export function SellData() {
     const [isUpdatingPrice, setIsUpdatingPrice] = useState(false);
     const [isCreatingListing, setIsCreatingListing] = useState(false);
     const [isClaimingEarnings, setIsClaimingEarnings] = useState(false);
+    const [isWaitingForRefetch, setIsWaitingForRefetch] = useState<"create" | "delete" | false>(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    // Main animation that runs once when screen is focused
-    useFocusEffect(
-        useCallback(() => {
-            // Reset animation values
-            scaleAnim.setValue(0.8);
-            opacityAnim.setValue(0);
-            circle1Scale.setValue(0.8);
-            circle2Scale.setValue(0.8);
-            circle3Scale.setValue(0.8);
-            circle4Scale.setValue(0.8);
-            contentOpacity.setValue(0);
+    // Helper function to refetch data after a delay
+    const refetchAfterDelay = async (delayMs: number = 1000, type: "create" | "delete") => {
+        setIsWaitingForRefetch(type);
+        setTimeout(async () => {
+            console.log('Refetching dashboard data after transaction...');
+            await refetch();
+            setIsWaitingForRefetch(false);
+        }, delayMs);
+    };
 
-            // Create circle wave animation
-            const createCircleAnimation = (animValue: Animated.Value, delay: number) => {
-                return Animated.sequence([
-                    Animated.delay(delay),
-                    Animated.spring(animValue, {
-                        toValue: 1,
-                        friction: 6,
-                        tension: 40,
-                        useNativeDriver: true,
-                    })
-                ]);
-            };
+    // Trigger animations when data loads (after skeleton or on focus)
+    const triggerAnimations = useCallback(() => {
+        // Reset animation values
+        scaleAnim.setValue(0.8);
+        opacityAnim.setValue(0);
+        circle1Scale.setValue(0.8);
+        circle2Scale.setValue(0.8);
+        circle3Scale.setValue(0.8);
+        circle4Scale.setValue(0.8);
+        contentOpacity.setValue(0);
+        slideAnim.setValue(30);
+        cardScaleAnim.setValue(0.95);
 
-            // Start all animations
-            Animated.parallel([
-                Animated.spring(scaleAnim, {
+        // Create circle wave animation
+        const createCircleAnimation = (animValue: Animated.Value, delay: number) => {
+            return Animated.sequence([
+                Animated.delay(delay),
+                Animated.spring(animValue, {
                     toValue: 1,
-                    friction: 5,
+                    friction: 6,
                     tension: 40,
                     useNativeDriver: true,
-                }),
-                Animated.timing(opacityAnim, {
-                    toValue: 1,
-                    duration: 400,
-                    useNativeDriver: true,
-                }),
-                createCircleAnimation(circle1Scale, 300),
-                createCircleAnimation(circle2Scale, 400),
-                createCircleAnimation(circle3Scale, 500),
-                createCircleAnimation(circle4Scale, 600),
-                // Fade in rest of content
-                Animated.timing(contentOpacity, {
-                    toValue: 1,
-                    duration: 600,
-                    delay: 400,
-                    useNativeDriver: true,
                 })
-            ]).start();
-        }, [])
-    );
+            ]);
+        };
+
+        // Start all animations
+        Animated.parallel([
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                friction: 5,
+                tension: 40,
+                useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+                toValue: 1,
+                duration: 400,
+                useNativeDriver: true,
+            }),
+            createCircleAnimation(circle1Scale, 300),
+            createCircleAnimation(circle2Scale, 400),
+            createCircleAnimation(circle3Scale, 500),
+            createCircleAnimation(circle4Scale, 600),
+            // Fade in rest of content
+            Animated.timing(contentOpacity, {
+                toValue: 1,
+                duration: 600,
+                delay: 400,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }, [scaleAnim, opacityAnim, circle1Scale, circle2Scale, circle3Scale, circle4Scale, contentOpacity, slideAnim, cardScaleAnim]);
 
     // Start showing placeholder immediately, then decrypt when data arrives
     useEffect(() => {
@@ -192,8 +205,10 @@ export function SellData() {
 
         if (data && !isLoading) {
             setShowNumbers(true);
+            // Trigger all animations when data loads
+            triggerAnimations();
         }
-    }, [data, isLoading]);
+    }, [data, isLoading, triggerAnimations]);
 
     // Animate transition when listing state changes
     useEffect(() => {
@@ -254,7 +269,7 @@ export function SellData() {
                 return;
             }
             try {
-                const result = await searchAssets( SolanaAppConfig.clusters["mainnet-beta"].endpoint, walletAddress);
+                const result = await searchAssets(SolanaAppConfig.clusters["mainnet-beta"].endpoint, walletAddress);
                 setGenesisToken(result.items[0]);
             } catch (e) {
                 setGenesisToken(null);
@@ -284,8 +299,11 @@ export function SellData() {
 
             if (!signature) throw new Error("Failed to create commitment");
             console.log('Claiming earnings');
-        } finally {
             setIsClaimingEarnings(false);
+            setTimeout(async () => { await refetch() }, 3000);
+        } catch (error) {
+            setIsClaimingEarnings(false);
+            console.error('Error claiming earnings:', error);
         }
     }
 
@@ -296,8 +314,12 @@ export function SellData() {
             const signature = await signAndSendTransaction(tx);
             if (!signature) throw new Error("Failed to remove listing");
             console.log('Removed listing');
-        } finally {
+            setShowRemoveDrawer(false); // Close the drawer after successful deletion
+            setIsRemovingListing(false); // Stop showing "removing" state
+            await refetchAfterDelay(1000, "delete"); // This will show the waiting state
+        } catch (error) {
             setIsRemovingListing(false);
+            console.error('Error removing listing:', error);
         }
     }
 
@@ -309,8 +331,11 @@ export function SellData() {
             const signature = await signAndSendTransaction(tx);
             if (!signature) throw new Error("Failed to update listing");
             console.log('Updated listing');
-        } finally {
             setIsUpdatingDate(false);
+            setTimeout(async () => { await refetch() }, 3000);
+        } catch (error) {
+            setIsUpdatingDate(false);
+            console.error('Error updating listing:', error);
         }
     }
 
@@ -322,14 +347,19 @@ export function SellData() {
             const tx = await updateListingTx(walletAddress, data?.listing.listingId, null, newPricePerDay)
             const signature = await signAndSendTransaction(tx);
             if (!signature) throw new Error("Failed to update listing price");
-        } finally {
+            console.log('Updated listing price');
             setIsUpdatingPrice(false);
             setShowUpdatePriceDrawer(false);
+            setTimeout(async () => { await refetch() }, 3000);
+        } catch (error) {
+            setIsUpdatingPrice(false);
+            console.error('Error updating listing price:', error);
         }
     }
 
     async function handleCreateListing() {
         try {
+            setIsCreatingListing(true);
             const startDate = dayjs("2025-07-20").toDate()
             const endDate = dayjs("2025-08-01").toDate()
             const pricePerDay = selectedPrice * 1000000000 // Convert SOL to lamports
@@ -342,9 +372,13 @@ export function SellData() {
             const signature = await signAndSendTransaction(tx);
             console.log("Signature", signature)
             if (!signature) throw new Error("Failed to create listing");
+            console.log('Created listing');
+            setIsCreatingListing(false); // Stop showing "creating" state
+            setShowSuccessModal(true); // Show success modal
+            await refetchAfterDelay(1000, "create"); // This will show the waiting state
         } catch (error) {
             setIsCreatingListing(false);
-            throw error;
+            console.error('Error creating listing:', error);
         }
     }
     const navigation = useNavigation();
@@ -353,9 +387,9 @@ export function SellData() {
         if (!!genesisToken) {
             navigation.setOptions({
                 headerRight: () => (
-                    <Pressable 
+                    <Pressable
                         onPress={() => setShowGenesisDrawer(true)}
-                        className="flex flex-row items-center gap-2 px-3 py-1.5 rounded-full" 
+                        className="flex flex-row items-center gap-2 px-3 py-1.5 rounded-full"
                         style={{ backgroundColor: 'rgba(255, 182, 0, 0.2)', zIndex: 10 }}
                     >
                         <StarIcon size={16} />
@@ -367,6 +401,184 @@ export function SellData() {
     }, [genesisToken]);
 
 
+    // Custom loading animation
+    const loadingPulseAnim = useRef(new Animated.Value(0.3)).current;
+
+    useEffect(() => {
+        if (isCreatingListing || isRemovingListing || isWaitingForRefetch || (isLoading && !data)) {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.timing(loadingPulseAnim, {
+                        toValue: 1,
+                        duration: 1000,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(loadingPulseAnim, {
+                        toValue: 0.3,
+                        duration: 1000,
+                        useNativeDriver: true,
+                    }),
+                ])
+            ).start();
+        }
+    }, [isCreatingListing, isRemovingListing, isWaitingForRefetch, isLoading, data]);
+
+    // Skeleton loading state when data hasn't been loaded yet
+    if (isLoading && !data) {
+        return (
+            <Box className="flex-1 items-center justify-center py-6 px-3" style={{ gap: 12, backgroundColor: currentColors.background }}>
+                <Box style={{ width: '100%' }}>
+                    {/* Header skeleton */}
+                    <Box className="relative h-[189px] overflow-hidden flex items-center justify-center rounded-lg w-full" style={{ backgroundColor: currentColors.surface.card }}>
+                        <Animated.View 
+                            className="h-6 w-32 rounded-md mb-2" 
+                            style={{ 
+                                backgroundColor: currentColors.surface.elevated,
+                                opacity: loadingPulseAnim 
+                            }} 
+                        />
+                        <Animated.View 
+                            className="h-12 w-48 rounded-md" 
+                            style={{ 
+                                backgroundColor: currentColors.surface.elevated,
+                                opacity: loadingPulseAnim 
+                            }} 
+                        />
+                    </Box>
+                </Box>
+                
+                {/* Caption skeleton */}
+                <Animated.View 
+                    className="h-4 w-64 rounded-md" 
+                    style={{ 
+                        backgroundColor: currentColors.surface.elevated,
+                        opacity: loadingPulseAnim 
+                    }} 
+                />
+                
+                {/* Card skeleton */}
+                <Box className="rounded-2xl p-6 flex flex-col gap-6 flex-1 w-full" style={{ backgroundColor: currentColors.surface.card }}>
+                    {/* Row skeletons */}
+                    {[1, 2, 3].map((i) => (
+                        <Box key={i} className="flex flex-row w-full justify-between items-center">
+                            <Animated.View 
+                                className="h-4 w-32 rounded-md" 
+                                style={{ 
+                                    backgroundColor: currentColors.surface.elevated,
+                                    opacity: loadingPulseAnim 
+                                }} 
+                            />
+                            <Box className="flex flex-row gap-2 items-center">
+                                <Animated.View 
+                                    className="h-5 w-20 rounded-md" 
+                                    style={{ 
+                                        backgroundColor: currentColors.surface.elevated,
+                                        opacity: loadingPulseAnim 
+                                    }} 
+                                />
+                                <Animated.View 
+                                    className="h-8 w-8 rounded-lg" 
+                                    style={{ 
+                                        backgroundColor: currentColors.surface.elevated,
+                                        opacity: loadingPulseAnim 
+                                    }} 
+                                />
+                            </Box>
+                        </Box>
+                    ))}
+                    
+                    {/* Button skeleton */}
+                    <Box className="flex flex-col gap-2 mt-auto">
+                        <Box className="flex flex-row justify-between items-center mb-2">
+                            <Animated.View 
+                                className="h-4 w-32 rounded-md" 
+                                style={{ 
+                                    backgroundColor: currentColors.surface.elevated,
+                                    opacity: loadingPulseAnim 
+                                }} 
+                            />
+                            <Animated.View 
+                                className="h-6 w-24 rounded-md" 
+                                style={{ 
+                                    backgroundColor: currentColors.surface.elevated,
+                                    opacity: loadingPulseAnim 
+                                }} 
+                            />
+                        </Box>
+                        <Animated.View 
+                            className="h-12 w-full rounded-lg" 
+                            style={{ 
+                                backgroundColor: currentColors.surface.elevated,
+                                opacity: loadingPulseAnim 
+                            }} 
+                        />
+                    </Box>
+                </Box>
+            </Box>
+        );
+    }
+
+    // Loading overlay for creating, removing listing, or waiting for refetch
+    if (isWaitingForRefetch) {
+        return (
+            <Box className="flex-1 items-center justify-center px-6" style={{ backgroundColor: currentColors.background }}>
+                
+                <Box className="items-center flex flex-col justify-center flex-1">
+                    {/* Simple loading dots */}
+                    <Box className="flex flex-row gap-2 mb-8">
+                        <Animated.View
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                                backgroundColor: currentColors.pop.indigo,
+                                opacity: loadingPulseAnim,
+                            }}
+                        />
+                        <Animated.View
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                                backgroundColor: currentColors.pop.indigo,
+                                opacity: loadingPulseAnim,
+                                transform: [{ scale: 0.8 }]
+                            }}
+                        />
+                        <Animated.View
+                            className="w-3 h-3 rounded-full"
+                            style={{
+                                backgroundColor: currentColors.pop.indigo,
+                                opacity: Animated.multiply(loadingPulseAnim, 0.6),
+                            }}
+                        />
+                    </Box>
+
+                    <Text
+                        className="text-center mb-2"
+                        style={{
+                            fontSize: 18,
+                            fontFamily: Platform.OS === 'ios' ? 'ClashDisplay-Bold' : 'ClashDisplay',
+                            fontWeight: '600',
+                            color: currentColors.text.main,
+                        }}
+                    >
+                        {isWaitingForRefetch === "create"
+                            ? 'Creating listing'
+                            : isWaitingForRefetch === "delete"
+                                ? 'Removing listing'
+                                : 'Updating dashboard'
+                        }
+                    </Text>
+                    <Text className="text-center opacity-50 text-sm">
+                        {isWaitingForRefetch === "create"
+                            ? 'Setting up your data marketplace'
+                            : isWaitingForRefetch === "delete"
+                                ? 'Your data will no longer be for sale.'
+                                : 'Updating dashboard'
+                        }
+                    </Text>
+                </Box>
+            </Box>
+        );
+    }
+
     return (
         <Box className="flex-1 items-center justify-center py-6 px-3" style={{ gap: 12 }}>
             <Animated.View style={{
@@ -375,8 +587,6 @@ export function SellData() {
                 opacity: opacityAnim
             }}>
                 <Box className="relative h-[189px] overflow-hidden flex items-center justify-center rounded-lg w-full" style={{ backgroundColor: '#1B0092' }}>
-                    {/* Genesis Token Badge */}
-
                     {
                         (hasActiveListing || showWelcome) ?
                             <Animated.View style={{
@@ -480,7 +690,7 @@ export function SellData() {
                                 <Text style={{ fontFamily: Platform.OS === 'ios' ? 'ClashDisplay-Bold' : 'ClashDisplay', fontWeight: '600', fontSize: 20, lineHeight: 20 }}>{data?.earnings.pending || 0} SOL</Text>
                             </Box>
                         </Pressable>
-                        <Button title="Claim Revenue" onPress={handleClaimEarnings} className="w-full" disabled={!data?.earnings.pending} loading={isClaimingEarnings} />
+                        <Button title="Claim Revenue" onPress={handleClaimEarnings} className="w-full" disabled={(data?.earnings.pending || 0) == 0} loading={isClaimingEarnings} />
                     </Box>
                 </Animated.View>
             ) : (
@@ -586,11 +796,17 @@ export function SellData() {
                 selectedPrice={selectedNewPrice}
                 onSelectPrice={setSelectedNewPrice}
             />
-            
+
             <GenesisHolderDrawer
                 genesisToken={genesisToken}
                 isOpen={showGenesisDrawer}
                 onClose={() => setShowGenesisDrawer(false)}
+            />
+
+            <SuccessModal
+                isVisible={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                pricePerDay={selectedPrice}
             />
         </Box >
     )

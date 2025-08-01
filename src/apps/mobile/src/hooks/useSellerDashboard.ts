@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@blockit/ui';
+import { api, useAuthStore } from '@blockit/ui';
 import { useSolana } from './solana/useSolana';
 
 interface SellerProof {
@@ -12,6 +12,18 @@ interface SellerProof {
   createdAt: Date;
 }
 
+interface SellerListing {
+  id: string;
+  listingId: string;
+  sellerAddress: string;
+  startDate: Date;
+  endDate: Date;
+  pricePerDay: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface SellerDashboardData {
   earnings: {
     total: string;
@@ -19,27 +31,18 @@ interface SellerDashboardData {
     claimed: string;
   };
   proofs: SellerProof[] | undefined;
-  listing: {
-    isActive: boolean;
-    pricePerDay: string;
-    updatedAt: Date;
-    endDate: Date;
-    listingId: string;
-    sellerAddress: string;
-    startDate: Date;
-    accountAddress: string;
-} | null | undefined
+  listing: SellerListing | null | undefined;
 }
 
 export const useSellerDashboard = () => {
   const { walletAddress } = useSolana();
-
+  const { token } = useAuthStore();
+  
   return useQuery<SellerDashboardData>({
-    queryKey: ['sellerDashboard', walletAddress],
+    queryKey: ['sellerDashboard', walletAddress, token],
     queryFn: async () => {
-      if (!walletAddress) {
-        throw new Error('No wallet address available');
-      }
+      if (!walletAddress) throw new Error('No wallet address available');
+      if (!token) throw new Error('No authentication token available');
 
       try {
         console.log('Fetching seller dashboard for:', walletAddress);
@@ -55,7 +58,7 @@ export const useSellerDashboard = () => {
         throw error;
       }
     },
-    enabled: !!walletAddress,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    enabled: !!walletAddress && !!token,
+    // No refetch interval - manual refetch only
   });
 };

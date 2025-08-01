@@ -79,7 +79,10 @@ export async function initializeMarketplaceIfNeeded(
     // Marketplace not initialized, so initialize it
     await program.methods
       .initializeMarketplace()
-      .accountsPartial({
+    .accountsStrict({
+        marketplaceConfig: marketplaceConfigPda,
+        program: program.programId,
+        eventAuthority: program.programId,
         authority: authority,
         systemProgram: SystemProgram.programId,
       })

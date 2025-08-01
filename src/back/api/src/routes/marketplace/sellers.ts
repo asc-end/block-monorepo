@@ -125,7 +125,6 @@ router.get('/:seller', authMiddleware, async (req: Request & { verifiedClaims?: 
       }
     });
 
-
     // Calculate total days of data sold
     let totalDaysSold = 0;
     let pendingApprovalDays = 0;
@@ -145,22 +144,22 @@ router.get('/:seller', authMiddleware, async (req: Request & { verifiedClaims?: 
     }
 
     // Convert SOL amounts from lamports to SOL (divide by 10^9)
-    const totalEarnings = sellerData?.totalRevenue ? (BigInt(sellerData.totalRevenue) / BigInt(1000000000)).toString() : '12';
-    const pendingEarnings = sellerData?.unclaimedRevenue !== undefined ? (BigInt(sellerData.unclaimedRevenue) / BigInt(1000000000)).toString(): '1';
-    const claimedEarnings = ((BigInt(sellerData?.totalRevenue || 0) - BigInt(sellerData?.unclaimedRevenue || 0)) / BigInt(1000000000)).toString() || '11';
+    const totalEarnings = sellerData?.totalRevenue ? (BigInt(sellerData.totalRevenue) / BigInt(1000000000)).toString() : '0';
+    const pendingEarnings = sellerData?.unclaimedRevenue !== undefined ? (BigInt(sellerData.unclaimedRevenue) / BigInt(1000000000)).toString(): '0';
+    const claimedEarnings = sellerData ? ((BigInt(sellerData.totalRevenue || 0) - BigInt(sellerData.unclaimedRevenue || 0)) / BigInt(1000000000)).toString() : '0';
 
-    // Add mock data for testing
-    const mockData = {
+    const response = {
       earnings: {
-        total: totalEarnings || '12.4',  // Mock: 12.4 SOL if no real data
-        pending: pendingEarnings || '3.2',  // Mock: 3.2 SOL pending
-        claimed: claimedEarnings || '9.2',  // Mock: 9.2 SOL claimed
+        total: totalEarnings,
+        pending: pendingEarnings,
+        claimed: claimedEarnings,
       },
-      proofs: sellerData?.proofs,
-      listing: sellerData?.listing
+      proofs: sellerData?.proofs || [],
+      listing: sellerData?.listing || null
     };
-
-    res.json(mockData);
+    
+    console.log('Seller dashboard response:', response);
+    res.json(response);
   } catch (error) {
     console.error('Error getting seller dashboard:', error);
     res.status(500).json({ error: 'Failed to get dashboard data' });

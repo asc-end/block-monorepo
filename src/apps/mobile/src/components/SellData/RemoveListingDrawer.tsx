@@ -1,4 +1,4 @@
-import { Box, Button, Drawer, Text } from "@blockit/cross-ui-toolkit";
+import { Box, Button, Drawer, Text, useTheme } from "@blockit/cross-ui-toolkit";
 
 interface RemoveListingDrawerProps {
     isOpen: boolean;
@@ -8,6 +8,7 @@ interface RemoveListingDrawerProps {
 }
 
 export function RemoveListingDrawer({ isOpen, onClose, onRemove, isLoading }: RemoveListingDrawerProps) {
+    const { currentColors } = useTheme()
     return (
         <Drawer
             isOpen={isOpen}
@@ -35,7 +36,8 @@ export function RemoveListingDrawer({ isOpen, onClose, onRemove, isLoading }: Re
                         title="Cancel"
                         onPress={onClose}
                         className="w-full"
-                        variant="ghost"
+                        variant="secondary"
+                        style={{ backgroundColor: currentColors.secondary[800] + "70", border: 1, borderColor: currentColors.secondary[800], color: currentColors.secondary[400] }}
                     />
                 </Box>
             </Box>
