@@ -5,6 +5,9 @@ runbooks:
   - name: deployment
     description: Deploy programs
     location: runbooks/deployment
+  - name: init-marketplace
+    description: Initialize marketplace configuration
+    location: runbooks/init-marketplace
 
 environments:
   localnet:
