@@ -1,9 +1,8 @@
-import { Circle, G, Mask } from "@blockit/cross-ui-toolkit";
-import { Svg, Path } from "react-native-svg";
+import { Circle, G, Mask, Svg, Path } from "@blockit/cross-ui-toolkit";
 
 export function Eye() {
     return (
-        <Svg width="402" height="532" viewBox="0 0 402 532" fill="none" >
+        <Svg width={402} height={532} viewBox="0 0 402 532" fill="none" >
             <Path d="M262.26 -0.5L210.717 345.43L184.791 344.065L130.256 -0.5H262.26Z" fill="#141114" />
             <Path d="M262.26 -0.5L210.717 345.43L184.791 344.065L130.256 -0.5H262.26Z" fill="#E500A4" />
             <Path d="M262.26 -0.5L210.717 345.43L184.791 344.065L130.256 -0.5H262.26Z" stroke="#312E81" strokeWidth="3" />

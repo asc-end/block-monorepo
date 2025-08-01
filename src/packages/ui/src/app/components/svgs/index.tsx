@@ -5,3 +5,4 @@ export * from './MeltingClock';
 export * from './Raibow';
 export * from './Rays';
 export * from './Star';
+export * from "./SimpleEye";
