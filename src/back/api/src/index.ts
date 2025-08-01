@@ -27,6 +27,7 @@ import Apps from './routes/apps';
 import Commitments from './routes/commitments';
 import Marketplace from './routes/marketplace/index';
 import MarketplaceSellers from './routes/marketplace/sellers';
+import ForfeitAll from './routes/forfeit-all';
 
 const app = express();
 
@@ -78,6 +79,7 @@ app.use('/apps', Apps);
 app.use('/marketplace', Marketplace);
 app.use('/marketplace/sellers', MarketplaceSellers);
 app.use('/commitments', Commitments);
+app.use('/forfeit-all', ForfeitAll);
 
 app.get('/', (req, res) => { res.send('Hello World!') });
 // Log every route being fetched

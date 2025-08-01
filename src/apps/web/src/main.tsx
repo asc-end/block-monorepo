@@ -5,7 +5,7 @@ import './index.css'
 import { App } from './routes'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { Box, ThemeProvider } from '@blockit/cross-ui-toolkit'
-import { darkColors, initializeConfig } from '@blockit/ui'
+import { AuthProvider, darkColors, initializeConfig } from '@blockit/ui'
 
 type EnvVar = {
   key: string;
@@ -28,7 +28,7 @@ function validateEnvironment(): void {
   if (missingVars.length > 0) {
     const errorDetails = missingVars.map(v => `• ${v.displayName} (${v.key})`).join('\n');
     const errorMsg = `Missing required environment variables:\n${errorDetails}`;
-    
+
     const root = document.getElementById('root');
     if (root) {
       root.innerHTML = `
@@ -76,7 +76,7 @@ function validateEnvironment(): void {
         </div>
       `;
     }
-    
+
     console.error(errorMsg);
     throw new Error('Environment validation failed');
   }
@@ -108,9 +108,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       }}
     >
       <ThemeProvider value={{ currentColors: darkColors, isDarkMode: true }}>
-        <Box className="min-h-screen w-full flex items-center justify-center " style={{ backgroundColor: darkColors.background }}>
-          <App />
-        </Box>
+        <AuthProvider>
+          <Box className="min-h-screen w-full flex items-center justify-center " style={{ backgroundColor: darkColors.background }}>
+            <App />
+          </Box>
+        </AuthProvider>
       </ThemeProvider>
     </PrivyProvider>
   </React.StrictMode>,

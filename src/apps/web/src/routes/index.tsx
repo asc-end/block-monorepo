@@ -6,11 +6,17 @@ import Home from "./Home";
 import Error from "./Error";
 import { sendMessageToExtension } from "../lib/sendMessageToExtension";
 import { createUser, useAuthStore } from "@blockit/ui";
+import { LoseScreen } from "./Lose";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/lose",
+    element: <LoseScreen />,
     errorElement: <Error />,
   },
 ]);
@@ -63,6 +69,7 @@ export function App() {
   useEffect(() => {
     const sendTokenToExtension = async () => {
       const accessToken = await getAccessToken();
+      console.log("SETTING TOKEN")
       setToken(accessToken);
       const urlParams = new URLSearchParams(window.location.search);
 
