@@ -6,3 +6,6 @@ export { Circle, type CircleProps } from './Circle';
 export { Defs, type DefsProps } from './Defs';
 export { Mask, type MaskProps } from './Mask';
 export { G, type GProps } from './G';
+export { LinearGradient, type LinearGradientProps } from './LinearGradient';
+export { Stop, type StopProps } from './Stop';
+export { Line, type LineProps } from './Line';
