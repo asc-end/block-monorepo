@@ -27,26 +27,31 @@ export async function createListingTx(seller: PublicKey | string, startDate: Dat
   if (typeof pricePerDay === 'number' || typeof pricePerDay === 'string') {
     pricePerDay = new BN(pricePerDay);
   }
-  const [marketplaceConfigPda] = marketplacePDAs.getMarketplaceConfig(program!.programId);
-  const marketplaceData = await program!.account.marketplaceConfig.fetch(marketplaceConfigPda);
+  try {
+    const [marketplaceConfigPda] = marketplacePDAs.getMarketplaceConfig();
+    const marketplaceData = await program!.account.marketplaceConfig.fetch(marketplaceConfigPda);
 
-  const currentListingCounter = new BN(marketplaceData.listingCounter);
-  const [listing] = marketplacePDAs.getListing(currentListingCounter, program!.programId);
-  const [dataSeller] = marketplacePDAs.getSeller(seller, program!.programId);
+    const currentListingCounter = new BN(marketplaceData.listingCounter);
+    const [listing] = marketplacePDAs.getListing(currentListingCounter);
+    const [dataSeller] = marketplacePDAs.getSeller(seller);
 
-  const startTimestamp = new BN(Math.floor(startDate.getTime() / 1000));
-  const endTimestamp = new BN(Math.floor(endDate.getTime() / 1000));
+    const startTimestamp = new BN(Math.floor(startDate.getTime() / 1000));
+    const endTimestamp = new BN(Math.floor(endDate.getTime() / 1000));
 
-  return await program!.methods
-    .createListing(startTimestamp, endTimestamp, pricePerDay)
-    .accountsPartial({
-      seller,
-      listing,
-      marketplaceConfig: marketplaceConfigPda,
-      dataSeller,
-      systemProgram: SystemProgram.programId,
-    })
-    .transaction();
+    return await program!.methods
+      .createListing(startTimestamp, endTimestamp, pricePerDay)
+      .accountsPartial({
+        seller,
+        listing,
+        marketplaceConfig: marketplaceConfigPda,
+        dataSeller,
+        systemProgram: SystemProgram.programId,
+      })
+      .transaction();
+  } catch (e) {
+    console.log("Error creating listing", e)
+    throw e
+  }
 }
 
 /**
