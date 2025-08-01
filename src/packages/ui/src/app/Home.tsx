@@ -33,6 +33,7 @@ type HomeProps = {
   nativeAppBlocking?: NativeAppBlocking;
   sendTransaction?: (tx: any) => Promise<{ signature: string } | null>;
   onNavigateToSuccess?: (sessionId: string) => void;
+  onNavigateToLose?: (sessionId: string) => void;
 }
 
 // Loading skeleton component for app usage
@@ -97,7 +98,7 @@ const RoutineLoadingSkeleton = () => {
 };
 
 export function Home(props: HomeProps) {
-  const { onCreateRoutine, onViewRoutine, nativeAppBlocking, sendTransaction, onNavigateToSuccess } = props;
+  const { onCreateRoutine, onViewRoutine, nativeAppBlocking, sendTransaction, onNavigateToSuccess, onNavigateToLose } = props;
   const { currentColors } = useTheme();
   const [showDetails, setShowDetails] = useState(false);
   const [routines, setRoutines] = useState<Routine[]>([]);
@@ -249,6 +250,7 @@ export function Home(props: HomeProps) {
                 nativeAppBlocking={nativeAppBlocking} 
                 sendTransaction={sendTransaction}
                 onNavigateToSuccess={onNavigateToSuccess}
+                onNavigateToLose={onNavigateToLose}
             />
           </Box>
 

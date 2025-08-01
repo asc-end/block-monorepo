@@ -5,12 +5,12 @@ import { Rainbow } from './components/svgs/Raibow';
 import { Star } from './components/svgs/Star';
 import { useHistoricalSessions, type HistoricalSession } from '../hooks/useHistoricalSessions';
 import { claimCommitmentIx, claimCommitmentTx } from '@blockit/shared';
-import { Transaction } from '@solana/web3.js';
+import { Transaction, VersionedTransaction } from '@solana/web3.js';
 
 interface SuccessProps {
   sessionId?: string;
   claimMode?: 'single' | 'multiple';
-  sendTransaction: (tx: any) => Promise<{ signature: string } | null>;
+  sendTransaction: (tx: Transaction | VersionedTransaction) => Promise<{ signature: string } | null>;
 }
 
 export function Success({

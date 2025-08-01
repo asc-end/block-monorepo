@@ -1,3 +1,5 @@
+import { Commitment } from "./routine";
+
 export type FocusSessionStatus = 'completed' | 'interrupted' | 'in_progress';
 
 export interface FocusSession {
@@ -10,6 +12,7 @@ export interface FocusSession {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  commitment?: Commitment
 }
 
 export interface CreateFocusSessionInput {

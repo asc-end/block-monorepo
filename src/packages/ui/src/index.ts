@@ -18,6 +18,7 @@ export * from './app/ViewRoutine';
 export * from './app/ViewFocusSession';
 export * from './app/HistoricalSessions';
 export * from './app/Success';
+export * from './app/Lose';
 export * from './app/components/create-routine/Apps';
 export * from './app/components/create-routine/Time';
 export * from './app/components/create-routine/Calendar';
@@ -32,3 +33,9 @@ export * from './providers';
 
 // Calendar Components
 export * from './app/components/calendar';
+
+// Onboarding Components
+export * from './app/components/onboarding';
+
+// SVG Components
+export * from './app/components/svgs';
