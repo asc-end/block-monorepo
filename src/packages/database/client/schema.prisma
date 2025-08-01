@@ -241,7 +241,7 @@ model DataSeller {
   unclaimedRevenue String
   accountAddress   String        @unique
   updatedAt        DateTime      @updatedAt
-  listing          DataListing?  @relation(fields: [listingId], references: [listingId])
+  listing          DataListing?  @relation(fields: [listingId], references: [listingId], onDelete: NoAction, onUpdate: NoAction)
   proofs           SellerProof[] // All proofs for this seller
 
   @@index([listingId])

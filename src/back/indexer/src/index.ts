@@ -4,7 +4,7 @@ import { Program, AnchorProvider, Wallet, IdlAccounts, BN, Idl } from '@coral-xy
 import * as dotenv from 'dotenv';
 import escrowIdl from '../../programs/target/idl/escrow.json';
 import type { Escrow } from '../../programs/target/types/escrow';
-import { createHandlers } from './handlers/escrow';
+import { createHandlers } from './lib/escrow/handlers';
 import { prisma } from './lib/prisma';
 import { SurfpoolWebsocketClient } from './surfpoolWebsocket';
 

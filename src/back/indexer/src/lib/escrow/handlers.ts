@@ -1,7 +1,7 @@
 import { BN, IdlAccounts, EventParser, Program } from "@coral-xyz/anchor";
 import { KeyedAccountInfo, Logs, PublicKey, Connection } from "@solana/web3.js";
-import { Escrow } from "../../../programs/target/types/escrow";
-import { prisma } from "../lib/prisma";
+import { Escrow } from "../../../../programs/target/types/escrow";
+import { prisma } from "../prisma";
 
 // Anchor event discriminators
 const COMMITMENT_CREATED_DISCRIMINATOR = "commitmentCreatedEvent";
