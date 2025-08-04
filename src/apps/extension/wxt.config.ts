@@ -9,12 +9,21 @@ export default defineConfig({
   srcDir: 'src',
   modules: ['@wxt-dev/module-react'],
   manifest: {
+    name: 'Blockit',
+    description: 'Block distracting apps and websites',
     permissions: ['storage', 'scripting', 'activeTab', "favicon", "tabs"],
     host_permissions: ["<all_urls>"], 
     externally_connectable: {
       matches: [WEB_URL, "https://blockit-web-production.up.railway.app/*"]
     },
     key: EXTENSION_PUBLIC_KEY,
+    icons: {
+      16: '/icon/icon.png',
+      32: '/icon/icon.png',
+      48: '/icon/icon.png',
+      96: '/icon/icon.png',
+      128: '/icon/icon.png'
+    },
   },
   vite: () => ({
     resolve: {
