@@ -1,76 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 
-interface AppWithIcon {
-  appName: string;
-  packageName: string;
-  iconUri?: string;
-}
-
-// Cache app icons in memory
-const appIconCache = new Map<string, string>();
-
+// Web version - no app icons available
 export function useAppIcons() {
-  const [appIcons, setAppIcons] = useState<Map<string, string>>(new Map());
-  const isLoadingRef = useRef(false);
+  const [appIcons] = useState<Map<string, string>>(new Map());
 
   const loadAppIcons = async () => {
-    // Skip entirely on web platform
-    if (typeof window !== 'undefined' && window.document) {
-      return;
-    }
-    
-    // Prevent multiple simultaneous loads
-    if (isLoadingRef.current) {
-      return;
-    }
-
-    isLoadingRef.current = true;
-
-    try {
-      // Try to import expo-app-blocker (will fail on web, succeed on mobile)
-      // @ts-ignore - This module only exists on mobile
-      const module = await import('expo-app-blocker').catch(() => null);
-      
-      if (module) {
-        const { getInstalledApps } = module;
-        const installedApps: AppWithIcon[] = await getInstalledApps();
-        
-        const newIconMap = new Map<string, string>();
-        
-        installedApps.forEach(app => {
-          if (app.iconUri) {
-            // Store by app name (display name)
-            newIconMap.set(app.appName, app.iconUri);
-            appIconCache.set(app.appName, app.iconUri);
-            
-            // Also store by package name for matching
-            newIconMap.set(app.packageName, app.iconUri);
-            appIconCache.set(app.packageName, app.iconUri);
-          }
-        });
-        
-        setAppIcons(newIconMap);
-      }
-    } catch (error) {
-      console.log('Could not load app icons:', error);
-      // This is expected on web platform
-    } finally {
-      isLoadingRef.current = false;
-    }
+    // No-op on web
   };
 
-  useEffect(() => {
-    // Load icons from cache first if available
-    if (appIconCache.size > 0) {
-      setAppIcons(new Map(appIconCache));
-    }
-    
-    // Then refresh from device
-    loadAppIcons();
-  }, []);
-
   const getAppIcon = (appName: string): string | null => {
-    return appIcons.get(appName) || appIconCache.get(appName) || null;
+    // Return null on web - icons will be handled differently
+    return null;
   };
 
   return {
