@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit
 import android.widget.TextView
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.widget.ImageView
 
 class AppBlockerService : Service() {
     private val windowManager by lazy { getSystemService(Context.WINDOW_SERVICE) as WindowManager }
@@ -160,6 +161,15 @@ class AppBlockerService : Service() {
             // Inflate the overlay layout
             val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             overlayView = inflater.inflate(R.layout.app_blocker_overlay, null)
+            
+            // Add pulsing animation to the dot
+            val pulsingDot = overlayView?.findViewById<View>(R.id.pulsingDot)
+            pulsingDot?.let {
+                val pulseAnimation = android.view.animation.AnimationUtils.loadAnimation(
+                    this, R.anim.pulse
+                )
+                it.startAnimation(pulseAnimation)
+            }
 
             // Set up home button
             overlayView?.findViewById<Button>(R.id.dismissButton)?.setOnClickListener {
@@ -212,9 +222,9 @@ class AppBlockerService : Service() {
                 ?.setDuration(300)
                 ?.start()
 
-            // After getting the app name...
+            // Update the message with the app name
             overlayView?.findViewById<TextView>(R.id.blockMessage)?.text = 
-                "\"$appName\" has been blocked to help you stay focused and productive"
+                "This app is blocked during your focus session.\nTake a deep breath and return to your important tasks."
 
             // Track this blocked attempt
             trackBlockedAttempt(packageName)

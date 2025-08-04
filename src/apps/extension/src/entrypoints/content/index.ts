@@ -201,26 +201,6 @@ export default defineContentScript({
             margin: 0 auto 2rem;
             animation: bounceRotate 2s ease-in-out infinite;
           ">
-            <div style="
-              position: absolute;
-              width: 100%;
-              height: 100%;
-              background: linear-gradient(135deg, ${colors.pop.violet} 0%, ${colors.pop.purple} 100%);
-              clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-              box-shadow: 0 8px 32px ${colors.pop.violet}40;
-            "></div>
-            <div style="
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              color: white;
-              font-size: 2rem;
-              font-weight: 900;
-              text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-              letter-spacing: 0.1em;
-            ">STOP</div>
-          </div>
           <h1 style="
             font-size: 3rem; 
             margin-bottom: 1.5rem; 

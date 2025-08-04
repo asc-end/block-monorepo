@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gradient background matching extension colors - fully opaque -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#F0F1FC"
+                android:centerColor="#E3EAFC"
+                android:endColor="#D6E2FF"
+                android:angle="135" />
+        </shape>
+    </item>
+</layer-list>

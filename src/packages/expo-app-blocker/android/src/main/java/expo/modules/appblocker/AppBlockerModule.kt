@@ -449,12 +449,6 @@ class AppBlockerModule : Module() {
               if (startTimeForApp != null) {
                 val duration = event.timeStamp - startTimeForApp
                 
-                // Skip tracking our own app
-                if (event.packageName == context.packageName) {
-                  appStartTimes.remove(event.packageName)
-                  continue
-                }
-                
                 // Get app name
                 val appName = try {
                   val appInfo = context.packageManager.getApplicationInfo(event.packageName, 0)
