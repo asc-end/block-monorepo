@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { BN } from '@coral-xyz/anchor';
 import { EscrowProgram } from "./types";
+import BN from "bn.js"
 
 export function getCommitmentPda (program: EscrowProgram, user: PublicKey, id: BN) {
 

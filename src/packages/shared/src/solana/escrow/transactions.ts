@@ -1,19 +1,18 @@
-import { BN, Program } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { EscrowProgram } from "./types";
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { getCommitmentPda } from "./pdas";
 import { getNextAvailableId } from "./queries";
 import { timeToUnix, unixToTime } from "..";
 import { AUTHORITY_PUBKEY } from "./constants";
+import idl from "../../../../../back/programs/target/idl/escrow.json" with { type: "json" };
+import BN from "bn.js"
 
-// Use native BN for React Native compatibility
-const BNCompat = typeof BN !== 'undefined' ? BN : require('bn.js');
 // Lazy initialization to prevent loading in React Native
 let program: EscrowProgram | null = null;
 
 function getProgram(): EscrowProgram {
     if (!program) {
-        const idl = require("../../../../../back/programs/target/idl/escrow.json");
         const connection = new Connection("https://api.devnet.solana.com");
         program = new Program(idl, {connection});
     }
@@ -46,7 +45,7 @@ export async function createCommitmentTx(user: PublicKey | string, amount: any, 
         user = new PublicKey(user);
     }
     if(typeof amount === 'number') {
-        amount = new BNCompat(amount * 1e9); // Convert SOL to lamports
+        amount = new BN(amount * 1e9); // Convert SOL to lamports
     }
     if(typeof unlockTime === 'string') {
         unlockTime = unixToTime(new Date(unlockTime));
@@ -91,7 +90,7 @@ export async function createCommitmentWithRetry(
             console.log("USER", user, amount, unlockTime, authority);
             console.log("createCommitmentWithRetry", attempt, maxRetries);
             // Generate a new ID for each attempt
-            const id = new BNCompat(Date.now() + attempt); // Use timestamp + attempt for subsequent tries
+            const id = new BN(Date.now() + attempt); // Use timestamp + attempt for subsequent tries
             
             console.log("ID", id);
             console.log(`Attempt ${attempt + 1} with ID:`, id.toString());

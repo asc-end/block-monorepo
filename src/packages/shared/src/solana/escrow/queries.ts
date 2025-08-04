@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { getCommitmentPda } from "./pdas";
-import { BN } from "@coral-xyz/anchor";
 import { EscrowProgram } from "./types";
+import BN from "bn.js"
 
 export function getCommitment(program: EscrowProgram, user: PublicKey, id: BN) {
     const commitment = getCommitmentPda(program, user, id);

@@ -1,6 +1,6 @@
 import { Program, Idl } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
-import { BN } from '@coral-xyz/anchor';
+import BN from "bn.js"
 import type { DataMarketplace } from "../../../../../back/programs/target/types/data_marketplace";
 
 export type MarketplaceProgram = Program<DataMarketplace>;

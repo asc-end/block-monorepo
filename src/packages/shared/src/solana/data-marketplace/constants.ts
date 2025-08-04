@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
-import { BN } from '@coral-xyz/anchor';
+import BN from "bn.js"
 
 // Constants
 export const MARKETPLACE_PROGRAM_ID = new PublicKey('5CkSqkGqrHKRzVWVRJGa1odNcaXo4bJnt9Sq2Npqpxpj');

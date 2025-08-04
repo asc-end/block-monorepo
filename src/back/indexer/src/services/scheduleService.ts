@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { PrismaClient } from '@prisma/client';
 import { MerkleService } from './merkleService';
 import { SquadsService, SquadsConfig } from './squadsService';
-import { BN } from '@coral-xyz/anchor';
+import BN from "bn.js"
 
 export class ScheduleService {
   private merkleService: MerkleService;

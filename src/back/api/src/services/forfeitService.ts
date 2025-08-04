@@ -2,7 +2,13 @@ import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction 
 import { forfeitCommitmentTx, TREASURY_PUBKEY } from '@blockit/shared';
 import * as fs from 'fs';
 import * as path from 'path';
-import { BN } from '@coral-xyz/anchor';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import BN from "bn.js"
+
+// ES module __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Service to handle commitment forfeits using the authority keypair

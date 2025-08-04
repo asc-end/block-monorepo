@@ -2,14 +2,15 @@ import { Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction, 
 import { marketplacePDAs, METADATA_PROGRAM_ID } from "./constants";
 import type { MarketplaceProgram } from "./types";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { BN, Instruction, Program } from '@coral-xyz/anchor';
+import { Instruction, Program } from '@coral-xyz/anchor';
 import { timeToUnix } from "..";
+import idl from "../../../../../back/programs/target/idl/data_marketplace.json" with { type: "json" };
+import BN from "bn.js"
 
 let program: MarketplaceProgram | null = null;
 
 function getProgram(): MarketplaceProgram {
   if (!program) {
-    const idl = require("../../../../../back/programs/target/idl/data_marketplace.json");
     const connection = new Connection("https://api.devnet.solana.com");
     program = new Program(idl, { connection });
   }

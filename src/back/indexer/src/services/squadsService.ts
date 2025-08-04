@@ -1,5 +1,5 @@
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
-import { BN } from '@coral-xyz/anchor';
+import BN from "bn.js"
 
 export interface SquadsConfig {
   multisigAddress: PublicKey;
