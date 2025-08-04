@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import RNSlider from '@react-native-community/slider';
 import { Text } from '../text/Text';
@@ -8,6 +7,7 @@ import { getSliderColors } from './';
 export interface SliderProps {
     value: number;
     onValueChange: (value: number) => void;
+    onSlidingComplete?: (value: number) => void;
     min?: number;
     max?: number;
     step?: number;
@@ -21,27 +21,23 @@ export interface SliderProps {
     style?: any;
 }
 
-export function Slider({
-    value,
-    onValueChange,
-    min = 0,
-    max = 100,
-    step = 0.1,
-    minTrackTintColor,
-    maxTrackTintColor,
-    thumbTintColor,
-    showLabels = true,
-    minLabel = 'Min',
-    maxLabel = 'Max',
-    className,
-    style,
-}: SliderProps) {
+export function Slider(props: SliderProps) {
+    const { value: propValue, onValueChange, onSlidingComplete, min = 0, max = 100, step = 0.1, minTrackTintColor, maxTrackTintColor, thumbTintColor, showLabels = true, minLabel = 'Min', maxLabel = 'Max', className, style } = props
     const { currentColors } = useTheme();
     const sliderColors = getSliderColors(currentColors);
-    
+
     const finalMinTrackColor = minTrackTintColor || sliderColors.minTrackTintColor;
     const finalMaxTrackColor = maxTrackTintColor || sliderColors.maxTrackTintColor;
     const finalThumbColor = thumbTintColor || sliderColors.thumbTintColor;
+
+    const handleChange = (v: number) => {
+        onValueChange?.(v);
+    };
+    
+    const handleSlidingComplete = (v: number) => {
+        onSlidingComplete?.(v);
+    };
+
     return (
         <View className={className}>
             <RNSlider
@@ -49,8 +45,9 @@ export function Slider({
                 minimumValue={min}
                 maximumValue={max}
                 step={step}
-                value={value}
-                onValueChange={onValueChange}
+                value={propValue}
+                onValueChange={handleChange}
+                onSlidingComplete={handleSlidingComplete}
                 minimumTrackTintColor={finalMinTrackColor}
                 maximumTrackTintColor={finalMaxTrackColor}
                 thumbTintColor={finalThumbColor}

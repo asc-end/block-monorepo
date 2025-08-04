@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
 import type { DrawerProps, DrawerHandle } from './index';
+import { useTheme } from '../theme/context';
 
 export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
   (
@@ -18,24 +19,53 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
     },
     ref
   ) => {
-
-            drawerClassName = drawerClassName + " bg-theme-bg";
+    const { currentColors } = useTheme()
     const [isOpen, setIsOpen] = React.useState(!!isOpenProp);
+    const [isAnimating, setIsAnimating] = React.useState(false);
+    const [isVisible, setIsVisible] = React.useState(!!isOpenProp);
     const lastActiveElement = useRef<HTMLElement | null>(null);
 
     // Sync with controlled prop
     React.useEffect(() => {
-      if (typeof isOpenProp === 'boolean') setIsOpen(isOpenProp);
+      if (typeof isOpenProp === 'boolean') {
+        if (isOpenProp) {
+          setIsVisible(true);
+          // Trigger animation after a frame
+          requestAnimationFrame(() => {
+            setIsOpen(true);
+            setIsAnimating(true);
+          });
+        } else {
+          setIsOpen(false);
+          setIsAnimating(true);
+          // Hide after animation completes
+          setTimeout(() => {
+            setIsVisible(false);
+            setIsAnimating(false);
+          }, 300);
+        }
+      }
     }, [isOpenProp]);
 
     // Expose open/close methods
     useImperativeHandle(
       ref,
       () => ({
-        open: () => setIsOpen(true),
+        open: () => {
+          setIsVisible(true);
+          requestAnimationFrame(() => {
+            setIsOpen(true);
+            setIsAnimating(true);
+          });
+        },
         close: () => {
           setIsOpen(false);
-          if (onClose) onClose();
+          setIsAnimating(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setIsAnimating(false);
+            if (onClose) onClose();
+          }, 300);
         },
       }),
       [onClose]
@@ -69,7 +99,12 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
       (e: React.MouseEvent<HTMLDivElement>) => {
         if (effectiveCloseOnOverlayClick && e.target === e.currentTarget) {
           setIsOpen(false);
-          if (onClose) onClose();
+          setIsAnimating(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setIsAnimating(false);
+            if (onClose) onClose();
+          }, 300);
         }
       },
       [onClose, effectiveCloseOnOverlayClick]
@@ -79,13 +114,18 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
       (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Escape') {
           setIsOpen(false);
-          if (onClose) onClose();
+          setIsAnimating(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setIsAnimating(false);
+            if (onClose) onClose();
+          }, 300);
         }
       },
       [onClose]
     );
 
-    if (!isOpen) return null;
+    if (!isVisible) return null;
 
     // Drawer slide-in styles based on placement
     const getDrawerStyle = () => {
@@ -95,8 +135,8 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
         outline: 'none',
         position: 'fixed',
         transition: openAnimationConfig?.timing?.duration
-          ? `transform ${openAnimationConfig.timing.duration}ms cubic-bezier(.4,0,.2,1)`
-          : 'transform 0.25s cubic-bezier(.4,0,.2,1)',
+          ? `transform ${openAnimationConfig.timing.duration}ms cubic-bezier(.4,0,.2,1), opacity 300ms ease`
+          : 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1), opacity 300ms ease',
         zIndex: 1001,
         display: 'flex',
         flexDirection: 'column',
@@ -108,9 +148,9 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
         adjustToContentHeight && (placement === 'bottom' || placement === 'top')
           ? {}
           : {
-              minHeight: 120,
-              maxHeight: '90vh',
-            };
+            minHeight: 120,
+            maxHeight: '90vh',
+          };
 
       switch (placement) {
         case 'bottom':
@@ -122,7 +162,7 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
             ...contentHeightStyles,
             minWidth: 320,
             maxWidth: '100vw',
-            transform: 'translateY(0%)',
+            transform: isOpen ? 'translateY(0%)' : 'translateY(100%)',
           };
         case 'top':
           return {
@@ -134,7 +174,7 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
             minWidth: 320,
             maxWidth: '100vw',
             borderRadius: '0 0 12px 12px',
-            transform: 'translateY(0%)',
+            transform: isOpen ? 'translateY(0%)' : 'translateY(-100%)',
           };
         case 'right':
           return {
@@ -145,7 +185,7 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
             minWidth: 320,
             maxWidth: '90vw',
             borderRadius: '12px 0 0 12px',
-            transform: 'translateX(0%)',
+            transform: isOpen ? 'translateX(0%)' : 'translateX(100%)',
           };
         case 'left':
           return {
@@ -156,7 +196,7 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
             minWidth: 320,
             maxWidth: '90vw',
             borderRadius: '0 12px 12px 0',
-            transform: 'translateX(0%)',
+            transform: isOpen ? 'translateX(0%)' : 'translateX(-100%)',
           };
         default:
           return base;
@@ -173,7 +213,8 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
           left: 0,
           width: '100vw',
           height: '100vh',
-          background: 'rgba(0,0,0,0.4)',
+          background: isOpen ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0)',
+          transition: 'background-color 300ms ease',
           display: 'flex',
           alignItems: placement === 'bottom' ? 'flex-end' : placement === 'top' ? 'flex-start' : 'stretch',
           justifyContent: placement === 'right' ? 'flex-end' : placement === 'left' ? 'flex-start' : 'center',
@@ -186,7 +227,7 @@ export const Drawer = forwardRef<DrawerHandle, DrawerProps>(
         <div
           id="drawer-root"
           className={`drawer-content ${drawerClassName}`}
-          style={getDrawerStyle()}
+          style={{ ...getDrawerStyle(), backgroundColor: currentColors.background }}
           tabIndex={0}
           onKeyDown={handleKeyDown}
           {...props}

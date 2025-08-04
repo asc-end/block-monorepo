@@ -22,10 +22,14 @@ export function Text(props: TextProps) {
     ...style,
   };
 
+  // If className is provided, use it instead of variant styles
+  // This allows full override of text styles with Tailwind classes
+  const combinedClassName = className || variantStyle;
+
   return (
     <RNText
       style={defaultStyle}
-      className={`${variantStyle} ${className || ''}`}
+      className={combinedClassName}
       {...rest}
     >
       {children}

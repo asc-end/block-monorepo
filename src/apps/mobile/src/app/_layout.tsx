@@ -4,7 +4,7 @@ import { router, SplashScreen, Stack } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useTheme, ThemeProvider, Pressable, Text, Box } from '@blockit/cross-ui-toolkit';
+import { useTheme, ThemeProvider, Pressable, Text, Box, AlertProvider, AlertManager } from '@blockit/cross-ui-toolkit';
 import { PrivyProvider, useEmbeddedSolanaWallet, usePrivy, usePrivyClient } from "@privy-io/expo";
 import Connect from './connect';
 import { PrivyElements } from "@privy-io/expo/ui";
@@ -30,8 +30,8 @@ type EnvVar = {
 }
 
 const requiredEnvVars: EnvVar[] = [
-  { key: 'EXPO_PUBLIC_API_URL', displayName: 'API URL', defaultValue: 'http://192.168.1.59:3001' },
-  { key: 'EXPO_PUBLIC_WS_URL', displayName: 'WebSocket URL', defaultValue: 'ws://192.168.1.59:3001' },
+  { key: 'EXPO_PUBLIC_API_URL', displayName: 'API URL', defaultValue: 'http://localhost:3001' },
+  { key: 'EXPO_PUBLIC_WS_URL', displayName: 'WebSocket URL', defaultValue: 'ws://localhost:3001' },
   { key: 'EXPO_PUBLIC_PRIVY_APP_ID', displayName: 'Privy App ID' },
   { key: 'EXPO_PUBLIC_PRIVY_CLIENT_ID', displayName: 'Privy Client ID', defaultValue: 'client-WY5bqDh4x6Vb9rATJs8qc3MofR9LA2x1QWW7Moj6J3roS' }
 ];
@@ -55,8 +55,8 @@ SplashScreen.preventAutoHideAsync();
 
 // Initialize config store with environment variables
 const config = {
-  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.59:3001',
-  wsUrl: process.env.EXPO_PUBLIC_WS_URL || 'ws://192.168.1.59:3001',
+  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001',
+  wsUrl: process.env.EXPO_PUBLIC_WS_URL || 'ws://localhost:3001',
   privyAppId: process.env.EXPO_PUBLIC_PRIVY_APP_ID,
   privyClientId: process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID || 'client-WY5bqDh4x6Vb9rATJs8qc3MofR9LA2x1QWW7Moj6J3roS',
   environment: 'development' as const
@@ -245,13 +245,16 @@ export default function RootLayout() {
       <SafeAreaProvider style={{ backgroundColor: currentColors.background }}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider value={{ currentColors, isDarkMode }}>
-            <QueryProvider>
-              <AppBlockerProvider>
-                <AuthProvider>
-                  <AppContent />
-                </AuthProvider>
-              </AppBlockerProvider>
-            </QueryProvider>
+            <AlertProvider>
+              <AlertManager />
+              <QueryProvider>
+                <AppBlockerProvider>
+                  <AuthProvider>
+                    <AppContent />
+                  </AuthProvider>
+                </AppBlockerProvider>
+              </QueryProvider>
+            </AlertProvider>
           </ThemeProvider>
         </GestureHandlerRootView>
       </SafeAreaProvider>

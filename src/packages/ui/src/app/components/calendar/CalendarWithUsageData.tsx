@@ -11,6 +11,7 @@ export interface CalendarWithUsageDataProps {
   usageData: UsageData;
   selectedDate?: string;
   onSelectDate?: (date: string) => void;
+  onMonthChange?: (year: number, month: number) => void;
   getUsageColor?: (totalTime: number) => string;
   minIntensity?: number; // Minimum time in ms to show color (default 1000ms = 1 second)
   disableFutureDates?: boolean;
@@ -20,6 +21,7 @@ export function CalendarWithUsageData({
   usageData,
   selectedDate,
   onSelectDate,
+  onMonthChange,
   getUsageColor,
   minIntensity = 1000,
   disableFutureDates = true
@@ -56,7 +58,12 @@ export function CalendarWithUsageData({
     }
 
     setCurrentMonth(newMonth);
-  }, [currentMonth, disableFutureDates]);
+    
+    // Notify parent of month change
+    if (onMonthChange) {
+      onMonthChange(newMonth.getFullYear(), newMonth.getMonth());
+    }
+  }, [currentMonth, disableFutureDates, onMonthChange]);
 
   const isNextMonthDisabled = () => {
     if (!disableFutureDates) return false;
@@ -79,13 +86,13 @@ export function CalendarWithUsageData({
         key={`${day.month}-${day.day || index}-${day.date || index}`}
         style={{
           width: '14.285714%', // 100% / 7 days
-          padding: 2
+          padding: 1
         }}
       >
         <Pressable
           onPress={() => isClickable && onSelectDate && onSelectDate(day.date)}
           style={{
-            height: 32,
+            height: 28,
             borderRadius: 8,
             alignItems: 'center',
             justifyContent: 'center',

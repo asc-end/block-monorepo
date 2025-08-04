@@ -37,10 +37,10 @@ export function MonthSelector({
           padding: 10,
           borderRadius: 8,
           backgroundColor: disablePrevious
-            ? currentColors.neutral[100] + '30'
+            ? currentColors.neutral[200] + '30'
             : prevPressed
-              ? currentColors.primary[200] + '60'
-              : currentColors.primary[100] + '30',
+              ? currentColors.neutral[300] + '50'
+              : currentColors.neutral[200] + '60',
           opacity: disablePrevious ? 0.5 : 1,
           transform: [{ scale: prevPressed && !disablePrevious ? 0.95 : 1 }],
           transition: 'all 0.2s ease'
@@ -50,7 +50,7 @@ export function MonthSelector({
         <ChevronIcon 
           direction="left" 
           size={16} 
-          color={disablePrevious ? currentColors.neutral[400] : currentColors.primary[500]} 
+          color={disablePrevious ? currentColors.neutral[400] : currentColors.text.soft} 
         />
       </Pressable>
       
@@ -72,10 +72,10 @@ export function MonthSelector({
           padding: 10,
           borderRadius: 8,
           backgroundColor: disableNext
-            ? currentColors.neutral[100] + '30'
+            ? currentColors.neutral[200] + '30'
             : nextPressed
-              ? currentColors.primary[200] + '60'
-              : currentColors.primary[100] + '30',
+              ? currentColors.neutral[300] + '50'
+              : currentColors.neutral[200] + '60',
           opacity: disableNext ? 0.5 : 1,
           transform: [{ scale: nextPressed && !disableNext ? 0.95 : 1 }],
           transition: 'all 0.2s ease'
@@ -85,7 +85,7 @@ export function MonthSelector({
         <ChevronIcon
           direction="right"
           size={16}
-          color={disableNext ? currentColors.neutral[400] : currentColors.primary[500]}
+          color={disableNext ? currentColors.neutral[400] : currentColors.text.soft}
         />
       </Pressable>
     </Box>

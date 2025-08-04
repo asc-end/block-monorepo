@@ -8,7 +8,7 @@ interface RemoveListingDrawerProps {
 }
 
 export function RemoveListingDrawer({ isOpen, onClose, onRemove, isLoading }: RemoveListingDrawerProps) {
-    const { currentColors } = useTheme()
+    const {currentColors} = useTheme()
     return (
         <Drawer
             isOpen={isOpen}
@@ -29,7 +29,7 @@ export function RemoveListingDrawer({ isOpen, onClose, onRemove, isLoading }: Re
                         title="Remove Listing"
                         onPress={onRemove}
                         className="w-full"
-                        variant="secondary"
+                        variant="destructive"
                         loading={isLoading}
                     />
                     <Button
@@ -37,7 +37,9 @@ export function RemoveListingDrawer({ isOpen, onClose, onRemove, isLoading }: Re
                         onPress={onClose}
                         className="w-full"
                         variant="secondary"
-                        style={{ backgroundColor: currentColors.secondary[800] + "70", border: 1, borderColor: currentColors.secondary[800], color: currentColors.secondary[400] }}
+                        style={{ backgroundColor: currentColors.secondary[800] + "70", border: 1, 
+                           borderColor: currentColors.secondary[800],
+                           color: currentColors.secondary[400] }}
                     />
                 </Box>
             </Box>

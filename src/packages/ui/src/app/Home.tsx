@@ -4,9 +4,10 @@ import { Image, Pressable, Box, Text, Button, useTheme, ScrollView, Drawer } fro
 import { FocusSession } from './components/focus-sesion/FocusSession';
 import { AppUsageToday } from './components/usage/Today';
 import { RoutineItem } from './components/routine/RoutineItem';
-import { useAppUsage } from '../hooks/useAppUsage';
+import { useAppUsageQuery } from '../hooks/useAppUsageQuery';
 import { api } from '../stores/authStore';
 import type { Routine } from '@blockit/shared';
+import { PlusIcon } from './icons';
 // import { useFocusEffect } from '../hooks/useFocusEffect';
 
 // Generate current date for demo data
@@ -105,8 +106,11 @@ export function Home(props: HomeProps) {
   const [routinesLoading, setRoutinesLoading] = useState(true);
   const [hasFetchedOnce, setHasFetchedOnce] = useState(false);
   const [scrollOffset, setScrollOffset] = useState(0);
-  const { appUsage, loading } = useAppUsage()
+  const { appUsage, loading } = useAppUsageQuery()
   const lastFetchTime = useRef<number>(0);
+
+  // Detect if running in extension (smaller viewport)
+  const isExtension = typeof window !== 'undefined' && window.innerHeight < 700;
 
   // Initial fetch
   useEffect(() => {
@@ -171,8 +175,8 @@ export function Home(props: HomeProps) {
   return (
     <Box className="flex flex-col flex-1 w-full h-full">
       {/* Sticky transforming header */}
-      <Box 
-        className="absolute top-0 left-0 right-0 z-10"
+      <Box
+        className="absolute top-0 left-0 right-0 z-10 flex flex-col items-center"
         style={{
           height: headerHeight,
           backgroundColor: currentColors.background,
@@ -192,9 +196,9 @@ export function Home(props: HomeProps) {
             transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <Text 
-            variant="caption" 
-            style={{ 
+          <Text
+            variant="caption"
+            style={{
               fontSize: isScrolled ? 10 : 12,
               opacity: isScrolled ? 0.6 : 0.7,
               marginBottom: isScrolled ? 2 : 4
@@ -205,12 +209,12 @@ export function Home(props: HomeProps) {
           {loading ? (
             <AppUsageLoadingSkeleton />
           ) : (
-              <Text 
-                variant={isScrolled ? 'h4' : 'h1'} 
-                style={{ transition: 'font-size 0.3s', fontWeight: '600', fontFamily: 'ClashDisplay' }}
-              >
-                {totalTime ? formatTime(totalTime) : "00:00"}
-              </Text>
+            <Text
+              variant={isScrolled ? 'h4' : 'h1'}
+              style={{ transition: 'font-size 0.3s', fontWeight: '600', fontFamily: 'ClashDisplay' }}
+            >
+              {totalTime ? formatTime(totalTime) : "00:00"}
+            </Text>
           )}
         </Pressable>
       </Box>
@@ -227,30 +231,30 @@ export function Home(props: HomeProps) {
           {/* Hero section with image and focus session */}
           <Box className="px-4 pb-4">
             <Box
-              className="w-full h-72 rounded-2xl mb-4 items-center justify-center overflow-hidden"
-              style={{ 
+              className={`w-full ${isExtension ? 'h-32' : 'h-72'} rounded-2xl mb-4 items-center justify-center overflow-hidden`}
+              style={{
                 // backgroundColor: currentColors.surface.card,
                 opacity: Math.max(0, 1 - scrollOffset / 100),
                 transform: `translateY(${scrollOffset * 0.5}px)`,
               }}
             >
-              <Image 
+              <Image
                 className='opacity-0'
                 src="https://images.unsplash.com/photo-1579548122080-c35fd6820ecb?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'cover' 
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
                 }}
                 alt="Hero image"
               />
             </Box>
-            
-            <FocusSession 
-                nativeAppBlocking={nativeAppBlocking} 
-                sendTransaction={sendTransaction}
-                onNavigateToSuccess={onNavigateToSuccess}
-                onNavigateToLose={onNavigateToLose}
+
+            <FocusSession
+              nativeAppBlocking={nativeAppBlocking}
+              sendTransaction={sendTransaction}
+              onNavigateToSuccess={onNavigateToSuccess}
+              onNavigateToLose={onNavigateToLose}
             />
           </Box>
 
@@ -258,26 +262,19 @@ export function Home(props: HomeProps) {
           <Box className="flex flex-col px-4 w-full">
             <Box className='flex flex-col w-full'>
               <Box className='w-full flex flex-row justify-between items-center mb-4'>
-                <Text variant='h4' style={{ fontWeight: '700' }}>Daily Routines</Text>
-                <Button 
-                  title='New' 
-                  size="sm" 
-                  onPress={onCreateRoutine} 
-                  variant="ghost" 
-                  style={{ 
-                    backgroundColor: currentColors.primary[100] + '20',
-                    borderRadius: 20,
-                    paddingHorizontal: 16
-                  }}
-                />
+                <Text className='flex-1 text-left' style={{ fontWeight: '700' }}>Routines</Text>
+                <Pressable onPress={onCreateRoutine} className='flex flex-row gap-3 items-center px-4 py-1 rounded-full' style={{backgroundColor: currentColors.surface.card }}>
+                  <PlusIcon color={currentColors.text.soft} size={16}/>
+                  <Text style={{color: currentColors.text.soft}} >New routine</Text>
+                </Pressable>
               </Box>
 
               {routinesLoading && !hasFetchedOnce ? (
                 <RoutineLoadingSkeleton />
               ) : routines.length === 0 ? (
-                <Box 
+                <Box
                   className='w-full p-8 flex bg-theme-card items-center justify-center rounded-2xl'
-                  style={{ 
+                  style={{
                     borderStyle: 'dashed',
                     borderWidth: 2,
                     borderColor: currentColors.neutral[200] + '30'

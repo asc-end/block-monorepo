@@ -130,8 +130,10 @@ router.get('/stats', authMiddleware, async (req: AppUsageStatsRequest & { verifi
         if (!userId) return res.status(401).json({ error: 'User not authenticated' });
 
         const { startDate, endDate } = req.query;
+        // Get timezone offset in minutes (e.g., -240 for UTC+4)
+        const timezoneOffset = parseInt(req.query.timezoneOffset as string) || 0;
 
-        console.log(startDate, endDate)
+        console.log(startDate, endDate, 'Timezone offset:', timezoneOffset)
 
         // Get total time spent per app with date and platform grouping
         const appStats = await prisma.appUsage.groupBy({
@@ -153,18 +155,50 @@ router.get('/stats', authMiddleware, async (req: AppUsageStatsRequest & { verifi
         });
         // console.log(appStats)
 
-        // Transform the data into the nested structure
-        const formattedStats: Record<string, Record<string, { mobile: number, web: number }>> = {};
+        // Get unique app names from the stats
+        const uniqueAppNames = [...new Set(appStats.map(stat => stat.appName))];
+        
+        // Fetch app icons for these apps
+        const apps = await prisma.app.findMany({
+            where: {
+                OR: [
+                    { name: { in: uniqueAppNames } },
+                    { androidPackageName: { in: uniqueAppNames } },
+                    { iosBundleId: { in: uniqueAppNames } }
+                ]
+            },
+            select: {
+                name: true,
+                androidPackageName: true,
+                iosBundleId: true,
+                icon: true
+            }
+        });
+        
+        // Create a map of app names to icons
+        const appIconMap: Record<string, string | null> = {};
+        apps.forEach(app => {
+            if (app.name) appIconMap[app.name] = app.icon;
+            if (app.androidPackageName) appIconMap[app.androidPackageName] = app.icon;
+            if (app.iosBundleId) appIconMap[app.iosBundleId] = app.icon;
+        });
+
+        // Transform the data into the nested structure with icons
+        const formattedStats: Record<string, Record<string, { mobile: number, web: number, icon?: string | null }>> = {};
 
         appStats.forEach(stat => {
-            const dateStr = stat.hourStart.toISOString().split('T')[0];
+            // Convert UTC date to local date using timezone offset
+            const localDate = new Date(stat.hourStart.getTime() - (timezoneOffset * 60 * 1000));
+            const dateStr = localDate.toISOString().split('T')[0];
+            
             if (!formattedStats[dateStr]) {
                 formattedStats[dateStr] = {};
             }
             if (!formattedStats[dateStr][stat.appName]) {
                 formattedStats[dateStr][stat.appName] = {
                     web: 0,
-                    mobile: 0
+                    mobile: 0,
+                    icon: appIconMap[stat.appName] || null
                 }
             }
             formattedStats[dateStr][stat.appName][stat.platform] += stat.timeSpent ?? 0;
@@ -183,18 +217,31 @@ router.get('/hourly-stats', authMiddleware, async (req: Request & { verifiedClai
         const userId = req.verifiedClaims?.userId;
         if (!userId) return res.status(401).json({ error: 'User not authenticated' });
         
+        // Get timezone offset in minutes (e.g., -240 for UTC+4)
+        // Note: getTimezoneOffset returns the difference in minutes from UTC
+        // Positive offset means behind UTC, negative means ahead of UTC
+        const timezoneOffset = parseInt(req.query.timezoneOffset as string) || 0;
+        
 
         const { date } = req.query;
         if (!date || typeof date !== 'string') {
             return res.status(400).json({ error: 'Date parameter required' });
         }
 
-        // Parse the date and get start/end of day in UTC
+        // Parse the date and adjust for timezone
+        // timezoneOffset is in minutes, positive means behind UTC
+        // So for UTC+4, timezoneOffset would be -240
         const startDate = new Date(date);
-        startDate.setUTCHours(0, 0, 0, 0);
+        // Set to start of day in user's timezone, then convert to UTC
+        startDate.setHours(0, 0, 0, 0);
+        // Adjust for timezone offset to get UTC time
+        startDate.setMinutes(startDate.getMinutes() + timezoneOffset);
         
         const endDate = new Date(date);
-        endDate.setUTCHours(23, 59, 59, 999);
+        // Set to end of day in user's timezone, then convert to UTC
+        endDate.setHours(23, 59, 59, 999);
+        // Adjust for timezone offset to get UTC time
+        endDate.setMinutes(endDate.getMinutes() + timezoneOffset);
 
         // Get all hourly data for the specified date
         const hourlyStats = await prisma.appUsage.findMany({
@@ -220,7 +267,12 @@ router.get('/hourly-stats', authMiddleware, async (req: Request & { verifiedClai
 
         // Fill in the actual data
         hourlyStats.forEach(stat => {
-            const hour = stat.hourStart.getUTCHours();
+            // Convert UTC hour to local hour
+            // timezoneOffset is in minutes, negative for ahead of UTC
+            const localDate = new Date(stat.hourStart);
+            localDate.setMinutes(localDate.getMinutes() - timezoneOffset);
+            const hour = localDate.getHours();
+            
             if (!hourlyBreakdown[hour][stat.appName]) {
                 hourlyBreakdown[hour][stat.appName] = {
                     mobile: 0,

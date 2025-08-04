@@ -39,10 +39,14 @@ export function useAppUsage(props: UseAppUsageProps & { hourlyDate?: string } = 
                 end = endDate || new Date(today.getTime() + 86399999); // 23:59:59.999
             }
 
+            // Get timezone offset in minutes
+            const timezoneOffset = new Date().getTimezoneOffset();
+            
             const { data } = await api().get('/app-usage/stats', {
                 params: {
                     startDate: start.toISOString(),
-                    endDate: end.toISOString()
+                    endDate: end.toISOString(),
+                    timezoneOffset: timezoneOffset.toString()
                 }
             });
 
@@ -63,9 +67,13 @@ export function useAppUsage(props: UseAppUsageProps & { hourlyDate?: string } = 
         setHourlyError(null);
 
         try {
+            // Get timezone offset in minutes
+            const timezoneOffset = new Date().getTimezoneOffset();
+            
             const { data } = await api().get('/app-usage/hourly-stats', {
                 params: {
-                    date: hourlyDate
+                    date: hourlyDate,
+                    timezoneOffset: timezoneOffset.toString()
                 }
             });
             setHourlyData(data);

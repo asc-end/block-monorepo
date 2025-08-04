@@ -1,6 +1,7 @@
 export * from './constants/colors';
 export * from './stores/authStore';
 export * from './stores/configStore';
+export * from './stores/routineStore';
 export * from './contexts/AuthContext';
 export * from './lib/time';
 export * from './lib/users';

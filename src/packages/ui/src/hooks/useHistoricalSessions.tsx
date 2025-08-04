@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../stores/authStore';
 import type { FocusSessionType } from '@blockit/shared';
 import type { Routine } from '@blockit/shared';
-import { BN } from '@coral-xyz/anchor';
+import BN from "bn.js"
 
 // Unified session type for display
 export interface HistoricalSession {

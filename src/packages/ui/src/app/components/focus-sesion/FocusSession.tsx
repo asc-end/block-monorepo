@@ -255,13 +255,8 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                                 !isCreating ? <PlayIcon size={18} color="white" /> : undefined
                             }
                             onPress={activeSession ? confirmEnd : () => handleSession('start')}
-                            variant="primary"
+                            variant={activeSession ? "destructive" : "primary"}
                             disabled={isCreating || (!activeSession && stakeAmount > 0 && !user?.walletAddress)}
-                            style={activeSession ? {
-                                backgroundColor: currentColors.error.main,
-                                borderColor: currentColors.error.dark,
-                                shadowColor: currentColors.error.dark,
-                            } : undefined}
                         />
                     )}
                 </Box>
@@ -350,13 +345,8 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                         }
                         loading={isCreating}
                         onPress={activeSession ? confirmEnd : () => handleSession('start')}
-                        variant="primary"
+                        variant={activeSession ? "destructive" : "primary"}
                         disabled={isCreating || (!activeSession && stakeAmount > 0 && !user?.walletAddress)}
-                        style={activeSession ? {
-                            backgroundColor: currentColors.error.main,
-                            borderColor: currentColors.error.dark,
-                            shadowColor: currentColors.error.dark,
-                        } : undefined}
                     />
                 )}
 

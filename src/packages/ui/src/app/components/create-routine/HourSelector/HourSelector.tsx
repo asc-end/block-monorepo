@@ -88,7 +88,7 @@ export function HourSelector({ selectedHours, onHoursChange, currentColors }: Ho
     return (
         <div
             ref={containerRef}
-            className="flex flex-row"
+            className="flex flex-row bg-red-400"
             style={{ gap: 8, userSelect: 'none' }}
             onPointerMove={handlePointerMove}
         >

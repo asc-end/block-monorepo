@@ -42,11 +42,6 @@ export const Slider: React.FC<SliderProps> = ({
     const finalMaxTrackColor = maxTrackTintColor || sliderColors.maxTrackTintColor;
     const finalThumbColor = thumbTintColor || sliderColors.thumbTintColor;
     const [value, setValue] = useState(initialValue);
-    const sliderRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        setValue(initialValue);
-    }, [initialValue]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // @ts-ignore

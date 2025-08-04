@@ -17,8 +17,73 @@ interface AppItem {
     isUserSubmitted?: boolean;
 }
 
-interface HistoricalStats {
-    historicalStats: Record<string, Record<string, number>>;
+
+// Helper function to get app icon from various sources
+function getAppIcon(appName: string, domain?: string): string | undefined {
+    // Try to get icon from Clearbit for web domains
+    if (domain) {
+        // Clean up domain (remove www., trailing slashes)
+        const cleanDomain = domain.replace(/^www\./, '').replace(/\/$/, '');
+        return `https://logo.clearbit.com/${cleanDomain}`;
+    }
+    
+    // For popular apps, use known icon sources
+    const appNameLower = appName.toLowerCase();
+    
+    // Map of popular apps to their icon URLs
+    const popularAppIcons: Record<string, string> = {
+        'facebook': 'https://logo.clearbit.com/facebook.com',
+        'instagram': 'https://logo.clearbit.com/instagram.com',
+        'twitter': 'https://logo.clearbit.com/twitter.com',
+        'x': 'https://logo.clearbit.com/x.com',
+        'tiktok': 'https://logo.clearbit.com/tiktok.com',
+        'snapchat': 'https://logo.clearbit.com/snapchat.com',
+        'youtube': 'https://logo.clearbit.com/youtube.com',
+        'netflix': 'https://logo.clearbit.com/netflix.com',
+        'whatsapp': 'https://logo.clearbit.com/whatsapp.com',
+        'discord': 'https://logo.clearbit.com/discord.com',
+        'spotify': 'https://logo.clearbit.com/spotify.com',
+        'reddit': 'https://logo.clearbit.com/reddit.com',
+        'linkedin': 'https://logo.clearbit.com/linkedin.com',
+        'pinterest': 'https://logo.clearbit.com/pinterest.com',
+        'twitch': 'https://logo.clearbit.com/twitch.tv',
+        'amazon': 'https://logo.clearbit.com/amazon.com',
+        'gmail': 'https://logo.clearbit.com/gmail.com',
+        'google maps': 'https://logo.clearbit.com/maps.google.com',
+        'chrome': 'https://logo.clearbit.com/chrome.google.com',
+        'slack': 'https://logo.clearbit.com/slack.com',
+        'zoom': 'https://logo.clearbit.com/zoom.us',
+        'teams': 'https://logo.clearbit.com/teams.microsoft.com',
+        'microsoft teams': 'https://logo.clearbit.com/teams.microsoft.com',
+        'notion': 'https://logo.clearbit.com/notion.so',
+        'figma': 'https://logo.clearbit.com/figma.com',
+        'github': 'https://logo.clearbit.com/github.com',
+        'gitlab': 'https://logo.clearbit.com/gitlab.com',
+        'vscode': 'https://logo.clearbit.com/code.visualstudio.com',
+        'visual studio code': 'https://logo.clearbit.com/code.visualstudio.com',
+        'telegram': 'https://logo.clearbit.com/telegram.org',
+        'messenger': 'https://logo.clearbit.com/messenger.com',
+        'skype': 'https://logo.clearbit.com/skype.com',
+        'ebay': 'https://logo.clearbit.com/ebay.com',
+        'paypal': 'https://logo.clearbit.com/paypal.com',
+        'uber': 'https://logo.clearbit.com/uber.com',
+        'lyft': 'https://logo.clearbit.com/lyft.com',
+        'airbnb': 'https://logo.clearbit.com/airbnb.com',
+        'dropbox': 'https://logo.clearbit.com/dropbox.com',
+        'google drive': 'https://logo.clearbit.com/drive.google.com',
+        'onedrive': 'https://logo.clearbit.com/onedrive.live.com',
+        'outlook': 'https://logo.clearbit.com/outlook.com',
+        'yahoo': 'https://logo.clearbit.com/yahoo.com',
+        'bing': 'https://logo.clearbit.com/bing.com',
+        'duckduckgo': 'https://logo.clearbit.com/duckduckgo.com',
+        'firefox': 'https://logo.clearbit.com/firefox.com',
+        'safari': 'https://logo.clearbit.com/apple.com',
+        'edge': 'https://logo.clearbit.com/microsoftedge.com',
+        'brave': 'https://logo.clearbit.com/brave.com',
+        'opera': 'https://logo.clearbit.com/opera.com',
+    };
+    
+    return popularAppIcons[appNameLower];
 }
 
 function categorizeApp(app: AppItem): string {
@@ -39,21 +104,21 @@ function categorizeApp(app: AppItem): string {
 
 // Mock installed apps data
 const mockInstalledApps: AppItem[] = [
-    { packageName: 'com.facebook.katana', appName: 'Facebook', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.instagram.android', appName: 'Instagram', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.twitter.android', appName: 'Twitter', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.tiktok', appName: 'TikTok', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.snapchat.android', appName: 'Snapchat', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.google.android.youtube', appName: 'YouTube', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.netflix.mediaclient', appName: 'Netflix', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.whatsapp', appName: 'WhatsApp', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.discord', appName: 'Discord', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.spotify.music', appName: 'Spotify', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.google.android.apps.maps', appName: 'Google Maps', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.google.android.gm', appName: 'Gmail', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.android.chrome', appName: 'Chrome', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.reddit.frontpage', appName: 'Reddit', iconUri: undefined, isBlocked: false },
-    { packageName: 'com.zhiliaoapp.musically', appName: 'TikTok', iconUri: undefined, isBlocked: false },
+    { packageName: 'com.facebook.katana', appName: 'Facebook', iconUri: getAppIcon('Facebook'), isBlocked: false },
+    { packageName: 'com.instagram.android', appName: 'Instagram', iconUri: getAppIcon('Instagram'), isBlocked: false },
+    { packageName: 'com.twitter.android', appName: 'Twitter', iconUri: getAppIcon('Twitter'), isBlocked: false },
+    { packageName: 'com.tiktok', appName: 'TikTok', iconUri: getAppIcon('TikTok'), isBlocked: false },
+    { packageName: 'com.snapchat.android', appName: 'Snapchat', iconUri: getAppIcon('Snapchat'), isBlocked: false },
+    { packageName: 'com.google.android.youtube', appName: 'YouTube', iconUri: getAppIcon('YouTube'), isBlocked: false },
+    { packageName: 'com.netflix.mediaclient', appName: 'Netflix', iconUri: getAppIcon('Netflix'), isBlocked: false },
+    { packageName: 'com.whatsapp', appName: 'WhatsApp', iconUri: getAppIcon('WhatsApp'), isBlocked: false },
+    { packageName: 'com.discord', appName: 'Discord', iconUri: getAppIcon('Discord'), isBlocked: false },
+    { packageName: 'com.spotify.music', appName: 'Spotify', iconUri: getAppIcon('Spotify'), isBlocked: false },
+    { packageName: 'com.google.android.apps.maps', appName: 'Google Maps', iconUri: getAppIcon('Google Maps'), isBlocked: false },
+    { packageName: 'com.google.android.gm', appName: 'Gmail', iconUri: getAppIcon('Gmail'), isBlocked: false },
+    { packageName: 'com.android.chrome', appName: 'Chrome', iconUri: getAppIcon('Chrome'), isBlocked: false },
+    { packageName: 'com.reddit.frontpage', appName: 'Reddit', iconUri: getAppIcon('Reddit'), isBlocked: false },
+    { packageName: 'com.zhiliaoapp.musically', appName: 'TikTok', iconUri: getAppIcon('TikTok'), isBlocked: false },
     { packageName: 'com.mojang.minecraftpe', appName: 'Minecraft', iconUri: undefined, isBlocked: false },
     { packageName: 'com.supercell.clashofclans', appName: 'Clash of Clans', iconUri: undefined, isBlocked: false },
     { packageName: 'com.android.calendar', appName: 'Calendar', iconUri: undefined, isBlocked: false },
@@ -63,9 +128,10 @@ const mockInstalledApps: AppItem[] = [
 
 interface RoutineAppsProps {
     onBack: () => void;
+    nativeApps?: AppItem[]; // Optional native apps from mobile platform
 }
 
-export function RoutineApps({ onBack }: RoutineAppsProps) {
+export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [apps, setApps] = useState<AppItem[]>()
@@ -79,9 +145,12 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
     const [showUrlInput, setShowUrlInput] = useState(false);
     const [urlInput, setUrlInput] = useState("");
     const [nameInput, setNameInput] = useState("");
-    const isWeb = typeof window !== 'undefined' && !('ReactNativeWebView' in window);
+    // Check if we're in a browser environment (web or extension) vs React Native
+    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+    const isReactNative = typeof window !== 'undefined' && window.navigator?.product === 'ReactNative';
+    const showWebsiteFeature = isBrowser && !isReactNative;
 
-    // Fetch apps from database
+    // Fetch apps from database and native apps
     useEffect(() => {
         const loadDatabaseApps = async () => {
             try {
@@ -89,19 +158,46 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                 const response = await api().get('/apps');
                 const dbAppsData = response.data;
                 
-                const formattedApps = dbAppsData.map((app: any) => ({
-                    id: app.id,
-                    packageName: app.androidPackageName || app.iosBundleId || '',
-                    appName: app.name,
-                    iconUri: app.icon,
-                    isBlocked: false,
-                    category: app.category || 'Other',
-                    domains: app.domains || [],
-                    isUserSubmitted: app.isUserSubmitted
-                }));
+                let formattedApps = dbAppsData.map((app: any) => {
+                    const iconUrl = app.icon || getAppIcon(app.name, app.domains?.[0]);
+                    console.log(`App: ${app.name}, Icon URL: ${iconUrl}`);
+                    return {
+                        id: app.id,
+                        packageName: app.androidPackageName || app.iosBundleId || '',
+                        appName: app.name,
+                        iconUri: iconUrl,
+                        isBlocked: false,
+                        category: app.category || 'Other',
+                        domains: app.domains || [],
+                        isUserSubmitted: app.isUserSubmitted
+                    };
+                });
                 
-                // On mobile, merge with installed apps (TODO: implement native app detection)
-                // For now, just use database apps
+                // Merge with native apps if provided (from mobile platform)
+                if (nativeApps && nativeApps.length > 0) {
+                    // Create a map of database apps by package name for merging
+                    const dbAppsMap = new Map(
+                        formattedApps.map(app => [app.packageName.toLowerCase(), app])
+                    );
+                    
+                    // Merge native apps with database apps, preferring native icons
+                    nativeApps.forEach((nativeApp) => {
+                        const packageNameLower = nativeApp.packageName.toLowerCase();
+                        const existingApp = dbAppsMap.get(packageNameLower);
+                        
+                        if (existingApp) {
+                            // Update existing app with native icon if available
+                            if (nativeApp.iconUri) {
+                                console.log(`Updating ${existingApp.appName} with native icon`);
+                                existingApp.iconUri = nativeApp.iconUri;
+                            }
+                        } else {
+                            // Add native app that's not in database
+                            formattedApps.push(nativeApp);
+                        }
+                    });
+                }
+                
                 setInstalledApps(formattedApps);
             } catch (error) {
                 console.error("Error loading apps from database:", error);
@@ -113,61 +209,43 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
         };
 
         loadDatabaseApps();
-    }, []);
+    }, [nativeApps]);
 
-    // Mock usage stats data
-    const mockUsageData: HistoricalStats = {
-        historicalStats: {
-            '2024-01-01': {
-                'Facebook': 3600000, // 1 hour
-                'Instagram': 2700000, // 45 minutes
-                'YouTube': 5400000, // 1.5 hours
-                'TikTok': 4500000, // 1.25 hours
-                'WhatsApp': 1800000, // 30 minutes
-                'Discord': 2100000, // 35 minutes
-                'Netflix': 7200000, // 2 hours
-                'Spotify': 3000000, // 50 minutes
-            },
-            '2024-01-02': {
-                'Facebook': 2400000, // 40 minutes
-                'Instagram': 3300000, // 55 minutes
-                'YouTube': 4800000, // 1.33 hours
-                'TikTok': 3900000, // 1.08 hours
-                'Twitter': 1500000, // 25 minutes
-                'Reddit': 2700000, // 45 minutes
-                'Chrome': 1200000, // 20 minutes
-            },
-            '2024-01-03': {
-                'Facebook': 1800000, // 30 minutes
-                'Instagram': 2100000, // 35 minutes
-                'YouTube': 6000000, // 1.67 hours
-                'TikTok': 5100000, // 1.42 hours
-                'Snapchat': 1800000, // 30 minutes
-                'Minecraft': 3600000, // 1 hour
-                'Clash of Clans': 2400000, // 40 minutes
-            }
-        }
-    };
-
-    // Fetch usage stats
+    // Fetch usage stats from backend
     useEffect(() => {
         const loadUsageStats = async () => {
             try {
                 setLoadingStats(true);
-                // Simulate API delay
-                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Get stats for last 30 days
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+                
+                const response = await api().get('/app-usage/stats', {
+                    params: {
+                        startDate: startDate.toISOString(),
+                        endDate: endDate.toISOString()
+                    }
+                });
 
+                const statsData = response.data;
                 const totalUsage: Record<string, number> = {};
 
-                Object.values(mockUsageData.historicalStats || {}).forEach((dayStats) => {
-                    Object.entries(dayStats).forEach(([appName, time]) => {
-                        totalUsage[appName] = (totalUsage[appName] || 0) + time;
+                // Aggregate usage across all dates and platforms
+                Object.values(statsData || {}).forEach((dayStats: any) => {
+                    Object.entries(dayStats).forEach(([appName, platformStats]: [string, any]) => {
+                        const mobileTime = platformStats.mobile || 0;
+                        const webTime = platformStats.web || 0;
+                        totalUsage[appName] = (totalUsage[appName] || 0) + mobileTime + webTime;
                     });
                 });
 
                 setUsageStats(totalUsage);
             } catch (error) {
                 console.error("Error loading usage stats:", error);
+                // Fallback to empty stats if API fails
+                setUsageStats({});
             } finally {
                 setLoadingStats(false);
             }
@@ -180,28 +258,66 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
         return () => clearInterval(interval);
     }, []);
 
-    // Set selected state based on blockedApps from store and add usage time
+    // Merge apps from database with apps from usage stats
     useEffect(() => {
         if (installedApps && installedApps.length > 0) {
-            const appsWithSelection = installedApps.map(app => ({
-                ...app,
-                selected: blockedApps.some(blockedApp => blockedApp.packageName === app.packageName),
-                usageTime: usageStats[app.appName] || 0
+            // Create a map of existing apps by name for quick lookup
+            const existingAppsMap = new Map(
+                installedApps.map(app => [app.appName.toLowerCase(), app])
+            );
+            
+            // Find apps in usage stats that aren't in the database
+            const appsFromStats: AppItem[] = [];
+            Object.entries(usageStats).forEach(([appName, usageTime]) => {
+                if (!existingAppsMap.has(appName.toLowerCase()) && usageTime > 0) {
+                    // Create a new app entry for apps with usage but not in database
+                    appsFromStats.push({
+                        id: `usage-${appName}`,
+                        packageName: appName.toLowerCase().replace(/\s+/g, '.'),
+                        appName: appName,
+                        iconUri: getAppIcon(appName),
+                        isBlocked: false,
+                        category: 'Other',
+                        domains: [],
+                        isUserSubmitted: false,
+                        usageTime: usageTime
+                    });
+                }
+            });
+            
+            // Combine database apps with usage stats apps
+            const allApps = [
+                ...installedApps.map(app => ({
+                    ...app,
+                    selected: blockedApps.some(blockedApp => blockedApp.packageName === app.packageName),
+                    usageTime: usageStats[app.appName] || 0
+                })),
+                ...appsFromStats.map(app => ({
+                    ...app,
+                    selected: blockedApps.some(blockedApp => blockedApp.appName === app.appName)
+                }))
+            ];
+            
+            setApps(allApps);
+        } else if (Object.keys(usageStats).length > 0) {
+            // If no database apps but we have usage stats, create apps from stats
+            const appsFromStats = Object.entries(usageStats).map(([appName, usageTime]) => ({
+                id: `usage-${appName}`,
+                packageName: appName.toLowerCase().replace(/\s+/g, '.'),
+                appName: appName,
+                iconUri: getAppIcon(appName),
+                isBlocked: false,
+                category: 'Other',
+                domains: [],
+                isUserSubmitted: false,
+                selected: blockedApps.some(blockedApp => blockedApp.appName === appName),
+                usageTime: usageTime
             }));
-            setApps(appsWithSelection);
+            
+            setApps(appsFromStats);
         }
     }, [installedApps, blockedApps, usageStats]);
 
-    // Update apps with usage stats when they change
-    useEffect(() => {
-        if (apps && Object.keys(usageStats).length > 0) {
-            const updatedApps = apps.map(app => ({
-                ...app,
-                usageTime: usageStats[app.appName] || 0
-            }));
-            setApps(updatedApps);
-        }
-    }, [usageStats]);
 
     // Memoize filtered apps based on search query
     const filteredApps = useMemo(() => {
@@ -308,8 +424,8 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                         className='flex flex-row'
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        contentContainerClassName='flex flex-row gap-2 pr-4'
-                    >
+                        contentContainerStyle={{ gap: 8, paddingRight: 16, display: "flex", flexDirection: "row" }}
+                        >
                         {[1, 2, 3, 4, 5, 6].map((index) => (
                             <Box
                                 key={index}
@@ -422,11 +538,10 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                     </Text>
                 </Box>
                 <ScrollView
-                    className='flex flex-row'
+                    // className='flex flex-row'
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    // contentContainerStyle={{ gap: 8, paddingRight: 16 }}
-                    contentContainerClassName='flex flex-row gap-2 pr-4'
+                    contentContainerStyle={{ gap: 8, paddingRight: 16, display: "flex", flexDirection: "row" }}
                 >
                     {mostUsedApps?.map((item) => (
                         <Pressable
@@ -453,29 +568,27 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                                 }}
                             >
                                 <Box className="flex-col" style={{ gap: 1 }}>
-                                    {item.iconUri ? (
-                                        <Image
-                                            src={item.iconUri}
-                                            style={{
-                                                aspectRatio: 1,
-                                                width: '100%',
-                                                borderRadius: 6
-                                            }}
-                                        // resizeMode="contain"
-                                        />
-                                    ) : (
-                                        <Box
-                                            className="w-full justify-center items-center rounded-lg overflow-hidden"
-                                            style={{
-                                                aspectRatio: 1,
-                                                backgroundColor: currentColors.neutral[200]
-                                            }}
-                                        >
+                                    <Box
+                                        className="w-full rounded-lg overflow-hidden justify-center items-center"
+                                        style={{
+                                            aspectRatio: 1,
+                                            backgroundColor: currentColors.neutral[100]
+                                        }}
+                                    >
+                                        {item.iconUri ? (
+                                            <Image
+                                                src={item.iconUri}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                }}
+                                            />
+                                        ) : (
                                             <Text variant="h5" className="font-bold" style={{ color: currentColors.text.soft }}>
                                                 {item.appName.charAt(0)}
                                             </Text>
-                                        </Box>
-                                    )}
+                                        )}
+                                    </Box>
                                     <Text
                                         variant="caption"
                                         className="font-semibold mt-1 truncate"
@@ -537,7 +650,7 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                 <ScrollView
                     className='flex-1'
                     showsVerticalScrollIndicator={false}
-                    contentContainerClassName='flex flex-row flex-wrap gap-2'
+                    contentContainerStyle={{ gap: 8, paddingRight: 16, display: "flex", flexDirection: "row", flexWrap: "wrap" }}
                 >
                     {groupedApps?.["Other"]?.map((item: AppItem) => (
                         <Pressable
@@ -565,29 +678,27 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                                 }}
                             >
                                 <Box className="flex-col" style={{ gap: 1 }}>
-                                    {item.iconUri ? (
-                                        <Image
-                                            src={item.iconUri}
-                                            style={{
-                                                aspectRatio: 1,
-                                                width: '100%',
-                                                borderRadius: 6
-                                            }}
-                                        // resizeMode="contain"
-                                        />
-                                    ) : (
-                                        <Box
-                                            className="w-full justify-center items-center rounded-lg overflow-hidden"
-                                            style={{
-                                                aspectRatio: 1,
-                                                backgroundColor: currentColors.neutral[200]
-                                            }}
-                                        >
+                                    <Box
+                                        className="w-full rounded-lg overflow-hidden justify-center items-center"
+                                        style={{
+                                            aspectRatio: 1,
+                                            backgroundColor: currentColors.neutral[100]
+                                        }}
+                                    >
+                                        {item.iconUri ? (
+                                            <Image
+                                                src={item.iconUri}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                }}
+                                            />
+                                        ) : (
                                             <Text variant="h5" className="font-bold" style={{ color: currentColors.text.soft }}>
                                                 {item.appName.charAt(0)}
                                             </Text>
-                                        </Box>
-                                    )}
+                                        )}
+                                    </Box>
                                     <Text
                                         variant="caption"
                                         className="font-semibold mt-1 truncate"
@@ -602,8 +713,8 @@ export function RoutineApps({ onBack }: RoutineAppsProps) {
                 </ScrollView>
             </Box>
 
-            {/* Add URL button for web */}
-            {isWeb && (
+            {/* Add URL button for web and extension */}
+            {showWebsiteFeature && (
                 <Box className="mb-4">
                     {!showUrlInput ? (
                         <Button

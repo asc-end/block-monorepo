@@ -26,7 +26,7 @@ export function Button(props: ButtonProps): React.ReactElement {
   const { currentColors } = useTheme();
   const variantStyle = getButtonStyles(currentColors, variant);
   const sizeStyle = buttonSizeStyles[size];
-  const isPrimary = variant === 'primary';
+  const isPrimary = variant === 'primary' || variant === 'destructive';
 
   const buttonStyle = useMemo(() => ({
     width: '100%',

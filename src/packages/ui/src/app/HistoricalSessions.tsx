@@ -4,7 +4,7 @@ import { useHistoricalSessions } from "../hooks/useHistoricalSessions";
 import { formatTime } from "../lib/time";
 import { ChevronIcon } from "./icons/ChevronIcon";
 import { SolIcon } from "./icons/SolIcon";
-import { ClockIcon, CloseIcon } from './icons';
+import { ClockIcon, CloseIcon, CloseIconGradient } from './icons';
 
 interface HistoricalSessionsProps {
     onBack?: () => void;
@@ -65,7 +65,7 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
         return (
             <Pressable
                 onPress={handlePress}
-                className="p-4 rounded-xl mb-3 overflow-hidden flex flex-row justify-between items-center"
+                className="p-4 rounded-xl mb-3 mx-4 overflow-hidden flex flex-row justify-between items-center"
                 style={{
                     backgroundColor: currentColors.surface.elevated + (session.status == "canceled" ? "B2" : ""),
                     borderWidth: 1,
@@ -80,12 +80,9 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                             {isRoutine ? (session.emoji || '🎯') : '🧘'}
                         </Text>
                     </Box>
-                    <Box className="flex-1"
-                        style={{
-                            opacity: session.status == "canceled" ? 0.5 : 1,
-                        }}
+                    <Box className="flex-1" style={{ opacity: session.status == "canceled" ? 0.5 : 1 }}
                     >
-                        <Text className="font-semibold text-base" style={{ color: currentColors.text.main }}>
+                        <Text className="font-semibold text-base text-left" style={{ color: currentColors.text.main }}>
                             {session.name || 'Unnamed Session'}
                         </Text>
                         <Box className="flex flex-row items-center gap-2">
@@ -119,7 +116,13 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                 <Box className="flex flex-row items-center gap-2">
                     {session.status == "canceled" &&
                         <Box style={{ backgroundColor: currentColors.surface.elevated }} className="p-2 rounded-full">
-                            <CloseIcon size={16} color={currentColors.error.main} />
+                            <CloseIconGradient 
+                                size={16} 
+                                colors={[
+                                    currentColors.pop.magenta,
+                                    currentColors.pop.red,
+                                ]}
+                            />
                         </Box>
                     }
                     {isClaimable && onNavigateToSuccess ? (
@@ -291,13 +294,14 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                 </Box>
             )}
             <ScrollView
-                className="flex-1 px-4"
+                className="flex-1"
+                contentContainerClassName="flex flex-col justify-start"
                 showsVerticalScrollIndicator={false}
             >
 
 
                 {sessions.length === 0 ? (
-                    <Box className="items-center justify-center py-16">
+                    <Box className="items-center justify-center py-16 px-4">
                         <Text className="text-4xl mb-4">📚</Text>
                         <Text className="text-lg font-medium mb-2" style={{ color: currentColors.text.main }}>
                             No sessions yet
@@ -309,7 +313,7 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                 ) : (
                     Object.entries(groupedSessions).map(([date, dateSessions]: any) => (
                         <Box key={date} className="mb-6">
-                            <Text className="text-sm font-medium mb-3" style={{ color: currentColors.text.soft }}>
+                            <Text className="text-sm font-medium mb-3 px-4 text-left" style={{ color: currentColors.text.soft }}>
                                 {date}
                             </Text>
                             {dateSessions.map((session: any) => (

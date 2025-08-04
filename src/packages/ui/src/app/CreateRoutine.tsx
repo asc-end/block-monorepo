@@ -3,12 +3,15 @@ import { PlayIcon } from './icons/PlayIcon';
 import { ChevronIcon } from './icons/ChevronIcon';
 import { EmojiPicker } from './components/EmojiPicker';
 import { useRoutineStore } from '../stores/routineStore';
-import { Box, Text, Button, Pressable, Drawer, useTheme, TextInput } from '@blockit/cross-ui-toolkit';
+import { Box, Text, Button, Pressable, Drawer, useTheme, TextInput, NumberInput } from '@blockit/cross-ui-toolkit';
 import { api } from '../stores/authStore';
 import { createCommitmentWithRetry } from '@blockit/shared';
 import { useUser } from '../hooks/useUser';
+import { SolIcon } from './icons/SolIcon';
+import { formatTimeDescription } from '../lib/timeFormatting';
+import { PencilIcon } from './icons/PencilIcon';
 
-function CardRow({ label, value, onPress }: { label: string; value: string; onPress?: () => void }) {
+function CardRow({ label, value, onPress, icon }: { label: string; value: string; onPress?: () => void; icon?: React.ReactNode }) {
     const isNotSet = value === 'Not set';
     const { currentColors } = useTheme();
 
@@ -23,7 +26,7 @@ function CardRow({ label, value, onPress }: { label: string; value: string; onPr
                 <Text variant='body'>{label}</Text>
                 {!isNotSet && <Text variant='h6'>{value}</Text>}
             </Box>
-            <ChevronIcon color={currentColors.text.soft} />
+            {icon || <ChevronIcon color={currentColors.text.soft} />}
         </Pressable>
     );
 }
@@ -33,19 +36,26 @@ type CreateRoutineProps = {
     onApps: () => void;
     onRoutineTime: () => void;
     onCalendar: () => void;
-    onMoney: () => void;
+    onMoney?: () => void;
     sendTransaction: (tx: any) => Promise<{signature: string}>;
 }
 
 export function CreateRoutine(props: CreateRoutineProps) {
     const modalizeRef = useRef<any>(null);
+    const stakeModalRef = useRef<any>(null);
     const { onBack, onApps, onRoutineTime, onCalendar, onMoney, sendTransaction } = props;
     const [routineName, setRoutineName] = useState("New Routine");
     const [routineEmoji, setRoutineEmoji] = useState("🚀");
     const [isCreating, setIsCreating] = useState(false);
+    const [localStakeAmount, setLocalStakeAmount] = useState(0);
     const {user} = useUser()
+    const { currentColors } = useTheme();
 
-    const { endDate, blockedApps, stakeAmount, timeSettings, resetRoutineState } = useRoutineStore();
+    const { endDate, blockedApps, stakeAmount, setStakeAmount, timeSettings, resetRoutineState } = useRoutineStore();
+    
+    useEffect(() => {
+        setLocalStakeAmount(stakeAmount || 0);
+    }, [stakeAmount]);
 
     const handleCreateRoutine = async () => {
         if (!routineName.trim() || isCreating || !user) return;
@@ -162,11 +172,12 @@ export function CreateRoutine(props: CreateRoutineProps) {
             <Box className="mt-4 flex flex-col flex-1" style={{ gap: 6 }}>
                 <CardRow
                     label="Time Settings"
-                    value={timeSettings.timeMode === 'blocking'
-                        ? `${timeSettings.startTime} - ${timeSettings.endTime}`
-                        : timeSettings.timeMode === 'limit'
-                            ? `${timeSettings.duration} min daily`
-                            : 'Not set'}
+                    value={formatTimeDescription(
+                        timeSettings.timeMode,
+                        timeSettings.startTime,
+                        timeSettings.endTime,
+                        timeSettings.duration
+                    ) || 'Not set'}
                     onPress={() => onRoutineTime()}
                 />
                 <CardRow
@@ -180,9 +191,10 @@ export function CreateRoutine(props: CreateRoutineProps) {
                     onPress={onApps}
                 />
                 <CardRow
-                    label="Money"
+                    label="Stake"
                     value={stakeAmount ? formatStakeAmount(stakeAmount) : 'Not set'}
-                    onPress={onMoney}
+                    onPress={() => stakeModalRef.current?.open()}
+                    icon={<PencilIcon size={20} color={currentColors.text.soft} />}
                 />
             </Box>
 
@@ -212,6 +224,63 @@ export function CreateRoutine(props: CreateRoutineProps) {
                         modalizeRef.current?.close()
                     }}
                 />
+            </Drawer>
+            
+            <Drawer ref={stakeModalRef}>
+                <Box className="p-4 rounded-t-xl">
+                    <Box className="flex flex-row items-center gap-2 mb-2">
+                        <SolIcon size={24} color={currentColors.primary[500]} />
+                        <Text variant="h6">Set Stake Amount</Text>
+                    </Box>
+                    <Text variant="body" style={{ color: currentColors.text.soft }} className="mb-4">
+                        Stake SOL to commit to completing your routine. If you fail, your stake will be forfeited.
+                    </Text>
+                    <Box className="mb-4">
+                        <NumberInput
+                            value={localStakeAmount}
+                            onChangeNumber={(value) => setLocalStakeAmount(value || 0)}
+                            min={0}
+                            max={100}
+                            step={0.01}
+                            allowDecimals={true}
+                            placeholder="0.00"
+                            variant="outline"
+                            size="lg"
+                            showClearButton={true}
+                        />
+                        <Box className="flex flex-row gap-2 justify-center flex-wrap mt-3">
+                            {[0.05, 0.1, 0.2, 0.5, 1].map((preset) => (
+                                <Pressable
+                                    key={preset}
+                                    className={`flex-1 p-2 rounded-lg flex items-center justify-center`}
+                                    style={{ 
+                                        backgroundColor: localStakeAmount === preset 
+                                            ? currentColors.primary[500] 
+                                            : currentColors.neutral[200],
+                                        minWidth: 60
+                                    }}
+                                    onPress={() => setLocalStakeAmount(preset)}
+                                >
+                                    <Text variant="body" style={{ 
+                                        color: localStakeAmount === preset 
+                                            ? currentColors.white 
+                                            : currentColors.text.soft 
+                                    }}>
+                                        {preset} SOL
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </Box>
+                    </Box>
+                    <Button
+                        title="Save"
+                        variant="primary"
+                        onPress={() => {
+                            setStakeAmount(localStakeAmount > 0 ? localStakeAmount : undefined);
+                            stakeModalRef.current?.close();
+                        }}
+                    />
+                </Box>
             </Drawer>
         </Box>
     );

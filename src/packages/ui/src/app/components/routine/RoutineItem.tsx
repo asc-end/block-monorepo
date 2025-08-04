@@ -1,6 +1,7 @@
 import { Pressable, Box, Text, useTheme } from '@blockit/cross-ui-toolkit';
 import type { Routine } from '@blockit/shared';
 import { getRoutineStatusDisplay } from '../../../lib/routine';
+import { formatTimeDescription } from '../../../lib/timeFormatting';
 
 interface RoutineItemProps {
   routine: Routine;
@@ -8,30 +9,12 @@ interface RoutineItemProps {
 }
 
 function getRoutineTimeDescription(routine: Routine): string {
-  if (routine.timeMode === 'blocking' && routine.startTime && routine.endTime) {
-    // Convert 24-hour format to 12-hour format with AM/PM
-    const formatTime = (time: string) => {
-      const [hour, min] = time.split(':').map(Number);
-      const period = hour >= 12 ? 'PM' : 'AM';
-      const displayHour = hour % 12 || 12;
-      return `${displayHour}:${min.toString().padStart(2, '0')} ${period}`;
-    };
-    
-    return `${formatTime(routine.startTime)} - ${formatTime(routine.endTime)}`;
-  }
-  
-  if (routine.timeMode === 'limit' && routine.dailyLimit) {
-    const hours = Math.floor(routine.dailyLimit / 60);
-    const minutes = routine.dailyLimit % 60;
-    if (hours > 0 && minutes > 0) {
-      return `${hours}h ${minutes}m daily`;
-    } else if (hours > 0) {
-      return `${hours}h daily`;
-    }
-    return `${minutes}m daily`;
-  }
-  
-  return '';
+  return formatTimeDescription(
+    routine.timeMode as 'blocking' | 'limit',
+    routine.startTime,
+    routine.endTime,
+    routine.dailyLimit
+  );
 }
 
 export function RoutineItem({ routine, onPress }: RoutineItemProps) {

@@ -26,7 +26,7 @@ export function Button(props: ButtonProps): React.ReactElement {
     const { currentColors } = useTheme();
     const variantStyle = getButtonStyles(currentColors, variant);
     const sizeStyle = buttonSizeStyles[size];
-    const isPrimary = variant === 'primary';
+    const isPrimary = variant === 'primary' || variant === 'destructive';
 
     // Memoize styles to prevent recreation on every render
     const nativeStyles = useMemo(() => StyleSheet.create({
@@ -50,7 +50,7 @@ export function Button(props: ButtonProps): React.ReactElement {
         buttonPressed: {
             transform: isPrimary ? [{ translateY: 4 }] : [],
             opacity: isPrimary ? 1 : 0.8,
-            backgroundColor: (variantStyle['&:active'] as any)?.backgroundColor || variantStyle.backgroundColor,
+            backgroundColor: style?.backgroundColor || (variantStyle['&:active'] as any)?.backgroundColor || variantStyle.backgroundColor,
         },
         shadow: {
             position: 'absolute' as const,

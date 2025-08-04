@@ -1,5 +1,5 @@
 export * from './types';
-export * from './box/Box';
+export * from './box';
 export * from './text/Text';
 export * from './buttons/Button';
 export * from './buttons/Pressable';
@@ -17,3 +17,4 @@ export * from './numberInput/NumberInput';
 export * from './toggle';
 export * from './gradient';
 export * from './gradient/Gradient';
+export * from './animated';

@@ -41,10 +41,10 @@ export function StatsSummary() {
           </Text>
         </Box>
         <Box className="flex flex-col items-center gap-1 w-12">
-          <Text variant="caption" style={{  color: currentColors.text.soft, fontSize: 11}}>
+          <Text variant="caption" className='opacity-60' style={{  color: currentColors.text.soft, fontSize: 11}}>
             lost
           </Text>
-          <Text variant="h5" style={{ fontSize: 20, lineHeight: 24, fontFamily: 'ClashDisplay', fontWeight: "400" }}>
+          <Text className='opacity-60' variant="h5" style={{ fontSize: 20, lineHeight: 24, fontFamily: 'ClashDisplay', fontWeight: "600" }}>
             {canceledValue}
           </Text>
         </Box>

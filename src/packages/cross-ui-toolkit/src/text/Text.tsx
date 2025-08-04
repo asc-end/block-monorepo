@@ -6,6 +6,8 @@ export function Text(props: TextProps) {
   const { currentColors } = useTheme();
   const variantStyle = textVariants[variant];
 
+  if (style)
+    style.lineHeight = null
   // Get default text color based on variant
   const getDefaultTextColor = () => {
     switch (variant) {
@@ -20,11 +22,15 @@ export function Text(props: TextProps) {
     color: getDefaultTextColor(),
     ...style,
   };
-  
+
+  // If className is provided, use it instead of variant styles
+  // This allows full override of text styles with Tailwind classes
+  const combinedClassName = className || variantStyle;
+
   return (
     <p
       style={defaultStyle}
-      className={`${variantStyle} ${className || ''}`}
+      className={combinedClassName}
       {...rest}
     >
       {children}

@@ -8,7 +8,7 @@ export interface ScrollViewProps extends BaseProps {
   onScroll?: (event: any) => void;
   scrollEnabled?: boolean;
   contentContainerStyle?: any;
-  contentContainerClassName?: string;
+  // contentContainerClassName?: string;
   scrollEventThrottle?: number;
 }
 
@@ -23,16 +23,31 @@ export function ScrollView(props: ScrollViewProps) {
     onScroll,
     scrollEnabled = true,
     contentContainerStyle,
-    contentContainerClassName,
+    // contentContainerClassName,
     ...rest
   } = props;
 
   // Extract layout styles from style prop and move them to contentContainerStyle
-  const { justifyContent, alignItems, ...remainingStyle } = style || {};
+  const { 
+    justifyContent, 
+    alignItems, 
+    alignContent,
+    flexDirection,
+    flexWrap,
+    flexGrow,
+    flexShrink,
+    ...remainingStyle 
+  } = style || {};
+  
   const mergedContentContainerStyle = {
-    ...contentContainerStyle,
     justifyContent,
     alignItems,
+    alignContent,
+    flexDirection,
+    flexWrap,
+    flexGrow,
+    flexShrink,
+    ...contentContainerStyle,
   };
 
   return (
@@ -43,12 +58,11 @@ export function ScrollView(props: ScrollViewProps) {
       onScroll={onScroll}
       scrollEnabled={scrollEnabled}
       style={remainingStyle}
+      contentContainerStyle={mergedContentContainerStyle}
       className={className}
       {...rest}
     >
-      <View style={mergedContentContainerStyle} className={contentContainerClassName}>
-        {children}
-      </View>
+      {children}
     </RNScrollView>
   );
 }

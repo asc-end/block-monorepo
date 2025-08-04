@@ -1,10 +1,12 @@
 import { BaseProps } from '../types';
-import { View as RNView } from 'react-native';
+import { View as RNView, ViewProps } from 'react-native';
 
-export function Box(props: BaseProps) {
-  const { children, style, className } = props;
+export interface BoxProps extends BaseProps, Omit<ViewProps, 'style' | 'children'> {}
+
+export function Box(props: BoxProps) {
+  const { children, style, className, ...restProps } = props;
   return (
-    <RNView style={[style]} className={className} {...props}>
+    <RNView style={[style]} className={className} {...restProps}>
       {children}
     </RNView>
   );

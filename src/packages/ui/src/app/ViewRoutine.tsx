@@ -5,6 +5,7 @@ import { PauseIcon } from './icons/PauseIcon';
 import { PlayIcon } from './icons/PlayIcon';
 import { api } from '../stores/authStore';
 import { getRoutineStatusDisplay } from '../lib/routine';
+import { formatTimeDescription } from '../lib/timeFormatting';
 
 function CardRow({ label, value }: { label: string; value: string }) {
     const { currentColors } = useTheme();
@@ -151,12 +152,12 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
     };
 
     const formatTimeSettings = () => {
-        if (routine.timeMode === 'blocking') {
-            return `${routine.startTime} - ${routine.endTime}`;
-        } else if (routine.timeMode === 'limit') {
-            return `${routine.dailyLimit} min daily`;
-        }
-        return 'Not set';
+        return formatTimeDescription(
+            routine.timeMode as 'blocking' | 'limit',
+            routine.startTime,
+            routine.endTime,
+            routine.dailyLimit
+        ) || 'Not set';
     };
 
     const formatBlockedApps = () => {

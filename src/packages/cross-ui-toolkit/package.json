@@ -32,7 +32,8 @@
     "react-native-gesture-handler": "~2.27.1",
     "react-native-modalize": "*",
     "react-native-reanimated": "*",
-    "react-native-svg": "*"
+    "react-native-svg": "*",
+    "framer-motion": "*"
   },
   "peerDependenciesMeta": {
     "react-native": {
@@ -51,6 +52,9 @@
       "optional": true
     },
     "react-native-svg": {
+      "optional": true
+    },
+    "framer-motion": {
       "optional": true
     }
   },

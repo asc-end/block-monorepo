@@ -41,8 +41,8 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
       </Box>
 
       {/* Search Input */}
-      <TextInput 
-        style={{ width: '100%', marginBottom: 12}}
+      <TextInput
+        style={{ width: '100%', marginBottom: 12 }}
         placeholder="Search emojis..."
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -62,7 +62,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
                 onPress={() => setSelectedCategory(category)}
                 style={{
                   backgroundColor: selectedCategory === category
-                    ? currentColors.primary[400]
+                    ? currentColors.secondary[500] + "40"
                     : currentColors.surface.card
                 }}
                 className={`px-3 py-1.5 rounded-2xl`}
@@ -71,7 +71,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
                   variant="caption"
                   className=' text-nowrap'
                   style={{
-                    color: currentColors.text.main,
+                    color: selectedCategory === category ? currentColors.secondary[400] : currentColors.text.main,
                     fontWeight: selectedCategory === category ? '600' : '400'
                   }}
                 >

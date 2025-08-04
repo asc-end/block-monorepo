@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Box, Text, Button, Pressable, useTheme } from '@blockit/cross-ui-toolkit';
-import { ChevronIcon } from '../../icons/ChevronIcon';
+import { useState, useEffect } from 'react';
+import { Box, Text, Button, useTheme, Pressable } from '@blockit/cross-ui-toolkit';
 import { useRoutineStore } from '../../../stores/routineStore';
+import { Calendar } from '../calendar/Calendar';
+import { MonthSelector } from '../calendar/MonthSelector';
 
 type CalendarProps = {
     onBack: () => void;
@@ -9,169 +10,135 @@ type CalendarProps = {
 
 export function RoutineCalendar({ onBack }: CalendarProps) {
     const { currentColors } = useTheme();
-    const { endDate, setEndDate } = useRoutineStore();
+    const { endDate, draft, setDraftEndDate, commitDraft, initializeDraft } = useRoutineStore();
     
-    // Initialize currentMonth to the month containing endDate, or current month if no endDate
+    // Initialize draft on mount
+    useEffect(() => {
+        initializeDraft();
+    }, []);
+    
+    // Initialize currentMonth based on the initial endDate or draft
     const [currentMonth, setCurrentMonth] = useState(() => {
-        return endDate ? new Date(endDate.getFullYear(), endDate.getMonth(), 1) : new Date();
+        const dateToUse = draft.endDate || endDate;
+        return dateToUse ? new Date(dateToUse.getFullYear(), dateToUse.getMonth(), 1) : new Date();
     });
     
-    // Initialize tempSelectedDate to endDate if it exists
-    const [tempSelectedDate, setTempSelectedDate] = useState<Date | null>(endDate ?? null);
+    // Initialize tempSelectedDate from draft or saved state
+    const [tempSelectedDate, setTempSelectedDate] = useState<string | null>(() => {
+        const dateToUse = draft.endDate || endDate;
+        return dateToUse ? 
+            `${dateToUse.getFullYear()}-${String(dateToUse.getMonth() + 1).padStart(2, '0')}-${String(dateToUse.getDate()).padStart(2, '0')}` : 
+            null;
+    });
+    
+    // Update tempSelectedDate when draft changes
+    useEffect(() => {
+        if (draft.endDate) {
+            const dateStr = `${draft.endDate.getFullYear()}-${String(draft.endDate.getMonth() + 1).padStart(2, '0')}-${String(draft.endDate.getDate()).padStart(2, '0')}`;
+            setTempSelectedDate(dateStr);
+        }
+    }, [draft.endDate]);
     
     const today = new Date();
+    const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    const getDaysInMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month + 1, 0).getDate();
+    const handleDateSelect = (dateStr: string) => {
+        setTempSelectedDate(dateStr);
+        // Update draft when date is selected
+        if (dateStr) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            setDraftEndDate(date);
+        }
     };
 
-    const getFirstDayOfMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month, 1).getDay();
+    const handleMonthChange = (month: Date) => {
+        setCurrentMonth(month);
     };
 
-    const formatMonthYear = (date: Date) =>
-        date.toLocaleString('default', { month: 'long', year: 'numeric' });
-
-    const handlePrevMonth = () =>
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-    const handleNextMonth = () =>
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-
-    const handleDateSelect = (day: number) => {
-        const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-        setTempSelectedDate(newDate);
+    const handleMonthDelta = (delta: number) => {
+        const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1);
+        setCurrentMonth(newMonth);
     };
 
     const handleSave = () => {
-        if (tempSelectedDate) {
-            setEndDate(tempSelectedDate);
-            onBack();
-        }
+        // Commit draft to saved state
+        commitDraft();
+        onBack();
     };
 
-    // Calculate number of rows for the current month
-    const getCalendarRows = () => {
-        const daysInMonth = getDaysInMonth(currentMonth);
-        const firstDay = getFirstDayOfMonth(currentMonth);
-        return Math.ceil((firstDay + daysInMonth) / 7);
+    // Check if we can navigate to previous month
+    const canGoPrevMonth = () => {
+        return !(
+            currentMonth.getFullYear() === today.getFullYear() &&
+            currentMonth.getMonth() === today.getMonth()
+        );
     };
 
-    const renderCalendarDays = () => {
-        const daysInMonth = getDaysInMonth(currentMonth);
-        const firstDay = getFirstDayOfMonth(currentMonth);
-        const totalRows = getCalendarRows();
-        const totalCells = totalRows * 7;
-        const days = [];
+    const renderDay = (day: any, isSelected: boolean, index: number) => {
+        const isToday = day.date && day.date === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const isClickable = day.date && !day.isDisabled;
+        
+        // Check if this is the initially saved date
+        const savedDateStr = endDate ? 
+            `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}` : 
+            null;
+        const isInitialDate = day.date && day.date === savedDateStr;
+        const isDraftChanged = isSelected && !isInitialDate; // Selected but different from saved
 
-        // Fill all cells (including empty ones at start/end)
-        for (let cell = 0; cell < totalCells; cell++) {
-            const day = cell - firstDay + 1;
-            if (cell < firstDay || day > daysInMonth) {
-                // Empty cell
-                days.push(
-                    <Box
-                        key={`empty-${cell}`}
+        return (
+            <Box
+                key={`${day.month}-${day.day || index}-${day.date || index}`}
+                style={{
+                    width: '14.285714%',
+                    padding: 2,
+                    height: 40,
+                }}
+            >
+                <Pressable
+                    onPress={() => isClickable && handleDateSelect(day.date)}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: isDraftChanged
+                            ? currentColors.primary[500]  // New selection - solid primary
+                            : isSelected && isInitialDate
+                                ? currentColors.primary[200]  // Saved date - lighter primary
+                                : isToday ? currentColors.secondary[800] + "50" : 'transparent',  // No background for today
+                        borderWidth: isInitialDate && !isSelected ? 2 : 0,  // Border for saved date when not selected
+                        borderColor: currentColors.primary[400],
+                        borderRadius: 8,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        opacity: day.isDisabled ? 0.3 : (day.date ? 1 : 0),
+                        cursor: day.isDisabled ? 'not-allowed' : 'pointer',
+                    }}
+                    disabled={!isClickable}
+                >
+                    <Text
                         style={{
-                            width: '14.28%',
-                            aspectRatio: '1/1',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            padding: 2,
-                        }}
-                    />
-                );
-            } else {
-                const isSelected =
-                    tempSelectedDate &&
-                    tempSelectedDate.getDate() === day &&
-                    tempSelectedDate.getMonth() === currentMonth.getMonth() &&
-                    tempSelectedDate.getFullYear() === currentMonth.getFullYear();
-
-                const isToday =
-                    today.getDate() === day &&
-                    today.getMonth() === currentMonth.getMonth() &&
-                    today.getFullYear() === currentMonth.getFullYear();
-
-                const isPastDate =
-                    new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day) <
-                    new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-                days.push(
-                    <Box
-                        key={day}
-                        className="flex flex-row items-center justify-center"
-                        style={{
-                            width: '14.28%',
-                            aspectRatio: '1/1',
-                            padding: 2,
-                        }}
-                    >
-                        <Pressable
-                            hitSlop={{ top: 8, left: 8, right: 8, bottom: 8 }}
-                            style={{
-                                width: '80%',
-                                height: '80%',
-                                minWidth: 36,
-                                minHeight: 36,
-                                maxWidth: 48,
-                                maxHeight: 48,
-                                background:
-                                    isSelected
-                                        ? `linear-gradient(135deg, ${currentColors.secondary[500]}, ${currentColors.secondary[600]})`
+                            color: isDraftChanged
+                                ? currentColors.white  // White text for new selection
+                                : isSelected && isInitialDate
+                                    ? currentColors.primary[700]  // Darker text for saved date
+                                    : isInitialDate && !isSelected
+                                        ? currentColors.primary[600]  // Primary color for saved date when not selected
                                         : isToday
-                                            ? `linear-gradient(135deg, ${currentColors.primary[50]}, ${currentColors.primary[100]})`
-                                            : 'transparent',
-                                borderWidth: isSelected ? 2 : isToday ? 2 : 0,
-                                borderColor: isSelected
-                                    ? currentColors.secondary[700]
-                                    : isToday
-                                        ? currentColors.primary[500]
-                                        : 'transparent',
-                                borderRadius: 10,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                opacity: isPastDate ? 0.4 : 1,
-                                boxShadow: isSelected
-                                    ? `0 2px 6px ${currentColors.secondary[500]}40, 0 1px 2px ${currentColors.secondary[600]}20`
-                                    : isToday
-                                        ? `0 1px 4px ${currentColors.primary[200]}60`
-                                        : 'none',
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                cursor: isPastDate ? 'not-allowed' : 'pointer',
-                                transform: 'scale(1)',
-                            }}
-                            className="hover:scale-105 active:scale-95"
-                            onPress={() => !isPastDate && handleDateSelect(day)}
-                            disabled={isPastDate}
-                        >
-                            <Text
-                                style={{
-                                    color: isSelected
-                                        ? currentColors.primary[50]
-                                        : isToday
-                                            ? currentColors.primary[700]
-                                            : isPastDate
+                                            ? currentColors.secondary[400]  // Regular text color for today
+                                            : day.isDisabled
                                                 ? currentColors.text.soft
                                                 : currentColors.text.main,
-                                    fontSize: 15,
-                                    fontWeight: isSelected ? '700' : isToday ? '600' : '500',
-                                    textAlign: 'center',
-                                    letterSpacing: 0.2,
-                                }}
-                            >
-                                {day}
-                            </Text>
-                        </Pressable>
-                    </Box>
-                );
-            }
-        }
-
-        return days;
+                            fontSize: 14,
+                            fontWeight: isSelected || isInitialDate ? '600' : '400',
+                            textDecoration: isToday && !isSelected && !isInitialDate ? 'underline' : 'none',  // Subtle underline for today
+                            textAlign: 'center',
+                        }}
+                    >
+                        {day.day}
+                    </Text>
+                </Pressable>
+            </Box>
+        );
     };
 
     return (
@@ -189,91 +156,42 @@ export function RoutineCalendar({ onBack }: CalendarProps) {
                 </Text>
             </Box>
 
-            <Box className="flex-1 px-4 py-4">
+            <Box className="flex-1 px-4 pt-8 pb-2">
                 {/* Calendar Container */}
                 <Box
-                    className="flex flex-col rounded-3xl overflow-hidden border border-solid"
+                    className="flex flex-col rounded-2xl overflow-hidden"
                     style={{
-                        background: `linear-gradient(135deg, ${currentColors.surface.elevated} 60%, ${currentColors.primary[50]} 100%)`,
-                        boxShadow: `0 8px 32px 0 ${currentColors.secondary[400]}33, 0 1.5px 6px 0 ${currentColors.secondary[400]}22`,
-                        border: `1.5px solid ${currentColors.secondary[200]}40`,
+                        backgroundColor: currentColors.surface.elevated,
+                        borderWidth: 1,
+                        borderColor: currentColors.border,
                         width: '100%',
-                        flex: 1,
-                        minHeight: 360,
-                        maxHeight: 500,
                         justifyContent: 'flex-start',
                     }}
                 >
-                    {/* Month Navigation */}
-                    <Box
-                        className="flex flex-row justify-between items-center p-2"
-                        style={{ background: currentColors.background, borderBottom: `1px solid ${currentColors.neutral[600]}` }}
-                    >
-                        <Pressable
-                            onPress={handlePrevMonth}
-                            disabled={
-                                currentMonth.getFullYear() === today.getFullYear() &&
-                                currentMonth.getMonth() === today.getMonth()
-                            }
-                            style={{
-                                padding: 8,
-                                borderRadius: 8,
-                                background: currentColors.surface.elevated,
-                                boxShadow: `0 1px 2px ${currentColors.neutral[200]}40`,
-                                border: `1px solid ${currentColors.neutral[200]}`,
-                            }}
-                            className="hover:scale-105 active:scale-95"
-                        >
-                            <ChevronIcon direction="left" size={16} color={currentColors.text.soft} />
-                        </Pressable>
-
-                        <Text variant="h4" style={{ fontSize: 16 }}>
-                            {formatMonthYear(currentMonth)}
-                        </Text>
-
-                        <Pressable
-                            onPress={handleNextMonth}
-                            style={{
-                                padding: 8,
-                                borderRadius: 8,
-                                background: currentColors.surface.elevated,
-                                boxShadow: `0 1px 2px ${currentColors.neutral[200]}40`,
-                                border: `1px solid ${currentColors.neutral[200]}`,
-                            }}
-                            className="hover:scale-105 active:scale-95"
-                        >
-                            <ChevronIcon size={16} color={currentColors.text.soft} />
-                        </Pressable>
-                    </Box>
-
-                    {/* Day Headers */}
-                    <Box className="flex flex-row p-1" style={{ minHeight: 32 }}>
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                            <Box key={day} className="flex-1 flex items-center justify-center">
-                                <Text className='uppercase' variant="caption" style={{ fontSize: 12 }}>
-                                    {day}
-                                </Text>
-                            </Box>
-                        ))}
-                    </Box>
-
-                    {/* Calendar Grid */}
-                    <Box
-                        className="flex flex-row flex-wrap p-1"
-                        style={{
-                            background: currentColors.surface.elevated,
-                            flex: 1,
-                            minHeight: 0,
-                            alignContent: 'stretch',
-                        }}
-                    >
-                        {renderCalendarDays()}
-                    </Box>
+                    {/* Calendar Component */}
+                    <Calendar
+                        selectedDate={tempSelectedDate || undefined}
+                        onSelectDate={handleDateSelect}
+                        currentMonth={currentMonth}
+                        onMonthChange={handleMonthChange}
+                        minDate={minDate}
+                        disableFutureDates={false}
+                        renderDay={renderDay}
+                        headerComponent={
+                            <MonthSelector
+                                currentMonth={currentMonth}
+                                onMonthChange={handleMonthDelta}
+                                disableNext={false}
+                                disablePrevious={!canGoPrevMonth()}
+                            />
+                        }
+                        weekDays={['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
+                    />
                 </Box>
             </Box>
 
             {/* Save Button */}
-            <Box className="p-3 pt-0">
+            <Box className="p-3">
                 <Button
                     title='Save'
                     variant="primary"

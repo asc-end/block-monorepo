@@ -22,6 +22,7 @@ export class RoutineBlockingService {
 
   constructor(config: RoutineBlockingConfig) {
     this.config = config;
+    console.log("CONFIG", config)
   }
 
   async fetchRoutines(): Promise<Routine[]> {

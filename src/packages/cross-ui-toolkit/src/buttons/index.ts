@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { ThemeColors } from "../theme/context";
 
 // Button variant types
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 // Button component props
@@ -126,6 +126,34 @@ export const getButtonStyles = (theme: ThemeColors, variant: ButtonVariant) => {
         transition: 'all 0.1s ease-in-out',
       },
       '&:disabled': {
+        color: theme.neutral[600],
+      },
+    },
+    destructive: {
+      backgroundColor: theme.error.main,
+      color: '#FFFFFF',
+      borderWidth: 0,
+      borderColor: theme.error.dark,
+      shadowColor: theme.error.dark,
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 0.8,
+      shadowRadius: 0,
+      elevation: 4,
+      transform: [{ translateY: 0 }],
+      transition: 'all 0.15s ease-in-out',
+      '&:hover': {
+        backgroundColor: theme.error.dark,
+      },
+      '&:active': {
+        backgroundColor: theme.error.dark,
+        shadowOffset: { width: 2, height: 2 },
+        shadowOpacity: 0.6,
+        elevation: 2,
+        transform: [{ translateY: 2 }],
+        transition: 'all 0.1s ease-in-out',
+      },
+      '&:disabled': {
+        backgroundColor: theme.neutral[300],
         color: theme.neutral[600],
       },
     },
