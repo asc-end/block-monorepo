@@ -6,6 +6,10 @@ declare function defineBackground(fn: () => void): any;
 
 let websocket: WebSocket | undefined;
 let websocketHeartbeatInterval: any;
+let websocketReconnectTimeout: any;
+let websocketReconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_DELAY = 5000; // 5 seconds
 
 // Helper function to make authenticated API calls with automatic token refresh
 const makeAuthenticatedRequest = async (
@@ -69,15 +73,20 @@ const makeAuthenticatedRequest = async (
 
 const extractUserIdFromToken = async (token: string): Promise<string | null> => {
   try {
+    console.log('Attempting to verify user token at:', `${import.meta.env.WXT_PUBLIC_API_URL}/users/verify`);
     const response = await makeAuthenticatedRequest(
       `${import.meta.env.WXT_PUBLIC_API_URL}/users/verify`
     );
 
     if (response.ok) {
       const data = await response.json();
+      console.log('User ID successfully extracted:', data.userId);
       return data.userId;
+    } else {
+      console.error('Failed to verify token, response status:', response.status);
     }
   } catch (error) {
+    console.error('Error extracting userId from token:', error);
   }
   return null;
 };
@@ -245,7 +254,7 @@ function initializeRoutineBlocking() {
   }
   
   const apiUrl = import.meta.env.WXT_PUBLIC_API_URL || 'http://localhost:3001';
-  
+  console.log("API URL", apiUrl)
   routineBlockingService = new RoutineBlockingService({
     apiUrl,
     getAuthToken,
@@ -268,30 +277,50 @@ function initializeRoutineBlocking() {
 
 
 async function makeWebsocket() {
+  // Close existing connection if any
+  if (websocket && (websocket.readyState === WebSocket.CONNECTING || websocket.readyState === WebSocket.OPEN)) {
+    console.log('WebSocket already connected or connecting, skipping...');
+    return;
+  }
+  
   const storage = await browser.storage.local.get(['authToken']);
   const token = storage.authToken;
 
   if (!token) {
+    console.log('No auth token available for WebSocket connection');
     return;
   }
 
-  const id = await extractUserIdFromToken(token)
+  const id = await extractUserIdFromToken(token);
+  
+  if (!id) {
+    console.error('Failed to extract user ID from token');
+    return;
+  }
   
   const wsUrl = `${import.meta.env.WXT_PUBLIC_WS_URL}/api/ws?userId=${id}`;
   
+  console.log('Creating WebSocket connection...');
   websocket = new WebSocket(wsUrl);
-  makeListeners()
+  makeListeners();
 }
 
 function closeWebsocket() {
-  websocket?.close()
+  if (websocketReconnectTimeout) {
+    clearTimeout(websocketReconnectTimeout);
+    websocketReconnectTimeout = null;
+  }
+  websocketReconnectAttempts = 0;
+  websocket?.close();
 }
 
 function makeListeners() {
   if (!websocket) return;
 
   websocket.onopen = function () {
-    startHeartbeat()
+    console.log('WebSocket connected successfully');
+    websocketReconnectAttempts = 0; // Reset reconnection attempts on successful connection
+    startHeartbeat();
   }
 
   websocket.onmessage = async function (event: MessageEvent) {
@@ -300,9 +329,13 @@ function makeListeners() {
       if (data.type === 'FOCUS_SESSION_UPDATED') {
         // Store focus session state
         if (data.payload.action === "created") {
-          await browser.storage.local.set({ currentFocusSession: true });
+          await browser.storage.local.set({ 
+            currentFocusSession: true,
+            focusSessionDetails: data.payload.session 
+          });
         } else {
           await browser.storage.local.remove('currentFocusSession');
+          await browser.storage.local.remove('focusSessionDetails');
         }
         
         const tabs = await browser.tabs.query({});
@@ -318,8 +351,11 @@ function makeListeners() {
             
             const action = data.payload.action == "created" ? 'BEGIN_FOCUS_SESSION' : 'STOP_FOCUS_SESSION';
             try {
-              // First try to send the message
-              await browser.tabs.sendMessage(tab.id, { action });
+              // Send the message with session details
+              await browser.tabs.sendMessage(tab.id, { 
+                action,
+                session: data.payload.action === "created" ? data.payload.session : null
+              });
             } catch (error) {
               // Content script might not be loaded
             }
@@ -330,20 +366,107 @@ function makeListeners() {
     }
   }
 
-  websocket.onclose = function () {
-    stopHeartbeat()
+  websocket.onclose = function (event) {
+    stopHeartbeat();
+    
+    // Don't reconnect if it was a normal closure
+    if (event.code === 1000) {
+      return;
+    }
+    
+    // Attempt to reconnect with exponential backoff
+    if (websocketReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      const delay = RECONNECT_DELAY * Math.pow(2, websocketReconnectAttempts);
+      console.log(`WebSocket closed unexpectedly. Reconnecting in ${delay}ms... (attempt ${websocketReconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})`);
+      
+      websocketReconnectTimeout = setTimeout(() => {
+        websocketReconnectAttempts++;
+        makeWebsocket();
+      }, delay);
+    } else {
+      console.error('Max WebSocket reconnection attempts reached. Giving up.');
+    }
+  }
+  
+  websocket.onerror = function (error) {
+    console.error('WebSocket error:', error);
+  }
+}
+
+// Check focus session status periodically
+async function checkFocusSessionStatus() {
+  try {
+    const storage = await browser.storage.local.get(['authToken']);
+    if (!storage.authToken) return;
+    
+    const response = await makeAuthenticatedRequest(
+      `${import.meta.env.WXT_PUBLIC_API_URL}/focus-sessions/active`
+    );
+    
+    if (response.ok) {
+      const session = await response.json();
+      const wasInSession = await browser.storage.local.get('currentFocusSession');
+      const isInSession = session !== null;
+      
+      // Update storage
+      if (isInSession) {
+        await browser.storage.local.set({ 
+          currentFocusSession: true,
+          focusSessionDetails: session 
+        });
+      } else {
+        await browser.storage.local.remove('currentFocusSession');
+        await browser.storage.local.remove('focusSessionDetails');
+      }
+      
+      // Notify tabs if status changed
+      if (wasInSession.currentFocusSession !== isInSession) {
+        const action = isInSession ? 'BEGIN_FOCUS_SESSION' : 'STOP_FOCUS_SESSION';
+        const tabs = await browser.tabs.query({});
+        for (const tab of tabs) {
+          if (tab.id && tab.url && 
+              !tab.url.startsWith('chrome://') && 
+              !tab.url.startsWith('chrome-extension://') &&
+              !tab.url.startsWith('edge://') &&
+              !tab.url.startsWith('about:')) {
+            try {
+              await browser.tabs.sendMessage(tab.id, { 
+                action,
+                session: isInSession ? session : null
+              });
+            } catch (error) {
+              // Content script might not be loaded
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error checking focus session status:', error);
   }
 }
 
 export default defineBackground(() => {
+  // Log environment variables for debugging
+  console.log('Extension Environment Variables:', {
+    API_URL: import.meta.env.WXT_PUBLIC_API_URL,
+    WS_URL: import.meta.env.WXT_PUBLIC_WS_URL,
+    WEB_URL: import.meta.env.WXT_PUBLIC_WEB_URL
+  });
+  
   let authWindowId: number | null = null;
   setInterval(syncHourlyUsage, SYNC_INTERVAL);
+  
+  // Check focus session status every 30 seconds as fallback
+  setInterval(checkFocusSessionStatus, 30 * 1000);
 
   // Check initial auth status on startup
   browser.storage.local.get(['authToken']).then((result) => {
     if (result.authToken) {
       // Start routine checking if authenticated
       initializeRoutineBlocking();
+      // Check focus session status immediately
+      checkFocusSessionStatus();
     }
   });
 
@@ -374,6 +497,9 @@ export default defineBackground(() => {
         
         // Start routine checking when authenticated
         initializeRoutineBlocking();
+        
+        // Establish WebSocket connection when authenticated
+        makeWebsocket();
 
       } catch (error) {
         sendResponse({ success: false, error: (error as Error).message });
@@ -394,7 +520,7 @@ export default defineBackground(() => {
       }
 
       try {
-        const backendUrl = `${import.meta.env.WXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/focus-session/status`;
+        const backendUrl = `${import.meta.env.WXT_PUBLIC_API_URL || 'http://localhost:3001'}/focus-sessions/active`;
         const response = await makeAuthenticatedRequest(backendUrl, {
           method: 'GET',
           headers: {
@@ -408,9 +534,50 @@ export default defineBackground(() => {
         }
 
         const data = await response.json();
-        sendResponse({ inFocusSession: !!data.inFocusSession });
+        sendResponse({ inFocusSession: data !== null });
       } catch (error) {
         sendResponse({ inFocusSession: false, error: (error as Error).message });
+      }
+      return true; // Keep the message channel open
+    }
+    
+    if (message.type === 'GET_FOCUS_SESSION_DETAILS') {
+      // First check if we have session details in storage
+      const storage = await browser.storage.local.get(['focusSessionDetails', 'authToken']);
+      
+      if (storage.focusSessionDetails) {
+        sendResponse({ session: storage.focusSessionDetails });
+        return true;
+      }
+      
+      // Otherwise fetch from backend
+      if (!storage.authToken) {
+        sendResponse({ session: null, error: 'No authToken' });
+        return true;
+      }
+
+      try {
+        const backendUrl = `${import.meta.env.WXT_PUBLIC_API_URL || 'http://localhost:3001'}/focus-sessions/active`;
+        const response = await makeAuthenticatedRequest(backendUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          sendResponse({ session: null, error: response.statusText });
+          return true;
+        }
+
+        const data = await response.json();
+        // Store it for future use
+        if (data) {
+          await browser.storage.local.set({ focusSessionDetails: data });
+        }
+        sendResponse({ session: data });
+      } catch (error) {
+        sendResponse({ session: null, error: (error as Error).message });
       }
       return true; // Keep the message channel open
     }

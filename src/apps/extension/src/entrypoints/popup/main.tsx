@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './style.css';
 import { App } from './App';
-import { AuthProvider, darkColors, initializeConfig } from '@blockit/ui';
+import { AuthProvider, QueryProvider, darkColors, initializeConfig } from '@blockit/ui';
 import { ThemeProvider } from '@blockit/cross-ui-toolkit';
 
 type EnvVar = {
@@ -92,12 +92,14 @@ initializeConfig(config);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider>
-      <ThemeProvider value={{ currentColors: darkColors, isDarkMode: true }}>
-        <div className='w-full flex-1 flex flex-col'>
-          <App />
-        </div>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryProvider>
+      <AuthProvider>
+        <ThemeProvider value={{ currentColors: darkColors, isDarkMode: true }}>
+          <div className='w-full flex-1 flex flex-col'>
+            <App />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryProvider>
   </React.StrictMode>,
 );

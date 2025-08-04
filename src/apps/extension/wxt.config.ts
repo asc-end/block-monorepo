@@ -24,7 +24,7 @@ export default defineConfig({
       extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.tsx', '.ts', '.jsx', '.js'],
     },
     optimizeDeps: {
-      exclude: ['react-native'],
+      exclude: ['react-native', '**/*.native.*'],
       esbuildOptions: {
         resolveExtensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.tsx', '.ts', '.jsx', '.js'],
       },
@@ -32,7 +32,7 @@ export default defineConfig({
     build: {
       commonjsOptions: {
         transformMixedEsModules: true,
-        exclude: ['react-native'],
+        exclude: ['react-native', /\.native\./],
       },
       rollupOptions: {
         external: ['react-native'],

@@ -1,5 +1,6 @@
 export { HomeScreen } from './Home';
 export { StatsScreen } from './Stats';
+export { HistoryScreen } from './History';
 export { ViewRoutineScreen } from './ViewRoutine';
 export { CreateRoutineScreen } from './create-routine/CreateRoutine';
 export { AppsScreen } from './create-routine/Apps';

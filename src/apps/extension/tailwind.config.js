@@ -10,6 +10,9 @@ export default {
   theme: {
     extend: {
       colors: {},
+      fontFamily: {
+        'clash': ['ClashDisplay', 'sans-serif'],
+      },
     },
   },
   plugins: [],
