@@ -85,15 +85,15 @@ export function HourlyUsageChart({ hourlyData, maxHourTime }: HourlyUsageChartPr
             [0, 1],
             [20, 0]
           ),
-        },
+        } as const,
         {
           scale: interpolate(
             tooltipAnimation.value,
             [0, 1],
             [0.95, 1]
           ),
-        },
-      ],
+        } as const,
+      ] as const,
     };
   });
 
@@ -350,7 +350,7 @@ export function HourlyUsageChart({ hourlyData, maxHourTime }: HourlyUsageChartPr
                         <Pressable
                           key={hour}
                           className="relative"
-                          style={{ flex: 1, marginHorizontal: 0.5 }}
+                          style={{ flex: 1 }}
                           onPress={() => handleBarPress(index)}
                           onPressIn={() => handleBarPressIn(index)}
                           onPressOut={handleBarPressOut}

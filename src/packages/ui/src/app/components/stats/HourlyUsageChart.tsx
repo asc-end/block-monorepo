@@ -82,7 +82,7 @@ export function HourlyUsageChart({ hourlyData, maxHourTime }: HourlyUsageChartPr
                 const appTotal = (platforms.mobile || 0) + (platforms.web || 0);
                 return (
                   <Box key={appName} className="flex flex-row justify-between items-center">
-                    <Text className="text-xs" style={{ color: currentColors.text.soft, maxWidth: 120 }} title={appName}>
+                    <Text className="text-xs" style={{ color: currentColors.text.soft, maxWidth: 120 }}>
                       {appName.length > 20 ? `${appName.substring(0, 20)}...` : appName}
                     </Text>
                     <Text className="text-xs font-medium" style={{ color: currentColors.text.main }}>

@@ -62,9 +62,9 @@ export function DaysScreen({ onContinue, isVisible = false }: Props) {
   const numberStyle = useAnimatedStyle(() => ({
     opacity: numberOpacity.value,
     transform: [
-      { rotate: `${numberRotate.value}deg` },
-      { scale: numberScale.value }
-    ]
+      { rotate: `${numberRotate.value}deg` } as const,
+      { scale: numberScale.value } as const
+    ] as const
   }));
 
   const perYearStyle = useAnimatedStyle(() => ({

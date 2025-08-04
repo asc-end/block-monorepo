@@ -86,7 +86,7 @@ export function useHistoricalSessions(): UseHistoricalSessionsReturn {
   if (routines) {
     routines.forEach(routine => {
       // Only include completed or canceled routines
-      if (routine.status === 'completed' || routine.status === 'canceled') {
+      if (routine.status === "completed" || routine.status === 'canceled') {
         sessions.push({
           id: routine.id,
           type: 'routine',

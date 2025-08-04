@@ -1,10 +1,5 @@
 import { Alert as RNAlert, Platform } from 'react-native';
-
-export interface AlertButton {
-  text: string;
-  onPress?: () => void;
-  style?: 'default' | 'cancel' | 'destructive';
-}
+import type { AlertButton } from './Alert';
 
 /**
  * Cross-platform alert function that works like React Native's Alert.alert()

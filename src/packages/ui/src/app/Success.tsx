@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Text, Button, useTheme, ScrollView } from '@blockit/cross-ui-toolkit';
+import { Box, Text, Button, useTheme, ScrollView, Pressable } from '@blockit/cross-ui-toolkit';
 import { SolIcon } from './icons/SolIcon';
 import { Rainbow } from './components/svgs/Raibow';
 import { Star } from './components/svgs/Star';
@@ -11,12 +11,14 @@ interface SuccessProps {
   sessionId?: string;
   claimMode?: 'single' | 'multiple';
   sendTransaction: (tx: Transaction | VersionedTransaction) => Promise<{ signature: string } | null>;
+  onBack:() => {}
 }
 
 export function Success({
   sessionId,
   claimMode = 'single',
-  sendTransaction
+  sendTransaction,
+  onBack
 }: SuccessProps) {
   const { currentColors } = useTheme();
   const [session, setSession] = useState<HistoricalSession | null>(null);
@@ -86,7 +88,7 @@ export function Success({
   }
 
   return (
-    <Box className="flex-1 p-6 pb-16" style={{ backgroundColor: currentColors.background }}
+    <Pressable onPress={onBack} className="flex-1 p-6 pb-16" style={{ backgroundColor: currentColors.background }}
     >
       <Box className="flex-1 px-6 pt-32 items-center">
 
@@ -240,6 +242,6 @@ export function Success({
         )}
       </Box>
 
-    </Box>
+    </Pressable>
   );
 }

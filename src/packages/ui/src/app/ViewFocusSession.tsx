@@ -112,11 +112,11 @@ export function ViewFocusSession({ sessionId, onBack }: ViewFocusSessionProps) {
 
     const getStatusColor = () => {
         switch (session.status) {
-            case 'finished':
-                return currentColors.success?.main || currentColors.success?.[500] || '#10b981';
+            case 'completed':
+                return currentColors.success?.main || currentColors.success?.main || '#10b981';
             case 'canceled':
-                return currentColors.error?.main || currentColors.error?.[500] || '#ef4444';
-            case 'in_progress':
+                return currentColors.error?.main || currentColors.error?.main || '#ef4444';
+            case 'active':
                 return currentColors.primary?.[500] || '#3b82f6';
             default:
                 return currentColors.neutral?.[500] || '#6b7280';
@@ -160,7 +160,7 @@ export function ViewFocusSession({ sessionId, onBack }: ViewFocusSessionProps) {
                     value={commitmentInfo.value}
                     icon={commitmentInfo.icon}
                 />
-                {session.status === 'finished' && (
+                {session.status === 'completed' && (
                     <CardRow
                         label="Completed"
                         value={formatDate(new Date(new Date(session.startTime).getTime() + session.duration * 60 * 1000))}

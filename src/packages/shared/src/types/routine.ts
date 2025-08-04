@@ -42,7 +42,7 @@ export interface Routine {
   endTime?: string;
   dailyLimit?: number;
   endDate?: string;
-  status: 'active' | 'paused' | 'completed' | 'canceled';
+  status: 'active' | 'completed' | 'canceled',
   blockedApps: RoutineApp[];
   commitment?: Commitment;
   createdAt: string;

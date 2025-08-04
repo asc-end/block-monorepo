@@ -21,7 +21,10 @@ export interface MerkleLeaf {
 }
 
 export function createMerkleLeafData(seller: PublicKey, amount: BN): Buffer {
-  return Buffer.concat([seller.toBuffer(), amount.toArrayLike(Buffer, 'le', 8)]);
+  return Buffer.concat([
+    seller.toBuffer() as unknown as Uint8Array, 
+    amount.toArrayLike(Buffer, 'le', 8) as unknown as Uint8Array
+  ]);
 }
 
 // Create a snapshot merkle leaf that includes just the seller address

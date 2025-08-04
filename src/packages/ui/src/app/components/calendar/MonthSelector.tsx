@@ -42,7 +42,7 @@ export function MonthSelector({
               ? currentColors.neutral[300] + '50'
               : currentColors.neutral[200] + '60',
           opacity: disablePrevious ? 0.5 : 1,
-          transform: [{ scale: prevPressed && !disablePrevious ? 0.95 : 1 }],
+          transform: `scale(${prevPressed && !disablePrevious ? 0.95 : 1})`,
           transition: 'all 0.2s ease'
         }}
         disabled={disablePrevious}
@@ -77,7 +77,7 @@ export function MonthSelector({
               ? currentColors.neutral[300] + '50'
               : currentColors.neutral[200] + '60',
           opacity: disableNext ? 0.5 : 1,
-          transform: [{ scale: nextPressed && !disableNext ? 0.95 : 1 }],
+          transform: `scale(${nextPressed && !disableNext ? 0.95 : 1})`,
           transition: 'all 0.2s ease'
         }}
         disabled={disableNext}

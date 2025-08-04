@@ -60,7 +60,6 @@ export function useAppUsageQuery(props: UseAppUsageProps = {}): UseAppUsageQuery
             return data;
         },
         staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
-        cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     });
 
     // Query for hourly stats
@@ -79,7 +78,6 @@ export function useAppUsageQuery(props: UseAppUsageProps = {}): UseAppUsageQuery
         },
         enabled: !!hourlyDate, // Only run if hourlyDate is provided
         staleTime: 1000 * 60 * 5,
-        cacheTime: 1000 * 60 * 30,
     });
 
     // Function to invalidate and refetch all queries

@@ -4,15 +4,8 @@ import type { Routine } from '@blockit/shared';
  * Check if a routine is currently within its active time window
  */
 export function isRoutineInActiveTimeWindow(routine: Routine): boolean {
-  // If routine is not active, it's not in time window
-  if (routine.status !== 'active') {
-    return false;
-  }
-
-  // For limit mode, it's always active when status is active
-  if (routine.timeMode === 'limit') {
-    return true;
-  }
+  if (routine.status !== 'active') return false;
+  if (routine.timeMode === 'limit') return true;
 
   // For blocking mode, check if current time is within start and end time
   if (routine.timeMode === 'blocking' && routine.startTime && routine.endTime) {
@@ -53,16 +46,12 @@ export function isRoutineInActiveTimeWindow(routine: Routine): boolean {
  * Get a display label for routine status
  */
 export function getRoutineStatusDisplay(routine: Routine): { label: string; color: string } {
-  if (routine.status === 'completed') {
+  if (routine.status === "completed") {
     return { label: 'completed', color: 'neutral' };
   }
   
   if (routine.status === 'canceled') {
     return { label: 'canceled', color: 'error' };
-  }
-  
-  if (routine.status === 'paused') {
-    return { label: 'paused', color: 'warning' };
   }
 
   // For active status, check if it's currently in time window

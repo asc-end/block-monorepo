@@ -192,11 +192,13 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
 
     Object.entries(appUsageData).forEach(([date, apps]) => {
       const totalTime = Object.entries(apps).reduce((sum, [appName, platforms]) => {
-        // Filter out usage less than 1 second
-        const filteredPlatforms = Object.fromEntries(
-          Object.entries(platforms).filter(([, time]) => time >= 1000)
-        );
-        return sum + Object.values(filteredPlatforms).reduce((appSum, time) => appSum + time, 0);
+        // Filter out usage less than 1 second and sum the values
+        return sum + Object.entries(platforms).reduce((appSum, [, time]) => {
+          if (time != null && Number(time) >= 1000) {
+            return appSum + Number(time);
+          }
+          return appSum;
+        }, 0);
       }, 0);
 
       if (totalTime > 0) {
@@ -217,11 +219,13 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
 
     return Object.entries(appUsageData[selectedDate])
       .reduce((sum, [appName, platforms]) => {
-        // Filter out usage less than 1 second
-        const filteredPlatforms = Object.fromEntries(
-          Object.entries(platforms).filter(([, time]) => time >= 1000)
-        );
-        return sum + Object.values(filteredPlatforms).reduce((appSum, time) => appSum + time, 0);
+        // Filter out usage less than 1 second and sum the values
+        return sum + Object.entries(platforms).reduce((appSum, [, time]) => {
+          if (time != null && Number(time) >= 1000) {
+            return appSum + Number(time);
+          }
+          return appSum;
+        }, 0);
       }, 0);
   }, [appUsageData, selectedDate]);
 
@@ -253,16 +257,16 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
     
     return Object.entries(appUsageData[selectedDate])
       .filter(([, times]) => {
-        const totalTime = (times.mobile >= 1000 ? times.mobile : 0) + (times.web >= 1000 ? times.web : 0);
+        const totalTime = ((times.mobile || 0) >= 1000 ? (times.mobile || 0) : 0) + ((times.web || 0) >= 1000 ? (times.web || 0) : 0);
         return totalTime > 0;
       })
       .sort(([, a], [, b]) => {
-        const totalA = (a.mobile >= 1000 ? a.mobile : 0) + (a.web >= 1000 ? a.web : 0);
-        const totalB = (b.mobile >= 1000 ? b.mobile : 0) + (b.web >= 1000 ? b.web : 0);
+        const totalA = ((a.mobile || 0) >= 1000 ? (a.mobile || 0) : 0) + ((a.web || 0) >= 1000 ? (a.web || 0) : 0);
+        const totalB = ((b.mobile || 0) >= 1000 ? (b.mobile || 0) : 0) + ((b.web || 0) >= 1000 ? (b.web || 0) : 0);
         return totalB - totalA;
       })
       .map(([appName, times]) => {
-        const totalTime = (times.mobile >= 1000 ? times.mobile : 0) + (times.web >= 1000 ? times.web : 0);
+        const totalTime = ((times.mobile || 0) >= 1000 ? (times.mobile || 0) : 0) + ((times.web || 0) >= 1000 ? (times.web || 0) : 0);
         const percentage = totalTime > 0 && totalDayTime > 0 ? Math.round((totalTime / totalDayTime) * 100) : 0;
         
         return {
@@ -398,8 +402,8 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                       const shouldClearFutureData = isToday && hour > currentHour;
                       
                       const totalHourTime = shouldClearFutureData ? 0 : Object.entries(hourData).reduce((sum, [, platforms]) => {
-                        const mobileTime = platforms.mobile >= 1000 ? platforms.mobile : 0;
-                        const webTime = platforms.web >= 1000 ? platforms.web : 0;
+                        const mobileTime = (platforms.mobile || 0) >= 1000 ? (platforms.mobile || 0) : 0;
+                        const webTime = (platforms.web || 0) >= 1000 ? (platforms.web || 0) : 0;
                         return sum + mobileTime + webTime;
                       }, 0);
 
@@ -523,7 +527,7 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                                 {expandedApp === appName && (
                                   <Box className="mt-3 pt-3" style={{ borderTopWidth: 1, borderTopColor: currentColors.neutral[300] + '40' }}>
                                     <Box className="flex flex-col gap-2">
-                                      {times.mobile >= 1000 && (
+                                      {(times.mobile || 0) >= 1000 && (
                                         <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: currentColors.secondary[400] + '10' }}>
                                           <Box className="flex flex-row items-center gap-2">
                                             <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: currentColors.secondary[400] + '20' }}>
@@ -534,11 +538,11 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                                             </Text>
                                           </Box>
                                           <Text className="text-sm font-bold" style={{ color: currentColors.secondary[600] }}>
-                                            {formatTime(times.mobile)}
+                                            {formatTime(times.mobile || 0)}
                                           </Text>
                                         </Box>
                                       )}
-                                      {times.web >= 1000 && (
+                                      {(times.web || 0) >= 1000 && (
                                         <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: currentColors.secondary[300] + '10' }}>
                                           <Box className="flex flex-row items-center gap-2">
                                             <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: currentColors.secondary[300] + '20'}}>
@@ -549,7 +553,7 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                                             </Text>
                                           </Box>
                                           <Text className="text-sm font-bold" style={{ color: currentColors.secondary[500] }}>
-                                            {formatTime(times.web)}
+                                            {formatTime(times.web || 0)}
                                           </Text>
                                         </Box>
                                       )}

@@ -68,9 +68,9 @@ export function YearScreen({ onContinue, isVisible = false }: YearScreenProps) {
   const yearStyle = useAnimatedStyle(() => ({
     opacity: yearOpacity.value,
     transform: [
-      { scale: yearScale.value },
-      { rotate: `${yearRotate.value}deg` }
-    ]
+      { scale: yearScale.value } as const,
+      { rotate: `${yearRotate.value}deg` } as const
+    ] as const
   }));
 
   const subTextStyle = useAnimatedStyle(() => ({

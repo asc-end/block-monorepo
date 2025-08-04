@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
 
 interface AppWithIcon {
   appName: string;
@@ -15,11 +14,11 @@ export function useAppIcons() {
   const isLoadingRef = useRef(false);
 
   const loadAppIcons = async () => {
-    // Only load on mobile platforms
-    if (Platform.OS === 'web') {
+    // Skip entirely on web platform
+    if (typeof window !== 'undefined' && window.document) {
       return;
     }
-
+    
     // Prevent multiple simultaneous loads
     if (isLoadingRef.current) {
       return;
@@ -28,25 +27,30 @@ export function useAppIcons() {
     isLoadingRef.current = true;
 
     try {
-      // Dynamically import to avoid issues on web
-      const { getInstalledApps } = await import('expo-app-blocker');
-      const installedApps: AppWithIcon[] = await getInstalledApps();
+      // Try to import expo-app-blocker (will fail on web, succeed on mobile)
+      // @ts-ignore - This module only exists on mobile
+      const module = await import('expo-app-blocker').catch(() => null);
       
-      const newIconMap = new Map<string, string>();
-      
-      installedApps.forEach(app => {
-        if (app.iconUri) {
-          // Store by app name (display name)
-          newIconMap.set(app.appName, app.iconUri);
-          appIconCache.set(app.appName, app.iconUri);
-          
-          // Also store by package name for matching
-          newIconMap.set(app.packageName, app.iconUri);
-          appIconCache.set(app.packageName, app.iconUri);
-        }
-      });
-      
-      setAppIcons(newIconMap);
+      if (module) {
+        const { getInstalledApps } = module;
+        const installedApps: AppWithIcon[] = await getInstalledApps();
+        
+        const newIconMap = new Map<string, string>();
+        
+        installedApps.forEach(app => {
+          if (app.iconUri) {
+            // Store by app name (display name)
+            newIconMap.set(app.appName, app.iconUri);
+            appIconCache.set(app.appName, app.iconUri);
+            
+            // Also store by package name for matching
+            newIconMap.set(app.packageName, app.iconUri);
+            appIconCache.set(app.packageName, app.iconUri);
+          }
+        });
+        
+        setAppIcons(newIconMap);
+      }
     } catch (error) {
       console.log('Could not load app icons:', error);
       // This is expected on web platform

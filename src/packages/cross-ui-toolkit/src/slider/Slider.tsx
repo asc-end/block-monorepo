@@ -7,6 +7,7 @@ import { getSliderColors } from './';
 export interface SliderProps {
     value: number;
     onValueChange: (value: number) => void;
+    onSlidingComplete?: (value: number) => void;
     min?: number;
     max?: number;
     step?: number;
@@ -23,6 +24,7 @@ export interface SliderProps {
 export const Slider: React.FC<SliderProps> = ({
     value: initialValue,
     onValueChange,
+    onSlidingComplete,
     min = 0,
     max = 100,
     step = 0.1,
@@ -50,6 +52,14 @@ export const Slider: React.FC<SliderProps> = ({
         onValueChange?.(newValue);
     };
 
+    const handleMouseUp = () => {
+        onSlidingComplete?.(value);
+    };
+
+    const handleTouchEnd = () => {
+        onSlidingComplete?.(value);
+    };
+
     const percentage = ((value - min) / (max - min)) * 100;
 
     return (
@@ -62,6 +72,8 @@ export const Slider: React.FC<SliderProps> = ({
                     step={step}
                     value={value}
                     onChange={handleChange}
+                    onMouseUp={handleMouseUp}
+                    onTouchEnd={handleTouchEnd}
                     className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                     style={{
                         background: `linear-gradient(to right, ${finalMinTrackColor} ${percentage}%, ${finalMaxTrackColor} ${percentage}%)`,

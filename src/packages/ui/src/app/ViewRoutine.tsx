@@ -52,7 +52,7 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
         }
     };
 
-    const handleToggleStatus = async (newStatus: 'active' | 'paused') => {
+    const handleToggleStatus = async (newStatus: 'active') => {
         if (!onToggleStatus || updating) return;
         
         setUpdating(true);
@@ -235,17 +235,17 @@ export function ViewRoutine({ routineId, onBack, onToggleStatus, onDelete }: Vie
 
             {/* Action Buttons */}
             <Box style={{ padding: 16, gap: 8 }} className="flex flex-col">
-                {onToggleStatus && (routine.status === 'active' || routine.status === 'paused') && (
+                {onToggleStatus && (routine.status === 'active') && (
                     <Button
                         title={isActive ? 'Pause' : 'Resume'}
                         variant={isActive ? "secondary" : "primary"}
-                        onPress={() => handleToggleStatus(isActive ? 'paused' : 'active')}
+                        onPress={() => handleToggleStatus('active')}
                         leftIcon={isActive ? <PauseIcon size={18} color={currentColors.text.main} /> : <PlayIcon size={18} color="white" />}
                         disabled={updating}
                     />
                 )}
                 
-                {(routine.status === 'active' || routine.status === 'paused') && (
+                {(routine.status === 'active') && (
                     <Button
                         title="Stop Routine"
                         variant="outline"

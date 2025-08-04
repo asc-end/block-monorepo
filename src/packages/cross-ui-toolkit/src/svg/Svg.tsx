@@ -3,8 +3,8 @@ import React from 'react';
 export interface SvgProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
   color?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   rotation?: number;
   children?: React.ReactNode;
 }

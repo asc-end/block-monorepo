@@ -1,6 +1,6 @@
 import { Commitment } from "./routine";
 
-export type FocusSessionStatus = 'completed' | 'interrupted' | 'in_progress';
+export type FocusSessionStatus = 'active' | 'completed' | 'canceled';
 
 export interface FocusSession {
   id: string;
@@ -31,7 +31,7 @@ export type FocusSessionType = {
   duration: number
   id:string,
   startTime: string,
-  status: "in_progress" | "canceled" | "finished",
+  status: FocusSessionStatus,
   userId: string,
   commitment?: {
     id: string;

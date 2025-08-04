@@ -17,5 +17,12 @@ export interface LineProps {
 }
 
 export const Line: React.FC<LineProps> = (props) => {
-  return <line {...props} />;
+  const { strokeDasharray, ...restProps } = props;
+  
+  // Convert number array to string if needed
+  const dashArray = Array.isArray(strokeDasharray) 
+    ? strokeDasharray.join(' ')
+    : strokeDasharray;
+  
+  return <line {...restProps} strokeDasharray={dashArray} />;
 };

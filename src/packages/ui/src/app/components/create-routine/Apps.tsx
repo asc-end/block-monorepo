@@ -176,8 +176,8 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                 // Merge with native apps if provided (from mobile platform)
                 if (nativeApps && nativeApps.length > 0) {
                     // Create a map of database apps by package name for merging
-                    const dbAppsMap = new Map(
-                        formattedApps.map(app => [app.packageName.toLowerCase(), app])
+                    const dbAppsMap = new Map<string, AppItem>(
+                        formattedApps.map((app: AppItem) => [app.packageName.toLowerCase(), app])
                     );
                     
                     // Merge native apps with database apps, preferring native icons

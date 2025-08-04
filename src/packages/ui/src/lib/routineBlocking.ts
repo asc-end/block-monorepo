@@ -17,8 +17,8 @@ export interface RoutineBlockingConfig {
 export class RoutineBlockingService {
   private routines: Routine[] = [];
   private config: RoutineBlockingConfig;
-  private checkInterval?: NodeJS.Timeout;
-  private fetchInterval?: NodeJS.Timeout;
+  private checkInterval?: ReturnType<typeof setInterval>;
+  private fetchInterval?: ReturnType<typeof setInterval>;
 
   constructor(config: RoutineBlockingConfig) {
     this.config = config;
@@ -26,17 +26,11 @@ export class RoutineBlockingService {
   }
 
   async fetchRoutines(): Promise<Routine[]> {
-    console.log('[RoutineBlockingService] Fetching routines...');
     try {
       const token = await this.config.getAuthToken();
-      console.log('[RoutineBlockingService] Auth token available:', !!token);
-      if (!token) {
-        console.warn('[RoutineBlockingService] No auth token available for fetching routines');
-        return [];
-      }
+      if (!token) { return []}
 
       const url = `${this.config.apiUrl}/routines`;
-      console.log('[RoutineBlockingService] Fetching from:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -44,17 +38,13 @@ export class RoutineBlockingService {
         }
       });
 
-      console.log('[RoutineBlockingService] Response status:', response.status);
       
       if (!response.ok) {
-        console.error('[RoutineBlockingService] Failed to fetch routines:', response.status);
         return [];
       }
 
       const data = await response.json();
-      console.log('[RoutineBlockingService] API response:', data);
       this.routines = data.routines || data || [];
-      console.log('[RoutineBlockingService] Fetched routines:', this.routines.length);
       if (this.routines.length > 0) {
         console.log('[RoutineBlockingService] First routine:', this.routines[0]);
       }
@@ -80,24 +70,12 @@ export class RoutineBlockingService {
     
     // Debug current time
     const now = new Date();
-    console.log('[RoutineBlockingService] Current time check:', {
-      localTime: now.toLocaleTimeString(),
-      utcTime: now.toUTCString(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      offset: now.getTimezoneOffset()
-    });
     
     // Get all active routines in time window
     const activeRoutines = this.routines.filter(r => {
       const isActive = isRoutineInActiveTimeWindow(r);
-      console.log(`[RoutineBlockingService] Routine "${r.name}" (${r.startTime}-${r.endTime}):`, {
-        status: r.status,
-        days: r.selectedDays,
-        isActive
-      });
       return isActive;
     });
-    console.log('[RoutineBlockingService] Active routines count:', activeRoutines.length);
     
     for (const routine of activeRoutines) {
       for (const blockedApp of routine.blockedApps || []) {
@@ -138,20 +116,17 @@ export class RoutineBlockingService {
   }
 
   start(): void {
-    console.log('[RoutineBlockingService] Starting service...');
     
     // Initial fetch
     this.fetchRoutines();
     
     // Check for time window changes every minute
     this.checkInterval = setInterval(() => {
-      console.log('[RoutineBlockingService] Periodic time window check');
       this.updateBlockedItems();
     }, 60 * 1000);
     
     // Fetch fresh routines every 5 minutes
     this.fetchInterval = setInterval(() => {
-      console.log('[RoutineBlockingService] Periodic routine refresh');
       this.fetchRoutines();
     }, 5 * 60 * 1000);
   }

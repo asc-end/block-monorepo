@@ -7,6 +7,8 @@ export interface PressableProps {
     className?: string;
     style?: React.CSSProperties;
     hitSlop?: number | { top?: number; bottom?: number; left?: number; right?: number };
+    onPressIn?: () => void
+    onPressOut?:() => void
 }
 
 function getHitSlopStyle(hitSlop?: number | { top?: number; bottom?: number; left?: number; right?: number }) {
@@ -60,6 +62,8 @@ export function Pressable({
     className = '', 
     style,
     hitSlop,
+    onPressIn,
+    onPressOut,
     ...props 
 }: PressableProps) {
     // If hitSlop is set, wrap the button in a div that increases the clickable area
@@ -68,6 +72,8 @@ export function Pressable({
             <div style={getHitSlopWrapperStyle(hitSlop)}>
                 <button
                     onClick={onPress}
+                    onPointerDown={onPressIn}
+                    onPointerUp={onPressOut}
                     disabled={disabled}
                     className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className}`}
                     style={{ ...style, ...getHitSlopStyle(hitSlop) }}
@@ -81,6 +87,8 @@ export function Pressable({
     return (
         <button
             onClick={onPress}
+            onPointerDown={onPressIn}
+            onPointerUp={onPressOut}
             disabled={disabled}
             className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className} disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none`}
             style={style}

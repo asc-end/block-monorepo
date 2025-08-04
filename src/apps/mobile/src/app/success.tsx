@@ -7,8 +7,14 @@ export default function SuccessScreen() {
   const { sessionId, claimMode } = useLocalSearchParams<{ sessionId?: string; claimMode?: 'single' | 'multiple' }>();
   const { signAndSendTransaction } = useSolana();
   
+  const handleBack = () => {
+    router.back();
+    return {};
+  };
+
   return (
     <Success
+      onBack={handleBack}
       sessionId={sessionId}
       claimMode={claimMode}
       sendTransaction={signAndSendTransaction}
