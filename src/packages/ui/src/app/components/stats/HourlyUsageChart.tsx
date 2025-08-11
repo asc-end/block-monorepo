@@ -195,12 +195,27 @@ export function HourlyUsageChart({ hourlyData, maxHourTime }: HourlyUsageChartPr
                       style={{
                         height: `${Math.max(height, time > 0 ? 2 : 0)}%`,
                         width: 3,
-                        backgroundColor: isPeakHour
-                          ? currentColors.secondary[600] + 'B0'
-                          : isCurrentHour
-                            ? currentColors.secondary[500] + '99'
-                            : currentColors.secondary[400] + '66',
-                        opacity: time > 0 ? (isHovered ? 1 : 1) : 0.15,
+                        backgroundColor: (() => {
+                          // More varied alpha based on usage level
+                          const usagePercent = maxHourTime > 0 ? (time / maxHourTime) : 0;
+                          
+                          if (isPeakHour) {
+                            return currentColors.secondary[600] + 'E6'; // 90% opacity for peak
+                          } else if (isCurrentHour) {
+                            return currentColors.secondary[500] + 'CC'; // 80% opacity for current
+                          } else if (usagePercent > 0.75) {
+                            return currentColors.secondary[500] + 'B3'; // 70% opacity for high usage
+                          } else if (usagePercent > 0.5) {
+                            return currentColors.secondary[400] + '99'; // 60% opacity for medium-high
+                          } else if (usagePercent > 0.25) {
+                            return currentColors.secondary[400] + '66'; // 40% opacity for medium-low
+                          } else if (time > 0) {
+                            return currentColors.secondary[300] + '4D'; // 30% opacity for low usage
+                          } else {
+                            return currentColors.secondary[200] + '1A'; // 10% opacity for no usage
+                          }
+                        })(),
+                        opacity: time > 0 ? (isHovered ? 1 : 0.9) : 0.15,
                         transform: isHovered ? 'scaleX(2) scaleY(1.05)' : 'scale(1)',
                         transformOrigin: 'bottom center',
                         zIndex: isHovered ? 10 : 1

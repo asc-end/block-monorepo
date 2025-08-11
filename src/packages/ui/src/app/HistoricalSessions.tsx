@@ -4,7 +4,7 @@ import { useHistoricalSessions } from "../hooks/useHistoricalSessions";
 import { formatTime } from "../lib/time";
 import { ChevronIcon } from "./icons/ChevronIcon";
 import { SolIcon } from "./icons/SolIcon";
-import { ClockIcon, CloseIcon, CloseIconGradient } from './icons';
+import { ClockIcon, CloseIcon, CloseIconGradient, FocusIcon } from './icons';
 
 interface HistoricalSessionsProps {
     onBack?: () => void;
@@ -21,8 +21,10 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
         if (!sessions) return 0;
 
         return sessions.filter((session) => {
+            // Canceled sessions can never be claimed
+            if (session.status === 'canceled') return false;
             if (!session.commitment) return false;
-            console.log(session.commitment)
+            
             // Check if commitment is completed and not yet claimed
             const isActive = session.commitment.status === 'active';
             const isNotClaimed = !session.commitment.claimedAt;
@@ -41,6 +43,8 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
 
         // Check if this session has a claimable commitment
         const isClaimable = useMemo(() => {
+            // Canceled sessions can never be claimed
+            if (session.status === 'canceled') return false;
             if (!session.commitment) return false;
 
             const isActive = session.commitment.status === 'active';
@@ -49,7 +53,7 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
             const isUnlocked = unlockTime ? new Date() > unlockTime : false;
 
             return isActive && isNotClaimed && isUnlocked;
-        }, [session.commitment]);
+        }, [session.commitment, session.status]);
 
         const handlePress = () => {
             if (isClaimable) return; // Don't navigate if there's a claim button
@@ -65,55 +69,74 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
         return (
             <Pressable
                 onPress={handlePress}
-                className="p-4 rounded-xl mb-3 mx-4 overflow-hidden flex flex-row justify-between items-center"
+                className="rounded-xl mb-3 mx-4 overflow-hidden flex flex-row justify-between items-center"
                 style={{
                     backgroundColor: currentColors.surface.elevated + (session.status == "canceled" ? "B2" : ""),
                     borderWidth: 1,
                     borderColor: currentColors.neutral?.[200] ? currentColors.neutral[200] + "30" : currentColors.border,
+                    paddingVertical: 12,
+                    paddingRight: 16,
+                    paddingLeft: 12
                 }}
-
             >
-
-                <Box className="flex-1 flex flex-row items-center gap-3">
-                    <Box className="w-10 h-10 rounded-lg items-center justify-center">
-                        <Text className="text-lg">
-                            {isRoutine ? (session.emoji || '🎯') : '🧘'}
-                        </Text>
+                <Box className="flex-1 flex flex-row items-center gap-3" style={{ minWidth: 0 }}>
+                    <Box className="w-11 h-11 rounded-lg items-center justify-center flex-shrink-0" style={{ backgroundColor: currentColors.surface.card }}>
+                        {isRoutine ? (
+                            <Text className="text-lg">
+                                {session.emoji || '🎯'}
+                            </Text>
+                        ) : (
+                            <FocusIcon size={22} color={currentColors.secondary[500]} />
+                        )}
                     </Box>
-                    <Box className="flex-1" style={{ opacity: session.status == "canceled" ? 0.5 : 1 }}
+                    <Box className="flex-1" style={{ opacity: session.status == "canceled" ? 0.5 : 1, minWidth: 0 }}
                     >
-                        <Text className="font-semibold text-base text-left" style={{ color: currentColors.text.main }}>
+                        <Text 
+                            className="font-semibold text-base text-left" 
+                            numberOfLines={1}
+                            style={{ color: currentColors.text.main }}
+                        >
                             {session.name || 'Unnamed Session'}
                         </Text>
-                        <Box className="flex flex-row items-center gap-2">
+                        <Box className="flex flex-row items-center gap-1 flex-wrap">
                             {session.duration && (
-                                <Box className="flex flex-row items-center gap-2">
-                                    <ClockIcon size={14} color={currentColors.text.soft} />
-                                    <Text className="text-sm" style={{ color: currentColors.text.soft }}>
-                                        {session.duration || 0} minutes
+                                <Box className="flex flex-row items-center gap-1">
+                                    <ClockIcon size={12} color={currentColors.text.soft} />
+                                    <Text className="text-xs" style={{ color: currentColors.text.soft }}>
+                                        {session.duration || 0}m
                                     </Text>
                                 </Box>
                             )}
-                            {isRoutine && <Text className="text-sm" style={{ color: currentColors.text.soft }}>
-                                Routine
-                            </Text>}
-                            {session.stakeAmount && session.stakeAmount > 0 &&
-                                <Box className="flex flex-row items-center gap-2 flex-wrap">
-                                    <Text className="text-sm" style={{ color: currentColors.text.soft }}>
-                                        ‧
+                            {isRoutine && (
+                                <>
+                                    {session.duration && (
+                                        <Text className="text-xs" style={{ color: currentColors.text.soft }}>
+                                            •
+                                        </Text>
+                                    )}
+                                    <Text className="text-xs" style={{ color: currentColors.text.soft }}>
+                                        Routine
                                     </Text>
-                                    <Box className="flex flex-row items-center gap-2">
-                                        <SolIcon size={14} color={currentColors.text.soft} />
-                                        <Text className="text-sm" style={{ color: currentColors.text.soft }}>
-                                            {(session.stakeAmount || 0).toFixed(2)} SOL
+                                </>
+                            )}
+                            {session.stakeAmount && session.stakeAmount > 0 && (
+                                <>
+                                    <Text className="text-xs" style={{ color: currentColors.text.soft }}>
+                                        •
+                                    </Text>
+                                    <Box className="flex flex-row items-center gap-1">
+                                        <SolIcon size={12} color={currentColors.text.soft} />
+                                        <Text className="text-xs" style={{ color: currentColors.text.soft }}>
+                                            {(session.stakeAmount || 0).toFixed(1)}
                                         </Text>
                                     </Box>
-                                </Box>}
+                                </>
+                            )}
                         </Box>
                     </Box>
 
                 </Box>
-                <Box className="flex flex-row items-center gap-2">
+                <Box className="flex flex-row items-center gap-2 flex-shrink-0 ml-2">
                     {session.status == "canceled" &&
                         <Box style={{ backgroundColor: currentColors.surface.elevated }} className="p-2 rounded-full">
                             <CloseIconGradient 
@@ -130,16 +153,16 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                             onPress={() => {
                                 onNavigateToSuccess(session.id, 'single');
                             }}
-                            className="px-3 py-2 rounded-lg flex flex-row items-center gap-1"
+                            className="px-2 py-1.5 rounded-lg flex flex-row items-center gap-1"
                             style={{ backgroundColor: currentColors.secondary[900] }}
                         >
-                            <SolIcon size={14} color={"white"} />
-                            <Text className="text-sm font-medium" style={{ color: "white" }}>
+                            <SolIcon size={12} color={"white"} />
+                            <Text className="text-xs font-medium" style={{ color: "white" }}>
                                 Claim
                             </Text>
                         </Pressable>
                     ) : (
-                        session.status !== "canceled" && <ChevronIcon color={currentColors.text.soft} direction="right" size={20} />
+                        session.status !== "canceled" && <ChevronIcon color={currentColors.text.soft} direction="right" size={16} />
                     )}
                 </Box>
                 {session.status == "completed" && <Box className="absolute top-0 right-0 left-0 bottom-0">
@@ -259,15 +282,19 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
             {/* Claim All Button */}
             {claimableCount > 0 && onNavigateToSuccess && (
                 <Box className="mb-4 mx-4 rounded-xl overflow-hidden" style={{ position: 'relative' }}>
-                    <Gradient className='p-1'
-                        colors={[currentColors.secondary[900], currentColors.secondary[800], currentColors.secondary[500]]}
+                    <Gradient 
+                        className='p-[1px]'
+                        colors={[currentColors.pop.indigo, currentColors.pop.violet, currentColors.pop.purple, currentColors.pop.magenta, currentColors.pop.red]}
                     >
-                        <Box className='absolute inset-[1.5px] rounded-xl overflow-hidden' style={{ backgroundColor: currentColors.background }}>
-                            <Gradient className="absolute inset-0" colors={[currentColors.secondary[900] + "30", currentColors.secondary[800] + "30", currentColors.secondary[500] + "30"]}/>
+                        <Box className='absolute inset-[1px] rounded-xl overflow-hidden' style={{ backgroundColor: currentColors.background }}>
+                            <Gradient 
+                                className="absolute inset-0 opacity-30" 
+                                colors={[currentColors.secondary[900], currentColors.secondary[800], currentColors.secondary[500]]}
+                            />
                         </Box>
                         <Pressable
                             onPress={() => onNavigateToSuccess(undefined, 'multiple')}
-                            className="px-5 py-2 flex flex-row items-center justify-between"
+                            className="px-5 py-3 flex flex-row items-center justify-between"
                         >
                             <Box className="flex-1">
                                 <Text className="text-lg font-bold" style={{ color: currentColors.text.main }}>
@@ -279,18 +306,18 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                             </Box>
                             <Box
                                 className="px-3 py-1.5 rounded-full flex flex-row items-center gap-1.5"
-                                style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                                style={{ 
+                                    backgroundColor: currentColors.secondary[900],
+                                }}
                             >
-                                <SolIcon size={16} color={currentColors.black} />
-                                <Text className="text-sm font-semibold" style={{ color: currentColors.black }}>
+                                <SolIcon size={16} color="white" />
+                                <Text className="text-sm font-semibold" style={{ color: "white" }}>
                                     Claim
                                 </Text>
-                                <ChevronIcon direction="right" size={20} color={currentColors.black} />
-
+                                <ChevronIcon direction="right" size={20} color="white" />
                             </Box>
                         </Pressable>
                     </Gradient>
-
                 </Box>
             )}
             <ScrollView

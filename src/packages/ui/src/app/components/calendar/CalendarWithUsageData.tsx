@@ -34,12 +34,17 @@ export function CalendarWithUsageData({
     const hours = totalTime / (1000 * 60 * 60);
 
     if (hours === 0) return 'transparent';
-    if (hours < 0.5) return currentColors.primary[50] + '40';
-    if (hours < 1) return currentColors.primary[100] + '60';
-    if (hours < 2) return currentColors.primary[200] + '80';
-    if (hours < 4) return currentColors.primary[300];
-    if (hours < 6) return currentColors.primary[400];
-    return currentColors.primary[500];
+    // Fewer, more distinct steps up to 17 hours
+    if (hours < 1) return currentColors.primary[100] + '1A'; // 10% opacity
+    if (hours < 3) return currentColors.primary[200] + '33'; // 20% opacity
+    if (hours < 5) return currentColors.primary[300] + '4D'; // 30% opacity
+    if (hours < 7) return currentColors.primary[400] + '66'; // 40% opacity
+    if (hours < 9) return currentColors.primary[500] + '80'; // 50% opacity
+    if (hours < 11) return currentColors.primary[500] + '99'; // 60% opacity
+    if (hours < 13) return currentColors.primary[600] + 'B3'; // 70% opacity
+    if (hours < 15) return currentColors.primary[700] + 'CC'; // 80% opacity
+    if (hours < 17) return currentColors.primary[700] + 'E6'; // 90% opacity
+    return currentColors.primary[700]; // Full opacity for 17+ hours
   };
 
   const colorFunction = getUsageColor || defaultGetUsageColor;
@@ -111,8 +116,8 @@ export function CalendarWithUsageData({
             fontSize: 12,
             color: day.isDisabled
               ? currentColors.text.soft
-              : hasData && totalTime > (1000 * 60 * 60 * 2) // More than 2 hours
-                ? currentColors.white
+              : hasData
+                ? '#FFFFFF' // Always white text when there's usage data
                 : currentColors.text.main,
             fontWeight: isSelected ? '600' : '500'
           }}>

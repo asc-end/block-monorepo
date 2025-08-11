@@ -154,52 +154,55 @@ export function CreateRoutine(props: CreateRoutineProps) {
     };
     
     return (
-        <Box className="flex-1 flex flex-col px-4">
-            {/* Emoji and Title */}
-            <Box className="flex flex-col w-full justify-center items-center mt-4 mb-2">
-                <Pressable onPress={() => modalizeRef.current?.open()}>
-                    <Text className="text-[90px] mb-2" style={{ fontSize: 90, lineHeight: 120 }}>{routineEmoji}</Text>
-                </Pressable>
-                <TextInput
-                    value={routineName}
-                    onChangeText={setRoutineName}
-                    placeholder="New Routine"
-                    style={{ width: 300 }}
-                />
+        <Box className="flex-1 flex flex-col">
+            {/* Scrollable Content */}
+            <Box className="flex-1 px-4">
+                {/* Emoji and Title */}
+                <Box className="flex flex-col w-full justify-center items-center mt-4 mb-2">
+                    <Pressable onPress={() => modalizeRef.current?.open()}>
+                        <Text className="text-[90px] mb-2" style={{ fontSize: 90, lineHeight: 120 }}>{routineEmoji}</Text>
+                    </Pressable>
+                    <TextInput
+                        value={routineName}
+                        onChangeText={setRoutineName}
+                        placeholder="New Routine"
+                        style={{ width: 300 }}
+                    />
+                </Box>
+
+                {/* Card rows */}
+                <Box className="mt-4 flex flex-col" style={{ gap: 6 }}>
+                    <CardRow
+                        label="Time Settings"
+                        value={formatTimeDescription(
+                            timeSettings.timeMode,
+                            timeSettings.startTime,
+                            timeSettings.endTime,
+                            timeSettings.duration
+                        ) || 'Not set'}
+                        onPress={() => onRoutineTime()}
+                    />
+                    <CardRow
+                        label="End date"
+                        value={formatEndDate(endDate)}
+                        onPress={() => onCalendar()}
+                    />
+                    <CardRow
+                        label="Blocking"
+                        value={blockedApps.length > 0 ? `${blockedApps.length} Apps` : 'Not set'}
+                        onPress={onApps}
+                    />
+                    <CardRow
+                        label="Stake"
+                        value={stakeAmount ? formatStakeAmount(stakeAmount) : 'Not set'}
+                        onPress={() => stakeModalRef.current?.open()}
+                        icon={<PencilIcon size={20} color={currentColors.text.soft} />}
+                    />
+                </Box>
             </Box>
 
-            {/* Card rows */}
-            <Box className="mt-4 flex flex-col flex-1" style={{ gap: 6 }}>
-                <CardRow
-                    label="Time Settings"
-                    value={formatTimeDescription(
-                        timeSettings.timeMode,
-                        timeSettings.startTime,
-                        timeSettings.endTime,
-                        timeSettings.duration
-                    ) || 'Not set'}
-                    onPress={() => onRoutineTime()}
-                />
-                <CardRow
-                    label="End date"
-                    value={formatEndDate(endDate)}
-                    onPress={() => onCalendar()}
-                />
-                <CardRow
-                    label="Blocking"
-                    value={blockedApps.length > 0 ? `${blockedApps.length} Apps` : 'Not set'}
-                    onPress={onApps}
-                />
-                <CardRow
-                    label="Stake"
-                    value={stakeAmount ? formatStakeAmount(stakeAmount) : 'Not set'}
-                    onPress={() => stakeModalRef.current?.open()}
-                    icon={<PencilIcon size={20} color={currentColors.text.soft} />}
-                />
-            </Box>
-
-            {/* Start Button */}
-            <Box style={{ padding: 16 }}>
+            {/* Fixed Bottom Button */}
+            <Box className="px-4 pb-8 pt-2">
                 <Button
                     title={isCreating ? 'Creating...' : 'Start'}
                     variant="primary"

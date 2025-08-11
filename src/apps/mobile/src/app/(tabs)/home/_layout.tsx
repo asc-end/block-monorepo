@@ -43,36 +43,6 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
-          name="create-routine/index"
-          options={{
-            headerTitle: "Create Routine",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/apps"
-          options={{
-            headerTitle: "Apps",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/calendar"
-          options={{
-            headerTitle: "Calendar",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/money"
-          options={{
-            headerTitle: "Money",
-          }}
-        />
-        <Stack.Screen
-          name="create-routine/time"
-          options={{
-            headerTitle: "Routine Time",
-          }}
-        />
-        <Stack.Screen
           name="routine"
           options={{
             headerTitle: "Routine",

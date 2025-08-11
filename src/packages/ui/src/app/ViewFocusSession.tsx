@@ -3,6 +3,7 @@ import { Box, Text, Button, useTheme, Alert, useAlert } from '@blockit/cross-ui-
 import type { FocusSession } from '@blockit/shared';
 import { api } from '../stores/authStore';
 import { SolIcon } from './icons/SolIcon';
+import { FocusIcon } from './icons';
 
 function CardRow({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
     const { currentColors } = useTheme();
@@ -130,7 +131,9 @@ export function ViewFocusSession({ sessionId, onBack }: ViewFocusSessionProps) {
         <Box className="flex-1 flex flex-col px-4">
             {/* Icon and Title */}
             <Box className="flex flex-col w-full justify-center items-center mt-4 mb-2">
-                <Text className="text-[90px] mb-2" style={{ fontSize: 90, lineHeight: 120 }}>🧘</Text>
+                <Box className="w-20 h-20 rounded-2xl items-center justify-center mb-2" style={{ backgroundColor: currentColors.secondary[500] + '10' }}>
+                    <FocusIcon size={44} color={currentColors.secondary[500]} />
+                </Box>
                 <Text variant='h3'>Focus Session</Text>
                 <Box 
                     className='px-3 py-1 rounded-full mt-2'

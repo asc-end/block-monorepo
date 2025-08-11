@@ -482,7 +482,7 @@ export function TimeRangePicker({
         {/* Time displays */}
         <Box className="flex flex-row gap-1">
           <Pressable onPress={() => setActiveEditor('start')} className="flex-1">
-            <Box className="p-4 rounded-xl flex flex-col items-center" style={{ backgroundColor: currentColors.surface.elevated, }}
+            <Box className="p-4 rounded-xl flex flex-col items-center" style={{ backgroundColor: currentColors.neutral[900] + '99' }}
             >
               <Text variant="caption">Start</Text>
               <Text variant="h4">{formatDisplay(startTime)}</Text>
@@ -494,7 +494,7 @@ export function TimeRangePicker({
           </Box>
 
           <Pressable onPress={() => setActiveEditor('end')} className="flex-1">
-            <Box className="p-4 rounded-xl flex flex-col items-center" style={{ backgroundColor: currentColors.surface.elevated, }}>
+            <Box className="p-4 rounded-xl flex flex-col items-center" style={{ backgroundColor:currentColors.neutral[900] + '99' }}>
               <Text variant="caption">End</Text>
               <Text variant="h4">{formatDisplay(endTime)}</Text>
             </Box>

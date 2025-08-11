@@ -107,7 +107,7 @@ const mockInstalledApps: AppItem[] = [
     { packageName: 'com.facebook.katana', appName: 'Facebook', iconUri: getAppIcon('Facebook'), isBlocked: false },
     { packageName: 'com.instagram.android', appName: 'Instagram', iconUri: getAppIcon('Instagram'), isBlocked: false },
     { packageName: 'com.twitter.android', appName: 'Twitter', iconUri: getAppIcon('Twitter'), isBlocked: false },
-    { packageName: 'com.tiktok', appName: 'TikTok', iconUri: getAppIcon('TikTok'), isBlocked: false },
+    { packageName: 'com.zhiliaoapp.musically', appName: 'TikTok', iconUri: getAppIcon('TikTok'), isBlocked: false },
     { packageName: 'com.snapchat.android', appName: 'Snapchat', iconUri: getAppIcon('Snapchat'), isBlocked: false },
     { packageName: 'com.google.android.youtube', appName: 'YouTube', iconUri: getAppIcon('YouTube'), isBlocked: false },
     { packageName: 'com.netflix.mediaclient', appName: 'Netflix', iconUri: getAppIcon('Netflix'), isBlocked: false },
@@ -118,7 +118,6 @@ const mockInstalledApps: AppItem[] = [
     { packageName: 'com.google.android.gm', appName: 'Gmail', iconUri: getAppIcon('Gmail'), isBlocked: false },
     { packageName: 'com.android.chrome', appName: 'Chrome', iconUri: getAppIcon('Chrome'), isBlocked: false },
     { packageName: 'com.reddit.frontpage', appName: 'Reddit', iconUri: getAppIcon('Reddit'), isBlocked: false },
-    { packageName: 'com.zhiliaoapp.musically', appName: 'TikTok', iconUri: getAppIcon('TikTok'), isBlocked: false },
     { packageName: 'com.mojang.minecraftpe', appName: 'Minecraft', iconUri: undefined, isBlocked: false },
     { packageName: 'com.supercell.clashofclans', appName: 'Clash of Clans', iconUri: undefined, isBlocked: false },
     { packageName: 'com.android.calendar', appName: 'Calendar', iconUri: undefined, isBlocked: false },
@@ -133,7 +132,6 @@ interface RoutineAppsProps {
 
 export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [apps, setApps] = useState<AppItem[]>()
     const { blockedApps } = useRoutineStore();
     const [usageStats, setUsageStats] = useState<Record<string, number>>({});
@@ -175,19 +173,25 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                 
                 // Merge with native apps if provided (from mobile platform)
                 if (nativeApps && nativeApps.length > 0) {
-                    // Create a map of database apps by package name for merging
+                    // Create maps for deduplication by both package name and app name
                     const dbAppsMap = new Map<string, AppItem>(
                         formattedApps.map((app: AppItem) => [app.packageName.toLowerCase(), app])
+                    );
+                    const dbAppsByName = new Map<string, AppItem>(
+                        formattedApps.map((app: AppItem) => [app.appName.toLowerCase(), app])
                     );
                     
                     // Merge native apps with database apps, preferring native icons
                     nativeApps.forEach((nativeApp) => {
                         const packageNameLower = nativeApp.packageName.toLowerCase();
-                        const existingApp = dbAppsMap.get(packageNameLower);
+                        const appNameLower = nativeApp.appName.toLowerCase();
+                        const existingAppByPackage = dbAppsMap.get(packageNameLower);
+                        const existingAppByName = dbAppsByName.get(appNameLower);
                         
-                        if (existingApp) {
+                        if (existingAppByPackage || existingAppByName) {
                             // Update existing app with native icon if available
-                            if (nativeApp.iconUri) {
+                            const existingApp = existingAppByPackage || existingAppByName;
+                            if (nativeApp.iconUri && existingApp) {
                                 console.log(`Updating ${existingApp.appName} with native icon`);
                                 existingApp.iconUri = nativeApp.iconUri;
                             }
@@ -357,6 +361,9 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
 
     // Get most used apps (top 6) from filtered apps
     const mostUsedApps = filteredApps?.sort((a, b) => (b.usageTime || 0) - (a.usageTime || 0)).slice(0, 6);
+    
+    // Check if any app is selected
+    const hasSelectedApps = apps?.some(app => app.selected) || false;
 
     const handleAddUrl = async () => {
         if (!urlInput || !nameInput) return;
@@ -517,20 +524,109 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
     }
 
     return (
-        <Box className="flex-1 flex flex-col p-3" style={{ gap: 5 }}>
-            {/* Search Bar */}
-            <TextInput
-                placeholder="Search apps..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
+        <Box className="flex-1 flex flex-col">
+            {/* Search Bar and Selection Header */}
+            <Box className="px-4 pt-3">
+                <TextInput
+                    placeholder="Search apps..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    className='mb-3 w-full'
+                    style={{ width: '100%' }}
+                />
+                
+                {/* Selection count header */}
+                {hasSelectedApps && (
+                    <Box className="mb-3 px-3 py-2.5 rounded-lg flex-row justify-between items-center" style={{ backgroundColor: currentColors.primary[500] + "10" }}>
+                        <Text variant="body" style={{ color: currentColors.primary[600], fontWeight: '600' }}>
+                            {apps?.filter(app => app.selected).length} app{apps?.filter(app => app.selected).length !== 1 ? 's' : ''} selected
+                        </Text>
+                        <Pressable
+                            onPress={() => {
+                                setApps(prevApps => prevApps?.map(app => ({ ...app, selected: false })));
+                            }}
+                            className="px-3 py-1 rounded-full"
+                            style={{ backgroundColor: currentColors.primary[500] + "20" }}
+                        >
+                            <Text variant="caption" style={{ color: currentColors.primary[600], fontWeight: '500' }}>
+                                Clear all
+                            </Text>
+                        </Pressable>
+                    </Box>
+                )}
+            </Box>
+            
+            {/* Scrollable Content */}
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+                <Box className="px-4" style={{ gap: 5 }}>
 
-                className='mb-2 w-full'
-            />
+                    <Box className="mb-6">
+                <Text variant="h5" className="font-semibold mb-3" style={{ color: currentColors.text.main }}>
+                    Categories
+                </Text>
+                <Box className="flex-row flex-wrap" style={{ gap: 8 }}>
+                    {categories.map(category => (
+                        <Pressable
+                            key={category}
+                            className="w-[48%]"
+                            onPress={() => {
+                                // Get all apps in this category (from all apps, not just filtered)
+                                const categoryApps = apps?.filter(app => categorizeApp(app) === category) || [];
+                                
+                                // Check if all apps in this category are selected
+                                const allSelected = categoryApps.length > 0 && categoryApps.every(app => app.selected);
+                                
+                                // Toggle selection for all apps in this category
+                                setApps(prevApps => 
+                                    prevApps?.map(app => {
+                                        if (categorizeApp(app) === category) {
+                                            return { ...app, selected: !allSelected };
+                                        }
+                                        return app;
+                                    })
+                                );
+                            }}
+                        >
+                            <Box
+                                className="px-4 py-2.5 rounded-full"
+                                style={{
+                                    backgroundColor: (() => {
+                                        const categoryApps = apps?.filter(app => categorizeApp(app) === category) || [];
+                                        const allSelected = categoryApps.length > 0 && categoryApps.every(app => app.selected);
+                                        const someSelected = categoryApps.some(app => app.selected);
+                                        if (allSelected) return currentColors.primary[500] + "30";
+                                        if (someSelected) return currentColors.primary[500] + "15";
+                                        return currentColors.surface.card;
+                                    })(),
+                                    borderWidth: 1,
+                                    borderColor: (() => {
+                                        const categoryApps = apps?.filter(app => categorizeApp(app) === category) || [];
+                                        const hasSelected = categoryApps.some(app => app.selected);
+                                        return hasSelected ? currentColors.primary[500] + "40" : currentColors.neutral[200];
+                                    })()
+                                }}
+                            >
+                                <Text
+                                    variant="body"
+                                    className="font-semibold"
+                                    style={{ color: (() => {
+                                        const categoryApps = apps?.filter(app => categorizeApp(app) === category) || [];
+                                        const allSelected = categoryApps.length > 0 && categoryApps.every(app => app.selected);
+                                        return allSelected ? currentColors.primary[500] : currentColors.text.main;
+                                    })() }}
+                                >
+                                    {category}
+                                </Text>
+                            </Box>
+                        </Pressable>
+                    ))}
+                </Box>
+            </Box>
 
             {/* Most Used Apps Section */}
-            <Box className="flex flex-colmb-4">
-                <Box className="flex-row justify-between items-center mb-2">
-                    <Text variant="h4" className="font-bold" style={{ color: currentColors.text.main }}>
+            <Box className="flex flex-col mb-6">
+                <Box className="flex-row justify-between items-center mb-3">
+                    <Text variant="h5" className="font-semibold" style={{ color: currentColors.text.main }}>
                         Most Used
                     </Text>
                     <Text variant="caption" style={{ color: currentColors.text.soft }}>
@@ -557,9 +653,10 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                             }}
                         >
                             <Box
-                                className="p-2 rounded-lg shadow-sm w-24"
+                                className="p-2 rounded-lg shadow-sm w-20"
                                 style={{
-                                    backgroundColor: item.selected ? currentColors.primary[500] : currentColors.surface.card,
+                                    backgroundColor: item.selected ? currentColors.primary[500] + "20" : currentColors.surface.card,
+                                    opacity: hasSelectedApps && !item.selected ? 0.5 : 1,
                                     shadowColor: currentColors.neutral[900],
                                     shadowOffset: { width: 0, height: 2 },
                                     shadowOpacity: 0.1,
@@ -591,14 +688,15 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                                     </Box>
                                     <Text
                                         variant="caption"
-                                        className="font-semibold mt-1 truncate"
-                                        style={{ color: item.selected ? currentColors.white : currentColors.text.main }}
+                                        className="font-semibold mt-1"
+                                        numberOfLines={1}
+                                        style={{ color: item.selected ? currentColors.primary[500] : currentColors.text.main }}
                                     >
                                         {item.appName}
                                     </Text>
                                     <Text
                                         variant="caption"
-                                        style={{ color: item.selected ? currentColors.white : currentColors.text.soft }}
+                                        style={{ color: item.selected ? currentColors.primary[500] + "CC" : currentColors.text.soft }}
                                     >
                                         {formatTime(item.usageTime || 0)}
                                     </Text>
@@ -609,52 +707,35 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                 </ScrollView>
             </Box>
 
-            {/* Categories Section */}
-            <Box className="mb-4">
-                <Text variant="h4" className="font-bold mb-2" style={{ color: currentColors.text.main }}>
-                    Categories
-                </Text>
-                <Box className="flex-row flex-wrap" style={{ gap: 8 }}>
-                    {categories.map(category => (
-                        <Pressable
-                            key={category}
-                            className="w-[48%]"
-                            onPress={() => setSelectedCategory(category === selectedCategory ? null : category)}
-                        >
-                            <Box
-                                className="px-4 py-2 rounded-full"
-                                style={{
-                                    backgroundColor: category === selectedCategory ? currentColors.primary[500] : currentColors.surface.card,
-                                    borderWidth: 1,
-                                    borderColor: category === selectedCategory ? currentColors.primary[500] : currentColors.neutral[200]
-                                }}
-                            >
-                                <Text
-                                    variant="body"
-                                    className="font-semibold"
-                                    style={{ color: category === selectedCategory ? currentColors.white : currentColors.text.main }}
-                                >
-                                    {category}
-                                </Text>
-                            </Box>
-                        </Pressable>
-                    ))}
-                </Box>
-            </Box>
-
             {/* Apps Grid */}
             <Box className="mb-4 flex-1 flex flex-col">
-                <Text variant="h4" className="font-bold mb-2" style={{ color: currentColors.text.main }}>
+                <Text variant="h5" className="font-semibold mb-3" style={{ color: currentColors.text.main }}>
                     All Apps
                 </Text>
                 <ScrollView
                     className='flex-1'
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ gap: 8, paddingRight: 16, display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+                    contentContainerStyle={{ gap: 8, display: "flex", flexDirection: "row", flexWrap: "wrap" }}
                 >
-                    {groupedApps?.["Other"]?.map((item: AppItem) => (
+                    {(() => {
+                        // Show selected apps from categories plus all "Other" category apps
+                        const selectedFromCategories = filteredApps.filter(app => {
+                            const category = categorizeApp(app);
+                            return category !== 'Other' && app.selected;
+                        });
+                        const otherApps = groupedApps?.["Other"] || [];
+                        
+                        // Combine and deduplicate
+                        const appsToShow = [...selectedFromCategories];
+                        otherApps.forEach(app => {
+                            if (!appsToShow.some(a => a.packageName === app.packageName)) {
+                                appsToShow.push(app);
+                            }
+                        });
+                        
+                        return appsToShow.map((item: AppItem) => (
                         <Pressable
-                            className='w-[23%]'
+                            className='w-[23.4%]'
                             key={item.packageName}
                             onPress={() => {
                                 setApps((prevApps: AppItem[] | undefined) =>
@@ -669,7 +750,8 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                             <Box
                                 className="p-2 rounded-lg shadow-sm"
                                 style={{
-                                    backgroundColor: item.selected ? currentColors.primary[500] : currentColors.surface.card,
+                                    backgroundColor: item.selected ? currentColors.primary[500] + "20" : currentColors.surface.card,
+                                    opacity: hasSelectedApps && !item.selected ? 0.5 : 1,
                                     shadowColor: currentColors.neutral[900],
                                     shadowOffset: { width: 0, height: 2 },
                                     shadowOpacity: 0.1,
@@ -701,67 +783,71 @@ export function RoutineApps({ onBack, nativeApps }: RoutineAppsProps) {
                                     </Box>
                                     <Text
                                         variant="caption"
-                                        className="font-semibold mt-1 truncate"
-                                        style={{ color: item.selected ? currentColors.white : currentColors.text.main }}
+                                        className="font-semibold mt-1"
+                                        numberOfLines={1}
+                                        style={{ color: item.selected ? currentColors.primary[500] : currentColors.text.main }}
                                     >
                                         {item.appName}
                                     </Text>
                                 </Box>
                             </Box>
                         </Pressable>
-                    ))}
+                        ));
+                    })()}
                 </ScrollView>
             </Box>
 
-            {/* Add URL button for web and extension */}
-            {showWebsiteFeature && (
-                <Box className="mb-4">
-                    {!showUrlInput ? (
-                        <Button
-                            title="Add Website"
-                            variant="secondary"
-                            onPress={() => setShowUrlInput(true)}
-                        />
-                    ) : (
-                        <Box className="p-4 rounded-lg" style={{ backgroundColor: currentColors.surface.card }}>
-                            <Text variant="h5" className="font-semibold mb-2" style={{ color: currentColors.text.main }}>
-                                Add Website to Block
-                            </Text>
-                            <TextInput
-                                placeholder="Website name (e.g., Facebook)"
-                                value={nameInput}
-                                onChangeText={setNameInput}
-                                className="mb-2"
-                            />
-                            <TextInput
-                                placeholder="URL (e.g., facebook.com)"
-                                value={urlInput}
-                                onChangeText={setUrlInput}
-                                className="mb-3"
-                            />
-                            <Box className="flex-row" style={{ gap: 8 }}>
+                    {/* Add URL button for web and extension */}
+                    {showWebsiteFeature && (
+                        <Box className="mb-4">
+                            {!showUrlInput ? (
                                 <Button
-                                    title="Add"
-                                    variant="primary"
-                                    onPress={handleAddUrl}
-                                />
-                                <Button
-                                    title="Cancel"
+                                    title="Add Website"
                                     variant="secondary"
-                                    onPress={() => {
-                                        setShowUrlInput(false);
-                                        setUrlInput('');
-                                        setNameInput('');
-                                    }}
+                                    onPress={() => setShowUrlInput(true)}
                                 />
-                            </Box>
+                            ) : (
+                                <Box className="p-4 rounded-lg" style={{ backgroundColor: currentColors.surface.card }}>
+                                    <Text variant="h5" className="font-semibold mb-2" style={{ color: currentColors.text.main }}>
+                                        Add Website to Block
+                                    </Text>
+                                    <TextInput
+                                        placeholder="Website name (e.g., Facebook)"
+                                        value={nameInput}
+                                        onChangeText={setNameInput}
+                                        className="mb-2"
+                                    />
+                                    <TextInput
+                                        placeholder="URL (e.g., facebook.com)"
+                                        value={urlInput}
+                                        onChangeText={setUrlInput}
+                                        className="mb-3"
+                                    />
+                                    <Box className="flex-row" style={{ gap: 8 }}>
+                                        <Button
+                                            title="Add"
+                                            variant="primary"
+                                            onPress={handleAddUrl}
+                                        />
+                                        <Button
+                                            title="Cancel"
+                                            variant="secondary"
+                                            onPress={() => {
+                                                setShowUrlInput(false);
+                                                setUrlInput('');
+                                                setNameInput('');
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </Box>
-            )}
+            </ScrollView>
 
-            {/* Save Button */}
-            <Box className="p-4 pt-0">
+            {/* Fixed Bottom Button */}
+            <Box className="px-4 pb-8 pt-2">
                 <Button
                     title='Save'
                     variant="primary"

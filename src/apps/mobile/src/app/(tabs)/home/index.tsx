@@ -10,7 +10,7 @@ export default function Page() {
   return (
       <Home
         onViewRoutine={(routineId) => router.push(`/(tabs)/home/routine?routineId=${routineId}`)}
-        onCreateRoutine={() => router.push("/(tabs)/home/create-routine")}
+        onCreateRoutine={() => router.push("/create-routine")}
         nativeAppBlocking={nativeAppBlocking}
         sendTransaction={signAndSendTransaction}
         onNavigateToSuccess={(sessionId) => router.push(`/success?sessionId=${sessionId}`)}

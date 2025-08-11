@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { formatTime } from "../lib/time";
 import { ChevronIcon, MobileIcon, WebIcon } from "./icons";
-import { useTheme, Box, Text, Pressable, ScrollView, Image } from "@blockit/cross-ui-toolkit";
+import { useTheme, Box, Text, Pressable, ScrollView, Image, AnimatedView } from "@blockit/cross-ui-toolkit";
 import { useAppUsageQuery } from "../hooks/useAppUsageQuery";
 import { useAppIcons } from "../hooks/useAppIcons";
 import { CalendarWithUsageData } from "./components/calendar";
@@ -25,6 +25,7 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState<string>(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`);
+  const [showTimeBreakdown, setShowTimeBreakdown] = useState(false);
   const hasSyncedInitialMonth = useRef(false);
 
   // Ensure we don't start with a future date selected
@@ -279,7 +280,11 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
   }, [appUsageData, selectedDate, totalDayTime]);
 
   return (
-    <Box className="flex-1" style={{ backgroundColor: currentColors.background }}>
+    <Pressable 
+      className="flex-1" 
+      style={{ backgroundColor: currentColors.background }}
+      onPress={() => setShowTimeBreakdown(false)}
+    >
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <Box className="p-4">
           {/* Show error if there's one, but don't block the calendar */}
@@ -322,12 +327,89 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                   {formatDate(selectedDate)}
                 </Text>
                 {totalDayTime > 0 ? (
-                  <Box className="px-4 py-2 rounded-lg" style={{
-                    backgroundColor: currentColors.neutral[300] + '40'
-                  }}>
-                    <Text className="text-2xl font-bold" style={{ color: currentColors.text.soft }}>
-                      {formatTime(totalDayTime)}
-                    </Text>
+                  <Box className="relative" style={{ zIndex: showTimeBreakdown ? 500 : 1 }}>
+                    <Pressable
+                      onPress={() => setShowTimeBreakdown(!showTimeBreakdown)}
+                    >
+                      <Box className="px-4 py-2 rounded-lg" style={{
+                        backgroundColor: currentColors.neutral[300] + '40'
+                      }}>
+                        <Text className="text-2xl font-bold" style={{ color: currentColors.text.soft }}>
+                          {formatTime(totalDayTime)}
+                        </Text>
+                      </Box>
+                    </Pressable>
+                    
+                    {/* Popover for time breakdown */}
+                    {(totalMobile > 0 || totalWeb > 0) && (
+                      <AnimatedView
+                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                        animate={{ 
+                          opacity: showTimeBreakdown ? 1 : 0, 
+                          scale: showTimeBreakdown ? 1 : 0.95, 
+                          y: showTimeBreakdown ? 0 : -10,
+                          display: showTimeBreakdown ? 'block' : 'none'
+                        }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          right: 0,
+                          marginTop: 8,
+                          zIndex: 1000,
+                        }}
+                      >
+                        <Pressable
+                          onPress={() => {
+                            // Keep popover open when clicking on it
+                          }}
+                        >
+                          <Box 
+                            className="p-3 rounded-xl shadow-lg"
+                            style={{
+                              backgroundColor: currentColors.surface.card,
+                              borderWidth: 1,
+                              borderColor: currentColors.neutral[300] + '60',
+                              minWidth: 180,
+                              shadowColor: '#000',
+                              shadowOffset: { width: 0, height: 4 },
+                              shadowOpacity: 0.12,
+                              shadowRadius: 8,
+                              elevation: 10
+                            }}
+                          >
+                          <Box className="flex flex-col gap-2">
+                            {totalMobile > 0 && (
+                              <Box className="flex flex-row justify-between items-center">
+                                <Box className="flex flex-row items-center gap-2">
+                                  <Box className="w-5 h-5 rounded items-center justify-center" style={{ backgroundColor: '#A500F220' }}>
+                                    <MobileIcon size={12} color="#A500F2" />
+                                  </Box>
+                                  <Text className="text-sm" style={{ color: currentColors.text.soft }}>Mobile</Text>
+                                </Box>
+                                <Text className="text-sm font-bold" style={{ color: '#A500F2' }}>
+                                  {formatTime(totalMobile)}
+                                </Text>
+                              </Box>
+                            )}
+                            {totalWeb > 0 && (
+                              <Box className="flex flex-row justify-between items-center">
+                                <Box className="flex flex-row items-center gap-2">
+                                  <Box className="w-5 h-5 rounded items-center justify-center" style={{ backgroundColor: '#E500A420' }}>
+                                    <WebIcon size={12} color="#E500A4" />
+                                  </Box>
+                                  <Text className="text-sm" style={{ color: currentColors.text.soft }}>Web</Text>
+                                </Box>
+                                <Text className="text-sm font-bold" style={{ color: '#E500A4' }}>
+                                  {formatTime(totalWeb)}
+                                </Text>
+                              </Box>
+                            )}
+                          </Box>
+                          </Box>
+                        </Pressable>
+                      </AnimatedView>
+                    )}
                   </Box>
                 ) : null}
               </Box>
@@ -344,21 +426,21 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
 
 
                   {/* Platform totals */}
-                  {(totalMobile > 0 && totalWeb > 0) && (
+                  {/* {(totalMobile > 0 && totalWeb > 0) && (
                     <Box className="flex flex-row gap-2">
                       {totalMobile > 0 && (
                         <Box className="flex-1 flex flex-row items-center p-2 rounded-xl" style={{
-                          backgroundColor: currentColors.secondary[400] + '12',
+                          backgroundColor: '#A500F215',
                           borderWidth: 1,
-                          borderColor: currentColors.secondary[400] + '20',
+                          borderColor: '#A500F225',
                           minWidth: 0
                         }}>
-                          <Box className="w-6 h-6 rounded-lg items-center justify-center mr-2" style={{ backgroundColor: currentColors.secondary[400] + '25' }}>
-                            <MobileIcon size={14} color={currentColors.secondary[500]} />
+                          <Box className="w-6 h-6 rounded-lg items-center justify-center mr-2" style={{ backgroundColor: '#A500F230' }}>
+                            <MobileIcon size={14} color="#A500F2" />
                           </Box>
                           <Box className="flex-1 min-w-0">
                             <Text className="text-xs font-medium" style={{ color: currentColors.text.soft }}>Mobile</Text>
-                            <Text className="text-sm font-bold" style={{ color: currentColors.secondary[600] }}>
+                            <Text className="text-sm font-bold" style={{ color: '#A500F2' }}>
                               {formatTime(totalMobile)}
                             </Text>
                           </Box>
@@ -366,24 +448,24 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                       )}
                       {totalWeb > 0 && (
                         <Box className="flex-1 flex flex-row items-center p-2 rounded-xl" style={{
-                          backgroundColor: currentColors.secondary[300] + '12',
+                          backgroundColor: '#E500A415',
                           borderWidth: 1,
-                          borderColor: currentColors.secondary[300] + '20',
+                          borderColor: '#E500A425',
                           minWidth: 0
                         }}>
-                          <Box className="w-6 h-6 rounded-lg items-center justify-center mr-2" style={{ backgroundColor: currentColors.secondary[300] + '25' }}>
-                            <WebIcon size={14} color={currentColors.secondary[400]} />
+                          <Box className="w-6 h-6 rounded-lg items-center justify-center mr-2" style={{ backgroundColor: '#E500A430' }}>
+                            <WebIcon size={14} color="#E500A4" />
                           </Box>
                           <Box className="flex-1 min-w-0">
                             <Text className="text-xs font-medium" style={{ color: currentColors.text.soft }}>Web</Text>
-                            <Text className="text-sm font-bold" style={{ color: currentColors.secondary[500] }}>
+                            <Text className="text-sm font-bold" style={{ color: '#E500A4' }}>
                               {formatTime(totalWeb)}
                             </Text>
                           </Box>
                         </Box>
                       )}
                     </Box>
-                  )}
+                  )} */}
 
                   {/* Hourly Usage Chart */}
                   {hourlyData && hourlyData.date === selectedDate && appUsageData && appUsageData[selectedDate] && (() => {
@@ -392,7 +474,9 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
 
                     // Create hourly data array with real data
                     const currentHour = new Date().getHours();
-                    const isToday = selectedDate === new Date().toISOString().split('T')[0];
+                    const today = new Date();
+                    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                    const isToday = selectedDate === todayStr;
                     
                     const hourlyChartData = Array.from({ length: 24 }, (_, hour) => {
                       // Backend now returns hours in local timezone, no conversion needed
@@ -419,7 +503,6 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                     const sortedHourlyData = hourlyChartData.sort((a, b) => a.hour - b.hour);
 
                     const maxHourTime = Math.max(...sortedHourlyData.map(d => d.time));
-                    const peakHour = sortedHourlyData.find(d => d.time === maxHourTime);
                     const totalDayUsage = sortedHourlyData.reduce((sum, d) => sum + d.time, 0);
 
                     // Only show chart if there's actual usage data
@@ -447,7 +530,7 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                         </Text>
                       </Box>
                       <Box className="space-y-2 flex flex-col gap-2">
-                        {appUsageListItems.map((item, index) => {
+                        {appUsageListItems.map((item) => {
                             const { appName, times, totalTime, percentage } = item;
 
                             return (
@@ -516,7 +599,7 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                                     <Box
                                       className="h-full rounded-full"
                                       style={{
-                                        backgroundColor: currentColors.secondary[400] + '80',
+                                        backgroundColor: '#A500F260',
                                         width: `${percentage}%`
                                       }}
                                     />
@@ -528,31 +611,31 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
                                   <Box className="mt-3 pt-3" style={{ borderTopWidth: 1, borderTopColor: currentColors.neutral[300] + '40' }}>
                                     <Box className="flex flex-col gap-2">
                                       {(times.mobile || 0) >= 1000 && (
-                                        <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: currentColors.secondary[400] + '10' }}>
+                                        <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: '#A500F212' }}>
                                           <Box className="flex flex-row items-center gap-2">
-                                            <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: currentColors.secondary[400] + '20' }}>
-                                              <MobileIcon size={14} color={currentColors.secondary[500]} />
+                                            <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: '#A500F225' }}>
+                                              <MobileIcon size={14} color="#A500F2" />
                                             </Box>
                                             <Text className="text-sm font-medium" style={{ color: currentColors.text.soft }}>
                                               Mobile
                                             </Text>
                                           </Box>
-                                          <Text className="text-sm font-bold" style={{ color: currentColors.secondary[600] }}>
+                                          <Text className="text-sm font-bold" style={{ color: '#A500F2' }}>
                                             {formatTime(times.mobile || 0)}
                                           </Text>
                                         </Box>
                                       )}
                                       {(times.web || 0) >= 1000 && (
-                                        <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: currentColors.secondary[300] + '10' }}>
+                                        <Box className="flex flex-row justify-between items-center p-2 rounded-lg" style={{ backgroundColor: '#E500A412' }}>
                                           <Box className="flex flex-row items-center gap-2">
-                                            <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: currentColors.secondary[300] + '20'}}>
-                                              <WebIcon size={14} color={currentColors.secondary[400]} />
+                                            <Box className="w-6 h-6 rounded-lg items-center justify-center" style={{ backgroundColor: '#E500A425'}}>
+                                              <WebIcon size={14} color="#E500A4" />
                                             </Box>
                                             <Text className="text-sm font-medium" style={{ color: currentColors.text.soft }}>
                                               Web
                                             </Text>
                                           </Box>
-                                          <Text className="text-sm font-bold" style={{ color: currentColors.secondary[500] }}>
+                                          <Text className="text-sm font-bold" style={{ color: '#E500A4' }}>
                                             {formatTime(times.web || 0)}
                                           </Text>
                                         </Box>
@@ -582,6 +665,6 @@ export function Stats({ onDayChange, onMonthSync, onRefreshReady }: StatsProps =
           )}
         </Box>
       </ScrollView>
-    </Box>
+    </Pressable>
   );
 }

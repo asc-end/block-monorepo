@@ -2,6 +2,7 @@ import { Box, Text, ScrollView, useTheme, Pressable } from "@blockit/cross-ui-to
 import { useHistoricalSessions } from "../../../hooks/useHistoricalSessions";
 import { formatTime } from "../../../lib/time";
 import { ChevronIcon } from "../../icons/ChevronIcon";
+import { FocusIcon } from "../../icons";
 
 interface HistoricalProps {
     onSeeAll?: () => void;
@@ -160,9 +161,13 @@ export function Historical({ onSeeAll }: HistoricalProps) {
                                                         : currentColors.secondary[100] + '60'
                                                 }}
                                             >
-                                                <Text className="text-sm">
-                                                    {isRoutine ? (session.emoji || '🎯') : '🧘'}
-                                                </Text>
+                                                {isRoutine ? (
+                                                    <Text className="text-sm">
+                                                        {session.emoji || '🎯'}
+                                                    </Text>
+                                                ) : (
+                                                    <FocusIcon size={18} color={currentColors.secondary[500]} />
+                                                )}
                                             </Box>
                                             <Box className="flex-1">
                                                 <Text className="font-medium text-sm" style={{ color: currentColors.text.main }}>

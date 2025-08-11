@@ -143,55 +143,58 @@ export function RoutineCalendar({ onBack }: CalendarProps) {
 
     return (
         <Box className="flex-1 flex flex-col" style={{ background: currentColors.surface.card }}>
-            {/* Header */}
-            <Box
-                className='flex flex-col items-center px-6 pb-2 pt-1 rounded-b-3xl'
-                style={{ background: currentColors.background, gap: 2 }}
-            >
-                <Text variant="h3" style={{ fontSize: 20 }}>
-                    Select End Date
-                </Text>
-                <Text variant="caption" style={{ fontSize: 12 }}>
-                    Choose when you'd like your routine to end
-                </Text>
-            </Box>
-
-            <Box className="flex-1 px-4 pt-8 pb-2">
-                {/* Calendar Container */}
+            {/* Scrollable Content */}
+            <Box className="flex-1">
+                {/* Header */}
                 <Box
-                    className="flex flex-col rounded-2xl overflow-hidden"
-                    style={{
-                        backgroundColor: currentColors.surface.elevated,
-                        borderWidth: 1,
-                        borderColor: currentColors.border,
-                        width: '100%',
-                        justifyContent: 'flex-start',
-                    }}
+                    className='flex flex-col items-center px-6 pb-2 pt-1 rounded-b-3xl'
+                    style={{ background: currentColors.background, gap: 2 }}
                 >
-                    {/* Calendar Component */}
-                    <Calendar
-                        selectedDate={tempSelectedDate || undefined}
-                        onSelectDate={handleDateSelect}
-                        currentMonth={currentMonth}
-                        onMonthChange={handleMonthChange}
-                        minDate={minDate}
-                        disableFutureDates={false}
-                        renderDay={renderDay}
-                        headerComponent={
-                            <MonthSelector
-                                currentMonth={currentMonth}
-                                onMonthChange={handleMonthDelta}
-                                disableNext={false}
-                                disablePrevious={!canGoPrevMonth()}
-                            />
-                        }
-                        weekDays={['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
-                    />
+                    <Text variant="h3" style={{ fontSize: 20 }}>
+                        Select End Date
+                    </Text>
+                    <Text variant="caption" style={{ fontSize: 12 }}>
+                        Choose when you'd like your routine to end
+                    </Text>
+                </Box>
+
+                <Box className="px-4 pt-8 pb-2">
+                    {/* Calendar Container */}
+                    <Box
+                        className="flex flex-col rounded-2xl overflow-hidden"
+                        style={{
+                            backgroundColor: currentColors.surface.elevated,
+                            borderWidth: 1,
+                            borderColor: currentColors.border,
+                            width: '100%',
+                            justifyContent: 'flex-start',
+                        }}
+                    >
+                        {/* Calendar Component */}
+                        <Calendar
+                            selectedDate={tempSelectedDate || undefined}
+                            onSelectDate={handleDateSelect}
+                            currentMonth={currentMonth}
+                            onMonthChange={handleMonthChange}
+                            minDate={minDate}
+                            disableFutureDates={false}
+                            renderDay={renderDay}
+                            headerComponent={
+                                <MonthSelector
+                                    currentMonth={currentMonth}
+                                    onMonthChange={handleMonthDelta}
+                                    disableNext={false}
+                                    disablePrevious={!canGoPrevMonth()}
+                                />
+                            }
+                            weekDays={['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']}
+                        />
+                    </Box>
                 </Box>
             </Box>
 
-            {/* Save Button */}
-            <Box className="p-3">
+            {/* Fixed Bottom Button */}
+            <Box className="px-4 pb-8 pt-2">
                 <Button
                     title='Save'
                     variant="primary"

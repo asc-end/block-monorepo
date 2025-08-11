@@ -22,13 +22,16 @@ export function RoutineItem({ routine, onPress }: RoutineItemProps) {
   const statusDisplay = getRoutineStatusDisplay(routine);
   const timeDescription = getRoutineTimeDescription(routine);
   
-  const statusColor = statusDisplay.color === 'success' ? currentColors.success.main :
+  // Use alpha for active status (success color)
+  const isActive = statusDisplay.label === 'active';
+  const statusColor = statusDisplay.color === 'success' ? (isActive ? currentColors.success.main + '30' : currentColors.success.main) :
                      statusDisplay.color === 'warning' ? currentColors.warning.main :
                      statusDisplay.color === 'error' ? currentColors.error.main :
                      statusDisplay.color === 'primary' ? currentColors.primary[500] :
                      currentColors.neutral[200];
   
-  const textColor = ['success', 'warning', 'error', 'primary'].includes(statusDisplay.color) 
+  const textColor = statusDisplay.color === 'success' && isActive ? currentColors.success.main :
+                    ['success', 'warning', 'error', 'primary'].includes(statusDisplay.color) 
     ? 'white' 
     : currentColors.text.soft;
 

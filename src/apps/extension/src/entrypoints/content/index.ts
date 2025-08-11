@@ -1,5 +1,5 @@
 import { browser, ContentScriptContext } from "wxt/browser";
-import { colors } from '@blockit/ui';
+import { darkColors } from '@blockit/ui';
 
 // Add type declaration for WXT auto-imports
 declare function defineContentScript(config: any): any;
@@ -114,14 +114,14 @@ export default defineContentScript({
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, ${colors.background}F2 0%, ${colors.surface.card}F2 50%, ${colors.surface.elevated}F2 100%);
+      background: linear-gradient(135deg, ${darkColors.background}F5 0%, ${darkColors.surface.card}E8 50%, ${darkColors.surface.elevated}F5 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 999999;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: ${colors.text.main};
+      color: ${darkColors.text.main};
       text-align: center;
       pointer-events: auto;
       backdrop-filter: blur(20px);
@@ -205,7 +205,7 @@ export default defineContentScript({
             font-size: 3rem; 
             margin-bottom: 1.5rem; 
             font-weight: 800; 
-            color: ${colors.text.main};
+            color: ${darkColors.text.main};
             animation: slideUp 0.6s ease-out;
             letter-spacing: -0.02em;
           ">Blocked by Routine</h1>
@@ -213,7 +213,7 @@ export default defineContentScript({
             font-size: 1.25rem; 
             max-width: 500px; 
             line-height: 1.8; 
-            color: ${colors.text.soft}; 
+            color: ${darkColors.text.soft}; 
             margin-bottom: 2rem;
             animation: slideUp 0.8s ease-out;
           ">
@@ -229,19 +229,19 @@ export default defineContentScript({
           ">
             ${activeRoutines.map(r => `
               <span style="
-                background: ${colors.surface.elevated};
-                color: ${colors.pop.violet};
+                background: ${darkColors.surface.elevated};
+                color: ${darkColors.primary['400']};
                 padding: 0.5rem 1rem;
                 border-radius: 1rem;
                 font-weight: 600;
-                border: 2px solid ${colors.pop.violet}20;
+                border: 2px solid ${darkColors.primary['400']}20;
               ">${r.name}</span>
             `).join('')}
           </div>
           <div id="countdown-timer" style="
             font-size: 2rem;
             font-weight: 600;
-            color: ${colors.pop.violet};
+            color: ${darkColors.primary['400']};
             margin-bottom: 2rem;
             animation: slideUp 1.1s ease-out;
             font-variant-numeric: tabular-nums;
@@ -254,21 +254,22 @@ export default defineContentScript({
             gap: 0.5rem;
             font-size: 0.75rem; 
             font-weight: 600;
-            background: ${colors.pop.violet}15;
-            color: ${colors.pop.violet};
+            background: ${darkColors.primary['400']}15;
+            color: ${darkColors.primary['400']};
             padding: 0.5rem 1rem;
             border-radius: 0.75rem;
-            border: 1px solid ${colors.pop.violet}25;
+            border: 1px solid ${darkColors.primary['400']}25;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             animation: slideUp 1.2s ease-out;
           ">
             <div style="
-              width: 6px;
-              height: 6px;
-              background: ${colors.pop.violet};
+              width: 8px;
+              height: 8px;
+              background: ${darkColors.primary['300']};
               border-radius: 50%;
               animation: pulseGlow 2s ease-in-out infinite;
+              box-shadow: 0 0 8px ${darkColors.primary['400']}60;
             "></div>
             Routine Active
           </div>
@@ -286,9 +287,9 @@ export default defineContentScript({
               position: absolute;
               width: 100%;
               height: 100%;
-              background: linear-gradient(135deg, ${colors.primary['600']} 0%, ${colors.primary['400']} 100%);
+              background: linear-gradient(135deg, ${darkColors.primary['600']} 0%, ${darkColors.primary['400']} 100%);
               clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-              box-shadow: 0 8px 32px ${colors.primary['500']}40;
+              box-shadow: 0 8px 32px ${darkColors.primary['500']}40;
             "></div>
             <div style="
               position: absolute;
@@ -306,7 +307,7 @@ export default defineContentScript({
             font-size: 3rem; 
             margin-bottom: 1.5rem; 
             font-weight: 800; 
-            color: ${colors.text.main};
+            color: ${darkColors.text.main};
             animation: slideUp 0.6s ease-out;
             letter-spacing: -0.02em;
           ">Time to Focus!</h1>
@@ -314,7 +315,7 @@ export default defineContentScript({
             font-size: 1.25rem; 
             max-width: 500px; 
             line-height: 1.8; 
-            color: ${colors.text.soft}; 
+            color: ${darkColors.text.soft}; 
             margin-bottom: 3rem;
             animation: slideUp 0.8s ease-out;
           ">
@@ -324,7 +325,7 @@ export default defineContentScript({
           <div id="countdown-timer" style="
             font-size: 2rem;
             font-weight: 600;
-            color: ${colors.primary['600']};
+            color: ${darkColors.primary['500']};
             margin-bottom: 2rem;
             animation: slideUp 0.9s ease-out;
             font-variant-numeric: tabular-nums;
@@ -342,43 +343,46 @@ export default defineContentScript({
               display: inline-flex;
               align-items: center;
               gap: 0.5rem;
-              font-size: 0.75rem; 
-              font-weight: 600;
-              background: ${colors.primary['500']}15;
-              color: ${colors.primary['700']};
-              padding: 0.5rem 1rem;
-              border-radius: 0.75rem;
-              border: 1px solid ${colors.primary['500']}25;
+              font-size: 0.875rem; 
+              font-weight: 700;
+              background: linear-gradient(135deg, ${darkColors.primary['500']}20 0%, ${darkColors.primary['400']}15 100%);
+              color: ${darkColors.primary['300']};
+              padding: 0.75rem 1.25rem;
+              border-radius: 1rem;
+              border: 2px solid ${darkColors.primary['400']}30;
               text-transform: uppercase;
-              letter-spacing: 0.05em;
+              letter-spacing: 0.08em;
+              animation: floatBadge 3s ease-in-out infinite;
+              box-shadow: 0 4px 16px ${darkColors.primary['500']}20;
             ">
               <div style="
-                width: 6px;
-                height: 6px;
-                background: ${colors.primary['600']};
+                width: 8px;
+                height: 8px;
+                background: ${darkColors.primary['300']};
                 border-radius: 50%;
                 animation: pulseGlow 2s ease-in-out infinite;
+                box-shadow: 0 0 8px ${darkColors.primary['400']}60;
               "></div>
               Focus Session Active
             </div>
             <p style="
               font-size: 0.875rem;
-              color: ${colors.text.verySoft};
+              color: ${darkColors.text.verySoft};
               margin: 0;
-            ">Stay focused, you've got this! 💪</p>
+            ">Stay focused, you've got this!</p>
           </div>
           <button onclick="window.location.reload()" style="
             margin-top: 3rem;
             background: none;
-            border: 1px solid ${colors.text.verySoft}40;
-            color: ${colors.text.verySoft};
+            border: 1px solid ${darkColors.text.verySoft}40;
+            color: ${darkColors.text.verySoft};
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
-          " onmouseover="this.style.borderColor='${colors.text.soft}'; this.style.color='${colors.text.soft}'" 
-             onmouseout="this.style.borderColor='${colors.text.verySoft}40'; this.style.color='${colors.text.verySoft}'">
+          " onmouseover="this.style.borderColor='${darkColors.text.soft}'; this.style.color='${darkColors.text.soft}'" 
+             onmouseout="this.style.borderColor='${darkColors.text.verySoft}40'; this.style.color='${darkColors.text.verySoft}'">
             Session ended? Click to refresh
           </button>
         `;
@@ -405,12 +409,12 @@ export default defineContentScript({
       
       if (timeRemaining !== null && timeRemaining > 0) {
         timerElement.innerHTML = `
-          <div style="margin-bottom: 0.5rem; font-size: 1rem; color: ${colors.text.soft};">Time Remaining</div>
+          <div style="margin-bottom: 0.5rem; font-size: 1rem; color: ${darkColors.text.soft};">Time Remaining</div>
           <div>${formatTime(timeRemaining)}</div>
         `;
       } else {
         timerElement.innerHTML = `
-          <div style="font-size: 1rem; color: ${colors.text.soft};">Session ending soon...</div>
+          <div style="font-size: 1rem; color: ${darkColors.text.soft};">Session ending soon...</div>
         `;
       }
     };

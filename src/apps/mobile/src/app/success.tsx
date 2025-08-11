@@ -5,7 +5,7 @@ import { useSolana } from '@/hooks/solana/useSolana';
 
 export default function SuccessScreen() {
   const { sessionId, claimMode } = useLocalSearchParams<{ sessionId?: string; claimMode?: 'single' | 'multiple' }>();
-  const { signAndSendTransaction } = useSolana();
+  const { signAndSendTransaction, walletAddress } = useSolana();
   
   const handleBack = () => {
     router.back();
@@ -18,6 +18,7 @@ export default function SuccessScreen() {
       sessionId={sessionId}
       claimMode={claimMode}
       sendTransaction={signAndSendTransaction}
+      walletAddress={walletAddress}
     />
   );
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gradient stroke background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#2D00F7"
+                android:centerColor="#6A00F4"
+                android:endColor="#A500F2"
+                android:angle="45" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+    
+    <!-- Inner purple background with padding to create stroke effect -->
+    <item 
+        android:top="1dp" 
+        android:bottom="1dp" 
+        android:left="1dp" 
+        android:right="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#31076F" />
+            <corners android:radius="15dp" />
+        </shape>
+    </item>
+</layer-list>

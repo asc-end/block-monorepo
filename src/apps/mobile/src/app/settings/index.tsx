@@ -9,6 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { SettingItem, SettingsSection } from '../../components/Settings';
 import { usePrivy } from '@privy-io/expo';
+import { api } from '@blockit/ui';
+import dayjs from 'dayjs';
 
 const SettingsScreen = () => {
   const { currentColors } = useTheme();
@@ -130,6 +132,104 @@ const SettingsScreen = () => {
           }}
         />
       </SettingsSection>
+
+      {__DEV__ && (
+        <SettingsSection title="Developer">
+          <SettingItem
+            title="Generate Mock Data"
+            description="Create 6 days of web usage data"
+            icon="bug-outline"
+            isLast
+            onPress={async () => {
+              try {
+                const generateMockData = async () => {
+                  const apps = [
+                    { name: 'YouTube', weight: 3 },
+                    { name: 'jup.ag', weight: 2 },
+                    { name: 'flashtrade', weight: 2 }
+                  ];
+                  
+                  const mockData = [];
+                  const now = dayjs();
+                  
+                  for (let day = 0; day < 6; day++) {
+                    const currentDay = now.subtract(day, 'day');
+                    
+                    // Generate data between 12 PM and 5 AM next day (17 hours)
+                    for (let hour = 12; hour <= 28; hour++) {
+                      const actualHour = hour % 24;
+                      const dayOffset = Math.floor(hour / 24);
+                      const hourStart = currentDay
+                        .add(dayOffset, 'day')
+                        .hour(actualHour)
+                        .minute(0)
+                        .second(0)
+                        .millisecond(0);
+                      
+                      // Random chance to have activity this hour (70% chance)
+                      if (Math.random() > 0.3) {
+                        // Pick a random app based on weights
+                        const totalWeight = apps.reduce((sum, app) => sum + app.weight, 0);
+                        let random = Math.random() * totalWeight;
+                        let selectedApp = apps[0].name;
+                        
+                        for (const app of apps) {
+                          random -= app.weight;
+                          if (random <= 0) {
+                            selectedApp = app.name;
+                            break;
+                          }
+                        }
+                        
+                        // Generate random time spent (between 5 and 45 minutes)
+                        const timeSpent = (5 + Math.random() * 40) * 60 * 1000;
+                        
+                        mockData.push({
+                          appName: selectedApp,
+                          timeSpent: Math.round(timeSpent),
+                          platform: 'web',
+                          hourStart: hourStart.toISOString()
+                        });
+                      }
+                    }
+                  }
+                  
+                  // Send data to backend
+                  Alert.alert(
+                    'Generate Mock Data',
+                    `This will create ${mockData.length} hours of mock web usage data for the last 6 days. Continue?`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Generate',
+                        onPress: async () => {
+                          try {
+                            // Send each record to the backend
+                            const promises = mockData.map(data => 
+                              api().post('/app-usage/hourly-set', data)
+                            );
+                            
+                            await Promise.all(promises);
+                            Alert.alert('Success', `Created ${mockData.length} hours of mock data`);
+                          } catch (error) {
+                            console.error('Error creating mock data:', error);
+                            Alert.alert('Error', 'Failed to create mock data');
+                          }
+                        }
+                      }
+                    ]
+                  );
+                };
+                
+                await generateMockData();
+              } catch (error) {
+                console.error('Error in mock data generation:', error);
+                Alert.alert('Error', 'Failed to generate mock data');
+              }
+            }}
+          />
+        </SettingsSection>
+      )}
       </ScrollView>
 
       <TouchableOpacity

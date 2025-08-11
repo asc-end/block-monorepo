@@ -221,11 +221,7 @@ class AppBlockerService : Service() {
                 ?.alpha(1f)
                 ?.setDuration(300)
                 ?.start()
-
-            // Update the message with the app name
-            overlayView?.findViewById<TextView>(R.id.blockMessage)?.text = 
-                "This app is blocked during your focus session.\nTake a deep breath and return to your important tasks."
-
+            
             // Track this blocked attempt
             trackBlockedAttempt(packageName)
         } catch (e: Exception) {

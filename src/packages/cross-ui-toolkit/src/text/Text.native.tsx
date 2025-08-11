@@ -3,7 +3,7 @@ import { TextProps, textVariants } from './index';
 import { useTheme } from '../theme/context';
 
 export function Text(props: TextProps) {
-  const { children, variant = 'body', style, className, ...rest } = props;
+  const { children, variant = 'body', style, className, numberOfLines, ...rest } = props;
   const { currentColors } = useTheme();
   const variantStyle = textVariants[variant];
 
@@ -30,6 +30,7 @@ export function Text(props: TextProps) {
     <RNText
       style={defaultStyle}
       className={combinedClassName}
+      numberOfLines={numberOfLines}
       {...rest}
     >
       {children}

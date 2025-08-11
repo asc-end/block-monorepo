@@ -361,7 +361,7 @@ export function SellData() {
         try {
             setIsCreatingListing(true);
             const startDate = dayjs("2025-07-20").toDate()
-            const endDate = dayjs("2025-08-01").toDate()
+            const endDate = dayjs().toDate() // Use current date/time (until now)
             const pricePerDay = selectedPrice * 1000000000 // Convert SOL to lamports
             console.log("Creating listing", walletAddress, startDate, endDate, pricePerDay)
             const tx = await createListingTx(walletAddress, startDate, endDate, pricePerDay).catch((e) => {
@@ -375,7 +375,7 @@ export function SellData() {
             console.log('Created listing');
             setIsCreatingListing(false); // Stop showing "creating" state
             setShowSuccessModal(true); // Show success modal
-            await refetchAfterDelay(1000, "create"); // This will show the waiting state
+            await refetchAfterDelay(1500, "create"); // This will show the waiting state
         } catch (error) {
             setIsCreatingListing(false);
             console.error('Error creating listing:', error);

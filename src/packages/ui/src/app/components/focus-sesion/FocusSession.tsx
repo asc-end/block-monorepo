@@ -96,9 +96,9 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
             if (action === 'start') {
                 setIsCreating(true);
                 setActiveSession(null)
-                
+
                 let sessionData: any = { duration, notes: 'Focus session started' };
-                
+
                 // If there's a stake amount, create the on-chain commitment FIRST
                 if (stakeAmount > 0 && user?.walletAddress && sendTransaction) {
                     try {
@@ -121,10 +121,10 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                         throw commitmentError;
                     }
                 }
-                
+
                 // Now create the session (with commitment data if applicable)
                 const { data } = await api().post('/focus-session', sessionData);
-                
+
                 setActiveSession(data)
                 // The WebSocket will handle setting the active session
                 // Don't set it here to avoid race conditions
@@ -174,11 +174,11 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                 <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
                     <Box className='flex flex-row justify-between items-center'>
                         <Text variant='h5'>Focus Session</Text>
-                        {(!activeSession || (activeSession && activeSession.commitment && activeSession.commitment.amount)) && (
+                        {!activeSession && (
                             <Pressable
                                 onPress={() => stakeModalRef.current?.open()}
                                 className='flex flex-row items-center gap-1 px-3 py-1 rounded-full'
-                                style={{ backgroundColor: stakeAmount && !activeSession ? currentColors.primary[200] : currentColors.neutral[200] }}
+                                style={{ backgroundColor: stakeAmount > 0 ? currentColors.primary[200] : currentColors.neutral[200] }}
                             >
                                 <SolIcon size={16} color={stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft} />
                                 <Text variant='caption' style={{ color: stakeAmount > 0 ? currentColors.primary[500] : currentColors.text.soft }}>
@@ -271,7 +271,7 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
             <Box style={{ backgroundColor: currentColors.surface.card, gap: 6 }} className='w-full p-4 flex flex-col rounded-2xl'>
                 <Box className='flex flex-row justify-between items-center'>
                     <Text variant='h5'>Focus Session</Text>
-                    {(!activeSession || activeSession.status && stakeAmount) && (
+                    {!activeSession && (
                         <Pressable
                             onPress={() => stakeModalRef.current?.open()}
                             className='flex flex-row items-center gap-1 px-3 py-1 rounded-full'
@@ -294,7 +294,6 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                             </Text>
                         </Box>
                     )}
-
                 </Box>
 
                 {isLoading ? (
@@ -401,7 +400,6 @@ export function FocusSession({ nativeAppBlocking, sendTransaction, onNavigateToS
                                     style={{ backgroundColor: stakeAmount === preset ? currentColors.neutral[500] : currentColors.neutral[200] }}
                                     onPress={() => setStakeAmount(preset)}
                                 >
-
                                     <Text variant="body" style={{ color: currentColors.text.soft }}>
                                         {preset} SOL
                                     </Text>

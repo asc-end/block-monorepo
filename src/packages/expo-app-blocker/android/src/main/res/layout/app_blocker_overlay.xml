@@ -19,7 +19,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@android:drawable/ic_lock_lock"
-            android:tint="#1b7df5"
+            android:tint="#59bbff"
             android:alpha="0.9"
             android:layout_marginBottom="24dp" />
 
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Time to Focus!"
-            android:textColor="#312E81"
+            android:textColor="#F0F0F0"
             android:textSize="32sp"
             android:textStyle="bold"
             android:letterSpacing="-0.02"
@@ -37,8 +37,8 @@
             android:id="@+id/blockMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This app is blocked during your focus session.\nTake a deep breath and return to your important tasks."
-            android:textColor="#8471B8"
+            android:text="This app is blocked during your focus session."
+            android:textColor="#C0C0C0"
             android:textSize="16sp"
             android:textAlignment="center"
             android:maxWidth="320dp"
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textColor="#1b7df5"
+            android:textColor="#59bbff"
             android:textSize="28sp"
             android:textStyle="bold"
             android:fontFamily="monospace"
@@ -63,9 +63,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/focus_badge_background"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
+            android:background="@drawable/gradient_stroke_badge"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="6dp"
             android:gravity="center"
             android:layout_marginBottom="32dp">
             
@@ -81,10 +81,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="FOCUS SESSION ACTIVE"
-                android:textColor="#1752b6"
-                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.05" />
+                android:letterSpacing="0.08" />
         </LinearLayout>
 
         <!-- Buttons container -->
@@ -100,13 +100,14 @@
                 android:layout_height="wrap_content"
                 android:minWidth="200dp"
                 android:text="RETURN HOME"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:backgroundTint="#1b7df5"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="14dp"
+                android:textColor="#909090"
+                android:textStyle="normal"
+                android:background="@drawable/secondary_button_background"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
                 android:layout_marginBottom="12dp"
-                android:letterSpacing="0.05" />
+                android:letterSpacing="0.05"
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/openAppButton"
@@ -116,8 +117,8 @@
                 android:text="OPEN BLOCKIT"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
-                android:backgroundTint="#00E5CA"
-                android:paddingHorizontal="24dp"
+                android:backgroundTint="#3aa0ff"
+                android:paddingHorizontal="28dp"
                 android:paddingVertical="14dp"
                 android:letterSpacing="0.05" />
         </LinearLayout>

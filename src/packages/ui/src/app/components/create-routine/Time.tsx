@@ -370,11 +370,11 @@ export function RoutineTime({ onBack }: TimeSettingsProps) {
     };
 
     return (
-        <Box className="flex-1 overflow-hidden p-4" style={{ backgroundColor: currentColors.background }}>
+        <Box className="flex-1 flex flex-col" style={{ backgroundColor: currentColors.background }}>
             {/* Scrollable content */}
             <ScrollView
-                className='flex-1 '
-                contentContainerStyle={{ gap: 12, display: "flex", padding: 4 }}
+                className='flex-1'
+                contentContainerStyle={{ gap: 12, display: "flex", padding: 16 }}
                 showsVerticalScrollIndicator={false}
                 style={{ flexGrow: 1 }}
             >
@@ -447,8 +447,8 @@ export function RoutineTime({ onBack }: TimeSettingsProps) {
 
             </ScrollView>
 
-            {/* Fixed save button at bottom */}
-            <Box className="p-3 pt-2">
+            {/* Fixed Bottom Button */}
+            <Box className="px-4 pb-8 pt-2">
                 <Button
                     title='Save'
                     variant="primary"

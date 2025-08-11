@@ -2,7 +2,7 @@ import { TextProps, textVariants } from './index';
 import { useTheme } from '../theme/context';
 
 export function Text(props: TextProps) {
-  const { children, variant = 'body', style, className, ...rest } = props;
+  const { children, variant = 'body', style, className, numberOfLines, ...rest } = props;
   const { currentColors } = useTheme();
   const variantStyle = textVariants[variant];
 
@@ -18,9 +18,17 @@ export function Text(props: TextProps) {
     }
   };
 
-  const defaultStyle = {
+  const defaultStyle: React.CSSProperties = {
     color: getDefaultTextColor(),
     ...style,
+    ...(numberOfLines && {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      display: '-webkit-box',
+      WebkitLineClamp: numberOfLines,
+      WebkitBoxOrient: 'vertical',
+      lineClamp: numberOfLines,
+    }),
   };
 
   // If className is provided, use it instead of variant styles
