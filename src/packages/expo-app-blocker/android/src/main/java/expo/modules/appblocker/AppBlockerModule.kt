@@ -22,6 +22,8 @@ import android.util.Base64
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
+import java.text.SimpleDateFormat
 
 class AppBlockerModule : Module() {
   private val context: Context
@@ -457,12 +459,17 @@ class AppBlockerModule : Module() {
                   event.packageName
                 }
                 
-                // Calculate hour bucket for the session
-                calendar.timeInMillis = startTimeForApp
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val hourKey = calendar.time.toInstant().toString()
+                // Calculate hour bucket for the session in UTC
+                val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                utcCalendar.timeInMillis = startTimeForApp
+                utcCalendar.set(Calendar.MINUTE, 0)
+                utcCalendar.set(Calendar.SECOND, 0)
+                utcCalendar.set(Calendar.MILLISECOND, 0)
+                
+                // Format as ISO string in UTC
+                val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                val hourKey = sdf.format(utcCalendar.time)
                 
                 // Add to hourly stats
                 if (!hourlyStats.containsKey(hourKey)) {
@@ -474,6 +481,42 @@ class AppBlockerModule : Module() {
               }
             }
           }
+        }
+        
+        // Handle currently active apps (still in foreground)
+        for ((packageName, startTimeForApp) in appStartTimes) {
+          val duration = endTime - startTimeForApp
+          
+          // Skip if duration is too short (less than 1 second)
+          if (duration < 1000) continue
+          
+          // Get app name
+          val appName = try {
+            val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+            context.packageManager.getApplicationLabel(appInfo).toString()
+          } catch (e: Exception) {
+            packageName
+          }
+          
+          // Calculate hour bucket for the session start in UTC
+          val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+          utcCalendar.timeInMillis = startTimeForApp
+          utcCalendar.set(Calendar.MINUTE, 0)
+          utcCalendar.set(Calendar.SECOND, 0)
+          utcCalendar.set(Calendar.MILLISECOND, 0)
+          
+          // Format as ISO string in UTC
+          val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+          sdf.timeZone = TimeZone.getTimeZone("UTC")
+          val hourKey = sdf.format(utcCalendar.time)
+          
+          // Add to hourly stats
+          if (!hourlyStats.containsKey(hourKey)) {
+            hourlyStats[hourKey] = mutableMapOf()
+          }
+          hourlyStats[hourKey]!![appName] = (hourlyStats[hourKey]!![appName] ?: 0L) + duration
+          
+          Log.d("AppBlockerModule", "Added active app $appName: ${duration}ms in hour $hourKey")
         }
         
         return@AsyncFunction mapOf(
