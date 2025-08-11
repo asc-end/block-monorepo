@@ -167,10 +167,10 @@ router.get('/current', authMiddleware, async (req: Request & { verifiedClaims?: 
     // Serialize BigInt values in commitments
     const serializedRoutines = routines.map(routine => ({
       ...routine,
-      commitments: routine.commitments.map(commitment => ({
-        ...commitment,
-        amount: commitment.amount.toString()
-      }))
+      commitment: routine.commitment ? {
+        ...routine.commitment,
+        amount: routine.commitment.amount.toString()
+      } : null
     }));
 
     res.json(serializedRoutines);

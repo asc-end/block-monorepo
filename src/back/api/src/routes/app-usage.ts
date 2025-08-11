@@ -3,6 +3,14 @@ import { authMiddleware } from '../middleware/auth';
 import { AuthTokenClaims } from '@privy-io/server-auth';
 import { prisma } from '../config';
 import { getCanonicalName } from '@blockit/shared';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+// Initialize dayjs plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const router = Router();
 
 interface AppUsageRequest extends Request {
@@ -187,9 +195,13 @@ router.get('/stats', authMiddleware, async (req: AppUsageStatsRequest & { verifi
         const formattedStats: Record<string, Record<string, { mobile: number, web: number, icon?: string | null }>> = {};
 
         appStats.forEach(stat => {
-            // Convert UTC date to local date using timezone offset
-            const localDate = new Date(stat.hourStart.getTime() - (timezoneOffset * 60 * 1000));
-            const dateStr = localDate.toISOString().split('T')[0];
+            // Convert UTC to user's local timezone
+            // Create a UTC dayjs object from the database timestamp
+            const utcDate = dayjs.utc(stat.hourStart);
+            // Apply the timezone offset to get local time
+            // We subtract the offset because JS convention is inverted
+            const localDate = utcDate.subtract(timezoneOffset, 'minutes');
+            const dateStr = localDate.format('YYYY-MM-DD');
             
             if (!formattedStats[dateStr]) {
                 formattedStats[dateStr] = {};
@@ -217,9 +229,10 @@ router.get('/hourly-stats', authMiddleware, async (req: Request & { verifiedClai
         const userId = req.verifiedClaims?.userId;
         if (!userId) return res.status(401).json({ error: 'User not authenticated' });
         
-        // Get timezone offset in minutes (e.g., -240 for UTC+4)
-        // Note: getTimezoneOffset returns the difference in minutes from UTC
-        // Positive offset means behind UTC, negative means ahead of UTC
+        // Get timezone offset in minutes from the client
+        // JavaScript's getTimezoneOffset() returns:
+        //   - Positive values for timezones BEHIND UTC (e.g., US: UTC-5 returns 300)
+        //   - Negative values for timezones AHEAD of UTC (e.g., Dubai: UTC+4 returns -240)
         const timezoneOffset = parseInt(req.query.timezoneOffset as string) || 0;
         
 
@@ -228,20 +241,15 @@ router.get('/hourly-stats', authMiddleware, async (req: Request & { verifiedClai
             return res.status(400).json({ error: 'Date parameter required' });
         }
 
-        // Parse the date and adjust for timezone
-        // timezoneOffset is in minutes, positive means behind UTC
-        // So for UTC+4, timezoneOffset would be -240
-        const startDate = new Date(date);
-        // Set to start of day in user's timezone, then convert to UTC
-        startDate.setHours(0, 0, 0, 0);
-        // Adjust for timezone offset to get UTC time
-        startDate.setMinutes(startDate.getMinutes() + timezoneOffset);
+        // Parse the date in user's local timezone and convert to UTC for database query
+        // The date string is in the user's local timezone
+        const localStartOfDay = dayjs(date).startOf('day');
+        const localEndOfDay = dayjs(date).endOf('day');
         
-        const endDate = new Date(date);
-        // Set to end of day in user's timezone, then convert to UTC
-        endDate.setHours(23, 59, 59, 999);
-        // Adjust for timezone offset to get UTC time
-        endDate.setMinutes(endDate.getMinutes() + timezoneOffset);
+        // Convert local times to UTC for database query
+        // We add the offset because JS convention is inverted
+        const startDate = localStartOfDay.add(timezoneOffset, 'minutes').toDate();
+        const endDate = localEndOfDay.add(timezoneOffset, 'minutes').toDate();
 
         // Get all hourly data for the specified date
         const hourlyStats = await prisma.appUsage.findMany({
@@ -267,11 +275,11 @@ router.get('/hourly-stats', authMiddleware, async (req: Request & { verifiedClai
 
         // Fill in the actual data
         hourlyStats.forEach(stat => {
-            // Convert UTC hour to local hour
-            // timezoneOffset is in minutes, negative for ahead of UTC
-            const localDate = new Date(stat.hourStart);
-            localDate.setMinutes(localDate.getMinutes() - timezoneOffset);
-            const hour = localDate.getHours();
+            // Convert UTC timestamp from database to user's local hour
+            const utcDate = dayjs.utc(stat.hourStart);
+            // Subtract offset to convert to local time (JS convention is inverted)
+            const localDate = utcDate.subtract(timezoneOffset, 'minutes');
+            const hour = localDate.hour();
             
             if (!hourlyBreakdown[hour][stat.appName]) {
                 hourlyBreakdown[hour][stat.appName] = {
