@@ -14,38 +14,22 @@ Blockit helps users reclaim their digital lives through intelligent app blocking
 
 Blockit is a monorepo containing multiple applications and services:
 
-```
-├── src/apps/
-│   ├── extension/        # WXT browser extension
-│   ├── mobile/           # Expo mobile app
-│   └── web/              # Web application
-├── src/back/
-│   ├── api/              # Express.js REST API + WebSocket
-│   ├── indexer/          # Blockchain event indexer
-│   └── programs/         # Solana smart contracts (Anchor + Surfpool)
-└── src/packages/
-    ├── database/         # Prisma schema and client
-    ├── shared/           # Common types and utilities
-    ├── ui/               # Shared React components and stores
-    ├── cross-ui-toolkit/ # Platform-agnostic components
-    └── expo-app-blocker/ # Native app blocking module
-```
+### Frontend Applications
+- [`src/apps/extension/`](./src/apps/extension/) - WXT browser extension ([docs](./src/apps/extension/README.md))
+- [`src/apps/mobile/`](./src/apps/mobile/) - Expo mobile app ([docs](./src/apps/mobile/README.md))  
+- [`src/apps/web/`](./src/apps/web/) - Web application ([docs](./src/apps/web/README.md))
 
 ### Backend Services
-- **[API](./src/back/api/README.md)**
-- **[Indexer](./src/back/indexer/README.md)**
-- **[Programs](./src/back/programs/README.md)**
-
-### Frontend Applications
-- **[Extension](./src/apps/extension/README.md)**
-- **[Mobile](./src/apps/mobile/README.md)**
-- **[Web](./src/apps/web/README.md)**
+- [`src/back/api/`](./src/back/api/) - Express.js REST API + WebSocket ([docs](./src/back/api/README.md))
+- [`src/back/indexer/`](./src/back/indexer/) - Blockchain event indexer ([docs](./src/back/indexer/README.md))
+- [`src/back/programs/`](./src/back/programs/) - Solana smart contracts ([docs](./src/back/programs/README.md))
 
 ### Shared Packages
-- **[UI](./src/packages/ui/README.md)**: Business logic, components, and state management
-- **Database**
-- **Cross-UI Toolkit**
-- **Expo App Blocker**
+- [`src/packages/database/`](./src/packages/database/) - Prisma schema and client
+- [`src/packages/shared/`](./src/packages/shared/) - Common types and utilities
+- [`src/packages/ui/`](./src/packages/ui/) - Shared React components and stores ([docs](./src/packages/ui/README.md))
+- [`src/packages/cross-ui-toolkit/`](./src/packages/cross-ui-toolkit/) - Platform-agnostic components
+- [`src/packages/expo-app-blocker/`](./src/packages/expo-app-blocker/) - Native app blocking module
 
 ## 🚀 Quick Start
 
