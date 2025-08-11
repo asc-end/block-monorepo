@@ -1,169 +1,129 @@
-# Blockit Monorepo
+# Blockit - Digital Wellness Platform
 
-A fullstack monorepo for the Blockit application including web, mobile, and browser extension.
+Blockit helps users reclaim their digital lives through intelligent app blocking, focus sessions, and blockchain-backed commitments. Turn your screen time goals into reality.
 
-## Prerequisites
+## 🌟 Features
+
+- **Smart App Blocking**: Block distracting apps during specific times or after daily limits
+- **Focus Sessions**: Time-boxed work sessions with automatic app restrictions
+- **Commitment Stakes**: Put SOL on the line - succeed and get it back, fail and forfeit
+- **Data Marketplace**: Monetize your anonymized app usage data
+- **Cross-Platform**: Works seamlessly across mobile, web, and browser extension
+
+## 🏗 Architecture
+
+Blockit is a monorepo containing multiple applications and services:
+
+```
+├── src/apps/
+│   ├── extension/        # WXT browser extension
+│   ├── mobile/           # Expo mobile app
+│   └── web/              # Web application
+├── src/back/
+│   ├── api/              # Express.js REST API + WebSocket
+│   ├── indexer/          # Blockchain event indexer
+│   └── programs/         # Solana smart contracts (Anchor + Surfpool)
+└── src/packages/
+    ├── database/         # Prisma schema and client
+    ├── shared/           # Common types and utilities
+    ├── ui/               # Shared React components and stores
+    ├── cross-ui-toolkit/ # Platform-agnostic components
+    └── expo-app-blocker/ # Native app blocking module
+```
+
+### Backend Services
+- **[API](./src/back/api/README.md)**
+- **[Indexer](./src/back/indexer/README.md)**
+- **[Programs](./src/back/programs/README.md)**
+
+### Frontend Applications
+- **[Extension](./src/apps/extension/README.md)**
+- **[Mobile](./src/apps/mobile/README.md)**
+- **[Web](./src/apps/web/README.md)**
+
+### Shared Packages
+- **[UI](./src/packages/ui/README.md)**: Business logic, components, and state management
+- **Database**
+- **Cross-UI Toolkit**
+- **Expo App Blocker**
+
+## 🚀 Quick Start
+
+### Prerequisites
 
 - Node.js 18+
-- pnpm
-- PostgreSQL database
-- Brave/Chrome browser (for extension)
-- iOS/Android simulator or device (for mobile)
+- pnpm 8.5+
+- PostgreSQL (or use Railway cloud database)
+- Solana CLI tools (for blockchain development)
 
-## Setup
+### Installation
 
-1. Install dependencies:
 ```bash
+# Clone the repository
+git clone https://github.com/blockit/blockit-monorepo.git
+cd blockit-monorepo
+
+# Install dependencies
 pnpm install
 ```
 
-2. Set up environment variables:
-   - Copy `.env.example` files in each app to `.env`
-   - Update with your local configuration
+## 🔧 Development
 
-## Running Locally
+### Environment Setup
 
-### Backend API
+Each application requires its own `.env` file:
 
 ```bash
-cd apps/backend
-pnpm dev
+# Backend API
+DATABASE_URL=postgresql://...
+PRIVY_APP_ID=...
+PRIVY_APP_SECRET=...
+SOLANA_RPC_URL=...
+
+# Frontend Apps
+VITE_BACKEND_URL=http://localhost:3001
+VITE_PRIVY_APP_ID=...
 ```
-
-The backend will run on `http://localhost:3001`
-
-### Web App
-
-```bash
-cd apps/web
-pnpm dev
-```
-
-The web app will run on `http://localhost:5173`
-
-### Browser Extension
-
-1. Build the extension:
-```bash
-cd apps/extension
-pnpm zip
-```
-
-2. Load in Brave/Chrome:
-   - Open `brave://extensions/` or `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `apps/extension/output/chrome-mv3` directory
-
-3. Make sure the web app and backend are running
-
-### Mobile App
-
-1. Start the backend:
-```bash
-cd apps/backend
-pnpm dev
-```
-
-2. Start the mobile app:
-```bash
-cd apps/mobile
-pnpm start
-```
-
-3. Press `i` for iOS or `a` for Android
-
-## Development Workflow
-
-### Full Stack Development
-
-To run the complete stack locally:
-
-1. **Terminal 1** - Backend:
-```bash
-cd apps/backend && pnpm dev
-```
-
-2. **Terminal 2** - Web app:
-```bash
-cd apps/web && pnpm dev
-```
-
-3. **Terminal 3** - Extension (if needed):
-```bash
-cd apps/extension && pnpm dev
-```
-
-4. **Terminal 4** - Mobile (if needed):
-```bash
-cd apps/mobile && pnpm start
-```
-
-## Project Structure
-
-```
-blockit-monorepo/
-├── apps/
-│   ├── backend/      # Node.js/Express API with Prisma
-│   ├── extension/    # Browser extension (WXT framework)
-│   ├── mobile/       # React Native/Expo app
-│   └── web/          # React web app
-├── packages/
-│   ├── shared/       # Shared utilities and types
-│   ├── ui/          # Shared UI components and stores
-│   └── cross-ui-toolkit/ # Cross-platform UI components
-└── docs/            # Documentation
-```
-
-## Common Commands
 
 ### Database
 
 ```bash
 # Run migrations
-cd apps/backend
+cd src/back/api
 npx prisma migrate dev
 
-# Generate Prisma client
-npx prisma generate
+# Open Prisma Studio
+npx prisma studio
 ```
 
-### Testing
+### Blockchain Development
 
 ```bash
-# Run all tests
-pnpm test
+# Start local validator
+cd src/back/programs
+surfpool
 
-# Run tests for specific app
-pnpm --filter @blockit/backend test
+# Build programs
+anchor build
+
+# Run tests
+anchor test
 ```
 
-### Building
+## 🏛 Architecture Decisions
 
-```bash
-# Build all packages
-pnpm build
+Blockit uses a monorepo architecture to:
+- Share code efficiently across platforms
+- Maintain consistent types and business logic
+- Simplify dependency management
+- Enable atomic commits across services
 
-# Build specific app
-pnpm --filter @blockit/web build
-```
+Key technologies:
+- **pnpm workspaces** for monorepo management
+- **Turborepo** for build orchestration
+- **Privy** for unified authentication
+- **Solana** for decentralized commitments
 
-## Troubleshooting
+## 🤝 License
 
-### Extension Issues
-
-- Make sure to run `pnpm zip` after making changes
-- Check that the extension ID in the web app matches your loaded extension
-- Ensure web app and backend are running
-
-### Mobile Issues
-
-- Clear Metro cache: `npx expo start --clear`
-- Reset simulators if needed
-- Check that backend URL in mobile app matches your local IP
-
-### General Issues
-
-- Clear node_modules: `pnpm clean && pnpm install`
-- Check all environment variables are set correctly
-- Ensure PostgreSQL is running
+This project is proprietary and confidential. See [LICENSE](LICENSE) for details.
