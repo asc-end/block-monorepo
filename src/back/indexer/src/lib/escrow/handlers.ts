@@ -40,12 +40,25 @@ export function createHandlers(program: Program<Escrow>, connection: Connection)
 // Helper function to index commitment accounts
 export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["commitment"]) {
     try {
+      const userPubkey = commitment.user.toString();
+      
+      // Find the user by wallet address
+      const user = await prisma.user.findUnique({
+        where: { walletAddress: userPubkey }
+      });
+
+      if (!user) {
+        console.error(`User not found for wallet address: ${userPubkey}`);
+        return;
+      }
+
+      // Create or update the commitment with the correct userId
       await prisma.commitment.upsert({
         where: { id: commitment.id.toString() },
         create: {
           id: commitment.id.toString(),
-          userId: commitment.user.toString(),
-          userPubkey: commitment.user.toString(),
+          userId: user.id,
+          userPubkey: userPubkey,
           amount: BigInt(commitment.amount.toString()),
           unlockTime: new Date(commitment.unlockTime.toNumber() * 1000),
           authorityPubkey: commitment.authority.toString(),
@@ -54,7 +67,7 @@ export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["co
         },
         update: {
           amount: BigInt(commitment.amount.toString()),
-          userPubkey: commitment.user.toString(),
+          userPubkey: userPubkey,
           unlockTime: new Date(commitment.unlockTime.toNumber() * 1000),
           authorityPubkey: commitment.authority.toString(),
           createdAt: new Date(commitment.createdAt.toNumber() * 1000),
@@ -105,9 +118,24 @@ export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["co
 
   async function handleCommitmentClaimed(data: any) {
     try {
+      const commitmentId = data.commitment.toString();
+      
+      // Check if commitment exists
+      const commitment = await prisma.commitment.findUnique({
+        where: { id: commitmentId }
+      });
+
+      if (!commitment) {
+        console.warn(`Commitment not found for claim: ${commitmentId}`);
+        return;
+      }
+
       await prisma.commitment.update({
-        where: { id: data.commitment.toString() },
-        data: { status: "claimed" }
+        where: { id: commitmentId },
+        data: { 
+          status: "claimed",
+          claimedAt: new Date()
+        }
       });
     } catch (error) {
       console.error('Error handling commitment claimed event:', error);
@@ -116,10 +144,23 @@ export async function indexCommitmentAccount(commitment: IdlAccounts<Escrow>["co
 
   async function handleCommitmentForfeited(data: any) {
     try {
+      const commitmentId = data.commitment.toString();
+      
+      // Check if commitment exists
+      const commitment = await prisma.commitment.findUnique({
+        where: { id: commitmentId }
+      });
+
+      if (!commitment) {
+        console.warn(`Commitment not found for forfeit: ${commitmentId}`);
+        return;
+      }
+
       await prisma.commitment.update({
-        where: { id: data.commitment.toString() },
+        where: { id: commitmentId },
         data: { 
           status: "forfeited",
+          forfeitedAt: new Date(),
           // Optionally store protocol fee and treasury amount
           // protocolFee: BigInt(data.protocolFee.toString()),
           // treasuryAmount: BigInt(data.treasuryAmount.toString())

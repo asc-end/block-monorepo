@@ -1,8 +1,10 @@
-import { IdlAccounts, BN } from "@coral-xyz/anchor";
+import { IdlAccounts } from "@coral-xyz/anchor";
 import { prisma } from "../prisma";
 import { DataMarketplace } from "../../../../programs/target/types/data_marketplace";
 import { PublicKey } from "@solana/web3.js";
 import { marketplacePDAs } from "@blockit/shared";
+import BN from "bn.js"
+
 
 // Helper function to index data seller accounts
 export async function indexDataSellerAccount(seller: IdlAccounts<DataMarketplace>["dataSeller"], accountId: PublicKey, programId?: PublicKey) {

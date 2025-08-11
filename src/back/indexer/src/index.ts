@@ -2,7 +2,7 @@ import { Connection, PublicKey, Keypair, Logs, AccountInfo, KeyedAccountInfo } f
 import * as anchor from '@coral-xyz/anchor';
 import { Program, AnchorProvider, Wallet, IdlAccounts, BN, Idl } from '@coral-xyz/anchor';
 import * as dotenv from 'dotenv';
-import escrowIdl from '../../programs/target/idl/escrow.json';
+import escrowIdl from '../../programs/target/idl/escrow.json' with { type: 'json' };
 import type { Escrow } from '../../programs/target/types/escrow';
 import { createHandlers } from './lib/escrow/handlers';
 import { prisma } from './lib/prisma';
@@ -152,7 +152,8 @@ async function main() {
 }
 
 // Start indexer if running directly
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 

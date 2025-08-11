@@ -1,11 +1,12 @@
 import { PublicKey, Connection, Keypair, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { Program, AnchorProvider, BN, Wallet } from '@coral-xyz/anchor';
+import { Program, AnchorProvider, Wallet } from '@coral-xyz/anchor';
 import { MerkleTree } from 'merkletreejs';
 import keccak256 from 'keccak256';
 import { PrismaClient } from '@prisma/client';
 import { marketplacePDAs, createMerkleLeafData, createSnapshotMerkleLeaf, MARKETPLACE_PROGRAM_ID } from '@blockit/shared';
 import type { DataMarketplace } from '../../../programs/target/types/data_marketplace';
-import IDL from '../../../programs/target/idl/data_marketplace.json';
+import IDL from '../../../programs/target/idl/data_marketplace.json' with { type: 'json' };
+import BN from "bn.js"
 
 export interface MerkleProof {
   amount: string;

@@ -1,6 +1,6 @@
 import { Connection, PublicKey, Keypair, Transaction, SystemProgram } from '@solana/web3.js';
 import { Program, AnchorProvider, Wallet, BN } from '@coral-xyz/anchor';
-import escrowIdl from '../../../programs/target/idl/escrow.json';
+import escrowIdl from '../../../programs/target/idl/escrow.json' with { type: 'json' };
 import type { Escrow } from '../../../programs/target/types/escrow';
 
 export class TransactionHelpers {

@@ -1,7 +1,7 @@
 import { Connection, PublicKey, Keypair, KeyedAccountInfo, Logs, Commitment } from '@solana/web3.js';
 import { Program, AnchorProvider, Wallet, Idl, BN, EventParser } from '@coral-xyz/anchor';
 import * as dotenv from 'dotenv';
-import marketplaceIdl from '../../programs/target/idl/data_marketplace.json';
+import marketplaceIdl from '../../programs/target/idl/data_marketplace.json' with { type: 'json' };
 import type { DataMarketplace } from '../../programs/target/types/data_marketplace';
 import { prisma } from './lib/prisma';
 import { ScheduleService } from './services/scheduleService';
@@ -236,7 +236,8 @@ async function main() {
 }
 
 // Start indexer if running directly
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 
