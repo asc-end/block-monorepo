@@ -36,8 +36,7 @@ export function Button(props: ButtonProps): React.ReactElement {
     // borderWidth: variantStyle.borderWidth,
     // borderColor: style?.borderColor ?? variantStyle.borderColor,
     borderRadius: sizeStyle.borderRadius,
-    paddingHorizontal: sizeStyle.paddingHorizontal,
-    paddingVertical: sizeStyle.paddingVertical,
+    padding: `${sizeStyle.paddingVertical}px ${sizeStyle.paddingHorizontal}px`,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     transform: isPressed && isPrimary ? 'translateY(4px)' : 'translateY(0)',
@@ -47,6 +46,7 @@ export function Button(props: ButtonProps): React.ReactElement {
     ...style,
   }), [variantStyle, sizeStyle, disabled, isPressed, isPrimary, style, loading, isHovered]);
 
+  console.log("BUTTON STYLE", buttonStyle, sizeStyle)
   const shadowStyle = useMemo(() => ({
     position: 'absolute' as const,
     top: 4,
@@ -82,7 +82,7 @@ export function Button(props: ButtonProps): React.ReactElement {
       <div style={shadowStyle} />
       <button
         style={buttonStyle}
-        className={className}
+        className={className + " cursor-pointer"}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

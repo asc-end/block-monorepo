@@ -75,7 +75,7 @@ export function Pressable({
                     onPointerDown={onPressIn}
                     onPointerUp={onPressOut}
                     disabled={disabled}
-                    className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className}`}
+                    className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className} cursor-pointer`}
                     style={{ ...style, ...getHitSlopStyle(hitSlop) }}
                     {...props}
                 >
@@ -90,7 +90,7 @@ export function Pressable({
             onPointerDown={onPressIn}
             onPointerUp={onPressOut}
             disabled={disabled}
-            className={`bg-transparent transition-opacity duration-150 active:opacity-50 ${className} disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none`}
+            className={`bg-transparent transition-opacity duration-150 cursor-pointer active:opacity-50 ${className} disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none`}
             style={style}
             {...props}
         >

@@ -1,16 +1,864 @@
-import { Box, Text } from "@blockit/cross-ui-toolkit";
+import { Box, Text, Button, Modal } from "@blockit/cross-ui-toolkit";
+import { Brain, Smartphone, Globe, Apple, Lock, Sparkles, ArrowRight, Clock as ClockIcon } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Rays } from "@blockit/ui";
+import { darkColors } from "@blockit/ui";
+import { Header, Footer } from "../components";
 
 export default function Home() {
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [barsOpen, setBarsOpen] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setBarsOpen(true);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (ctaRef.current) {
+      observer.observe(ctaRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Box className="min-h-screen w-full flex items-center justify-center">
-      <Box className="p-8">
-        <Text variant="h2" className="text-2xl font-bold text-center mb-4">
-          Welcome to Blokit!
-        </Text>
-        <Text variant="body" className="text-gray-400 text-center">
-          You are successfully connected.
-        </Text>
+    <>
+      {/* Header */}
+      <Header showDownloadModal={() => setShowDownloadModal(true)} />
+
+      <Box className="min-h-screen w-full overflow-x-hidden flex flex-col justify-start" style={{ backgroundColor: darkColors.background }}>
+        {/* Dynamic Gradient Background */}
+        <div className="fixed inset-0" style={{ backgroundColor: darkColors.background }}>
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 50%, ${darkColors.pop.purple}15 0%, transparent 40%),
+              radial-gradient(circle at 80% 80%, ${darkColors.pop.violet}10 0%, transparent 40%),
+              radial-gradient(circle at 50% 0%, ${darkColors.secondary[500]}08 0%, transparent 60%)
+            `
+          }} />
+          {/* Rays Background */}
+          <Box className="absolute inset-0 opacity-5">
+            <Rays size={1000} color={darkColors.pop.purple} />
+          </Box>
+        </div>
+        {/* Hero Section */}
+        <Box id="hero" className="relative min-h-screen flex items-center justify-center px-4 py-20 md:py-0">
+          <Box className="max-w-7xl mx-auto w-full">
+            <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              {/* Left side - Text content */}
+              <Box className="flex flex-col items-center lg:items-start text-center lg:text-left relative z-10">
+
+                <Text variant="h1" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 md:mb-8 leading-tight relative" style={{
+                  fontFamily: 'ClashDisplay',
+                  color: darkColors.text.main
+                }}>
+                  Block the noise,
+                  <Box className="block mt-2">
+                    <span className="bg-clip-text text-transparent" style={{
+                      backgroundImage: `linear-gradient(135deg, ${darkColors.pop.purple}, ${darkColors.pop.violet}, ${darkColors.pop.magenta})`,
+                    }}>earn the time.</span>
+                  </Box>
+                </Text>
+                <Text variant="body" className="text-lg sm:text-xl md:text-2xl mb-8 md:mb-12 max-w-xl leading-relaxed" style={{
+                  color: darkColors.text.soft
+                }}>
+                  The only focus app that puts your money where your goals are.
+                  Block distractions, stake SOL, and build unbreakable habits.
+                </Text>
+                <Box>
+                  <Button
+                    onPress={() => setShowDownloadModal(true)}
+                    variant="primary"
+                    title="Download Now"
+                    className="group"
+                    rightIcon={<ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} color="white" />}
+                  />
+                </Box>
+
+
+                {/* Platform availability */}
+                <Box className="flex flex-row gap-4 items-center justify-center pt-4">
+                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
+                    backgroundColor: `${darkColors.surface.card}50`,
+                    border: `1px solid ${darkColors.neutral[700]}50`
+                  }}>
+                    <Globe size={18} style={{ color: darkColors.pop.indigo }} />
+                    <span style={{ color: darkColors.text.soft }}>Chrome</span>
+                  </Box>
+                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
+                    backgroundColor: `${darkColors.surface.card}50`,
+                    border: `1px solid ${darkColors.neutral[700]}50`
+                  }}>
+                    <Globe size={18} style={{ color: darkColors.pop.yellow }} />
+                    <span style={{ color: darkColors.text.soft }}>Firefox</span>
+                  </Box>
+                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
+                    backgroundColor: `${darkColors.surface.card}50`,
+                    border: `1px solid ${darkColors.neutral[700]}50`
+                  }}>
+                    <Apple size={18} style={{ color: darkColors.secondary[400] }} />
+                    <span style={{ color: darkColors.text.soft }}>iOS</span>
+                  </Box>
+                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
+                    backgroundColor: `${darkColors.surface.card}50`,
+                    border: `1px solid ${darkColors.neutral[700]}50`
+                  }}>
+                    <Smartphone size={18} style={{ color: darkColors.primary[400] }} />
+                    <span style={{ color: darkColors.text.soft }}>Android</span>
+                  </Box>
+                  <Box className="flex flex-row flex-nowrap items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
+                    backgroundColor: `${darkColors.surface.card}50`,
+                    border: `1px solid ${darkColors.neutral[700]}50`
+                  }}>
+                    <Smartphone size={18} style={{ color: darkColors.pop.purple }} />
+                    <span style={{ color: darkColors.text.soft }} className=" text-nowrap">Solana Mobile</span>
+                  </Box>
+                </Box>
+              </Box>
+
+              {/* Right side - Visual element */}
+              <Box className="relative flex items-center justify-center lg:justify-end">
+                <Box className="relative w-full max-w-lg mx-auto">
+                  {/* Hands visual */}
+                  <Box className="absolute inset-0">
+                    {/* <img src="/onboarding.png" /> */}
+                    {/* Gradient overlay */}
+                    <Box className="absolute inset-0 rounded-full opacity-30 blur-3xl" style={{
+                      background: `radial-gradient(circle, ${darkColors.pop.purple}40, ${darkColors.pop.violet}20, transparent)`
+                    }} />
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+          <Box className="absolute left-0 top-0 -right-[500px] -mr-40 hidden lg:block">
+            <img src="/onboarding.png" className="" />
+          </Box>
+        </Box>
+
+        {/* Focus Sessions Section */}
+        <Box id="focus-sessions" className="relative py-16 md:py-32 overflow-hidden" >
+          <Box className="max-w-7xl mx-auto px-4">
+            <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <Box className="relative">
+                <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
+                  background: `radial-gradient(circle, ${darkColors.pop.purple}40, transparent)`
+                }} />
+                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
+                  backgroundColor: darkColors.surface.card + '50',
+                  border: `1px solid ${darkColors.neutral[700]}50`
+                }}>
+                  <Box className="flex items-center gap-4 mb-6">
+                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${darkColors.pop.purple}, ${darkColors.pop.violet})`
+                    }}>
+                      <ClockIcon className="text-white" size={24} />
+                    </Box>
+                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
+                      Focus Sessions
+                    </Text>
+                  </Box>
+                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
+                    Create custom focus sessions tailored to your workflow. Set specific time blocks where distracting apps and websites are automatically blocked, helping you maintain deep focus.
+                  </Text>
+                  <Box className="space-y-4">
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Pomodoro timer with customizable intervals</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.violet }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Schedule recurring focus blocks</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.magenta }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Track focus time and build streaks</Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box className="relative">
+                <Box className="relative animate-float">
+                  <Box className="w-full h-64 md:h-96 rounded-2xl p-6 md:p-8 flex flex-col justify-center backdrop-blur-2xl" style={{
+                    background: `linear-gradient(135deg, ${darkColors.pop.purple}10, ${darkColors.pop.violet}10)`,
+                    border: `2px solid ${darkColors.pop.purple}30`,
+                    boxShadow: `0 20px 40px ${darkColors.pop.purple}10`
+                  }}>
+                    {/* Timer Display */}
+                    <Box className="text-center mb-6">
+                      <Text variant="h1" className="text-5xl md:text-7xl font-bold mb-2" style={{
+                        color: darkColors.pop.purple,
+                        textShadow: `0 0 20px ${darkColors.pop.purple}40`
+                      }}>25:00</Text>
+                      <Text variant="caption" className="text-sm uppercase tracking-wider" style={{ color: darkColors.pop.violet }}>
+                        Deep Work Mode
+                      </Text>
+                    </Box>
+
+                    {/* Blocked Apps */}
+                    <Box className="flex gap-3 justify-center mb-6">
+                      <Box className="px-3 py-1.5 rounded-lg" style={{
+                        backgroundColor: darkColors.pop.purple + '20',
+                        border: `1px solid ${darkColors.pop.purple}30`
+                      }}>
+                        <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>
+                          Instagram
+                        </Text>
+                      </Box>
+                      <Box className="px-3 py-1.5 rounded-lg" style={{
+                        backgroundColor: darkColors.pop.violet + '20',
+                        border: `1px solid ${darkColors.pop.violet}30`
+                      }}>
+                        <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>
+                          Twitter
+                        </Text>
+                      </Box>
+                      <Box className="px-3 py-1.5 rounded-lg" style={{
+                        backgroundColor: darkColors.pop.magenta + '20',
+                        border: `1px solid ${darkColors.pop.magenta}30`
+                      }}>
+                        <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>
+                          YouTube
+                        </Text>
+                      </Box>
+                    </Box>
+
+                    {/* Progress Ring */}
+                    <Box className="relative w-full">
+                      <Box className="w-full rounded-full h-3 overflow-hidden" style={{
+                        backgroundColor: darkColors.neutral[800]
+                      }}>
+                        <Box className="h-full rounded-full transition-all duration-1000" style={{
+                          width: '40%',
+                          background: `linear-gradient(90deg, ${darkColors.pop.purple}, ${darkColors.pop.violet})`,
+                          boxShadow: `0 0 10px ${darkColors.pop.purple}40`
+                        }} />
+                      </Box>
+                      <Box className="flex justify-between mt-3">
+                        <Text className="text-xs" style={{ color: darkColors.text.soft }}>
+                          10:00 elapsed
+                        </Text>
+                        <Text className="text-xs" style={{ color: darkColors.text.soft }}>
+                          15:00 remaining
+                        </Text>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Uncheatable Stakes Section */}
+        <Box id="stakes" className="relative py-16 md:py-32 overflow-hidden" >
+          <Box className="max-w-7xl mx-auto px-4">
+            <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <Box className="order-2 lg:order-1 relative">
+                <Box className="relative animate-float">
+                  <Box className="w-full h-64 md:h-96 rounded-2xl p-6 md:p-8 flex flex-col justify-center" style={{
+                    background: `linear-gradient(135deg, ${darkColors.pop.yellow}20, ${darkColors.pop.magenta}20)`,
+                    border: `1px solid ${darkColors.pop.yellow}50`
+                  }}>
+                    <Text variant="h2" className="text-3xl md:text-4xl font-bold mb-4" style={{ color: darkColors.text.main }}>1.0 SOL</Text>
+                    <Text variant="body" className="mb-6" style={{ color: darkColors.text.soft }}>
+                      No Instagram for 30 days
+                    </Text>
+                    <Box className="w-full bg-black/20 rounded-full h-2 overflow-hidden">
+                      <Box className="h-full rounded-full transition-all" style={{
+                        width: '73%',
+                        background: `linear-gradient(90deg, ${darkColors.pop.yellow}, ${darkColors.pop.magenta})`
+                      }} />
+                    </Box>
+                    <Text variant="caption" className="mt-2" style={{ color: darkColors.text.soft }}>22 of 30 days completed</Text>
+                  </Box>
+                </Box>
+              </Box>
+              <Box className="order-1 lg:order-2 relative">
+                <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
+                  background: `radial-gradient(circle, ${darkColors.pop.yellow}40, transparent)`
+                }} />
+                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
+                  backgroundColor: darkColors.surface.card + '50',
+                  border: `1px solid ${darkColors.neutral[700]}50`
+                }}>
+                  <Box className="flex items-center gap-4 mb-6">
+                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${darkColors.pop.yellow}, ${darkColors.pop.magenta})`
+                    }}>
+                      <Lock className="text-white" size={24} />
+                    </Box>
+                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
+                      Uncheatable Stakes
+                    </Text>
+                  </Box>
+                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
+                    Put your money where your goals are. Stake SOL on your commitments - one stake per challenge. Complete it and get 100% back. Fail, and lose it all.
+                  </Text>
+                  <Box className="space-y-4">
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.yellow }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>100% return on success</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.magenta }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>0% return on failure</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Automatic forfeit on cheating</Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Cross-Platform Section */}
+        <Box id="cross-platform" className="relative py-16 md:py-32" style={{ backgroundColor: darkColors.surface.elevated + "40" }}>
+          <Box className="max-w-7xl mx-auto px-4">
+            <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <Box className="relative">
+                <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
+                  background: `radial-gradient(circle, ${darkColors.primary[500]}40, transparent)`
+                }} />
+                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
+                  backgroundColor: darkColors.surface.card + '50',
+                  border: `1px solid ${darkColors.neutral[700]}50`
+                }}>
+                  <Box className="flex items-center gap-4 mb-6">
+                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${darkColors.primary[500]}, ${darkColors.primary[600]}`
+                    }}>
+                      <Globe className="text-white" size={24} />
+                    </Box>
+                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
+                      Cross-Platform
+                    </Text>
+                  </Box>
+                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
+                    One account, all your devices. Blockit works seamlessly across iOS, Android, Solana Mobile, Chrome, Firefox, and web, ensuring you stay focused no matter which device you're using.
+                  </Text>
+                  <Box className="space-y-4">
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.primary[500] }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Real-time sync across devices</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.primary[600] }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Native mobile app blocking</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.indigo }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Browser extension for web blocking</Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box className="relative">
+                <Box className="relative">
+                  {/* MacBook Image */}
+                  <img
+                    src="/macbook.png"
+                    alt="Blockit on MacBook"
+                    className="w-full h-auto"
+                    style={{ filter: 'drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))' }}
+                  />
+
+                  {/* Seeker Phone Image floating independently */}
+                  <Box className="absolute -bottom-6 md:-bottom-10 right-0 lg:-right-24 w-1/3 md:w-1/2">
+                    <img
+                      src="/seeker.png"
+                      alt="Blockit on Phone"
+                      className="w-full h-auto"
+                      style={{
+                        filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3))'
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Digital Life Insights Section */}
+        <Box id="insights" className="relative py-16 md:py-32">
+          <Box className="max-w-7xl mx-auto px-4">
+            <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <Box className="order-2 lg:order-1 relative">
+                <Box className="relative animate-float">
+                  <Box className="w-full h-64 md:h-96 rounded-2xl p-6 md:p-8" style={{
+                    background: darkColors.surface.card,
+                    border: `1px solid ${darkColors.neutral[800]}`
+                  }}>
+                    <Box className="flex justify-between items-start mb-6">
+                      <Text variant="caption" className="text-xs font-medium uppercase tracking-widest" style={{ color: darkColors.text.soft }}>Cross-Platform Insights</Text>
+                      <Box className="flex gap-2">
+                        <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.indigo }} title="Desktop" />
+                        <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.primary[400] }} title="Mobile" />
+                      </Box>
+                    </Box>
+                    <Box className="space-y-4">
+                      <Box>
+                        <Box className="flex justify-between mb-2">
+                          <Box className="flex items-center gap-2">
+                            <Text variant="body" style={{ color: darkColors.text.main }}>Instagram</Text>
+                            <Box className="flex gap-1">
+                              <Globe size={12} style={{ color: darkColors.pop.indigo }} />
+                              <Smartphone size={12} style={{ color: darkColors.primary[400] }} />
+                            </Box>
+                          </Box>
+                          <Text variant="body" style={{ color: darkColors.pop.magenta }}>12h 30m</Text>
+                        </Box>
+                        <Box className="w-full rounded-full h-2 overflow-hidden" style={{
+                          backgroundColor: darkColors.neutral[900]
+                        }}>
+                          <Box className="h-full rounded-full relative" style={{
+                            width: '75%',
+                            backgroundColor: darkColors.pop.magenta
+                          }}>
+                            <Box className="absolute inset-0 flex">
+                              <Box className="h-full" style={{ width: '40%', backgroundColor: darkColors.pop.indigo, opacity: 0.3 }} />
+                              <Box className="h-full" style={{ width: '60%', backgroundColor: darkColors.primary[400], opacity: 0.3 }} />
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Box className="flex justify-between mb-2">
+                          <Box className="flex items-center gap-2">
+                            <Text variant="body" style={{ color: darkColors.text.main }}>Twitter</Text>
+                            <Box className="flex gap-1">
+                              <Globe size={12} style={{ color: darkColors.pop.indigo }} />
+                            </Box>
+                          </Box>
+                          <Text variant="body" style={{ color: darkColors.pop.purple }}>8h 15m</Text>
+                        </Box>
+                        <Box className="w-full rounded-full h-2 overflow-hidden" style={{
+                          backgroundColor: darkColors.neutral[900]
+                        }}>
+                          <Box className="h-full rounded-full" style={{
+                            width: '50%',
+                            backgroundColor: darkColors.pop.purple
+                          }} />
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Box className="flex justify-between mb-2">
+                          <Box className="flex items-center gap-2">
+                            <Text variant="body" style={{ color: darkColors.text.main }}>YouTube</Text>
+                            <Box className="flex gap-1">
+                              <Globe size={12} style={{ color: darkColors.pop.indigo }} />
+                              <Smartphone size={12} style={{ color: darkColors.primary[400] }} />
+                            </Box>
+                          </Box>
+                          <Text variant="body" style={{ color: darkColors.pop.indigo }}>5h 45m</Text>
+                        </Box>
+                        <Box className="w-full rounded-full h-2 overflow-hidden" style={{
+                          backgroundColor: darkColors.neutral[900]
+                        }}>
+                          <Box className="h-full rounded-full relative" style={{
+                            width: '35%',
+                            backgroundColor: darkColors.pop.indigo
+                          }}>
+                            <Box className="absolute inset-0 flex">
+                              <Box className="h-full" style={{ width: '70%', backgroundColor: darkColors.pop.indigo, opacity: 0.3 }} />
+                              <Box className="h-full" style={{ width: '30%', backgroundColor: darkColors.primary[400], opacity: 0.3 }} />
+                            </Box>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Box className="mt-6 pt-4 border-t" style={{ borderColor: darkColors.neutral[800] }}>
+                      <Text variant="caption" className="text-xs" style={{ color: darkColors.text.verySoft }}>
+                        Synced across all your devices
+                      </Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box className="order-1 lg:order-2 relative">
+                <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
+                  background: `radial-gradient(circle, ${darkColors.pop.indigo}40, transparent)`
+                }} />
+                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
+                  backgroundColor: darkColors.surface.card + '50',
+                  border: `1px solid ${darkColors.neutral[700]}50`
+                }}>
+                  <Box className="flex items-center gap-4 mb-6">
+                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
+                      background: `linear-gradient(135deg, ${darkColors.pop.indigo}, ${darkColors.secondary[500]}`
+                    }}>
+                      <Brain className="text-white" size={24} />
+                    </Box>
+                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
+                      Digital Life Insights
+                    </Text>
+                  </Box>
+                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
+                    Understand your digital habits with detailed analytics. Track time spent on apps and websites, identify patterns, and make informed decisions about your digital life.
+                  </Text>
+                  <Box className="space-y-4">
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.indigo }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Weekly and monthly reports</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.secondary[500] }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Usage trends and patterns</Text>
+                    </Box>
+                    <Box className="flex items-center gap-3">
+                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
+                      <Text variant="body" style={{ color: darkColors.text.main }}>Export data for deeper analysis</Text>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Data Marketplace Section */}
+        <Box id="marketplace" className="relative py-16 md:py-32 overflow-hidden" style={{
+          background: `linear-gradient(180deg, ${darkColors.background} 0%, ${darkColors.surface.elevated}50 50%, ${darkColors.background} 100%)`
+        }}>
+          {/* Animated background elements */}
+          <Box className="absolute inset-0">
+            <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] animate-pulse" style={{
+              background: `radial-gradient(circle, ${darkColors.pop.yellow}30, ${darkColors.pop.purple}10, transparent)`,
+              filter: 'blur(100px)'
+            }} />
+            <Box className="absolute top-20 left-10 w-64 h-64 animate-float" style={{
+              background: `radial-gradient(circle, ${darkColors.pop.magenta}20, transparent)`,
+              filter: 'blur(80px)'
+            }} />
+            <Box className="absolute bottom-20 right-10 w-96 h-96 animate-float" style={{
+              background: `radial-gradient(circle, ${darkColors.pop.purple}20, transparent)`,
+              filter: 'blur(80px)',
+              animationDelay: '2s'
+            }} />
+          </Box>
+
+          <Box className="relative max-w-7xl mx-auto px-4 z-10">
+            <Box className="text-center mb-20">
+
+              <Text variant="h1" className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 md:mb-8 leading-none" style={{
+                fontFamily: 'ClashDisplay',
+                letterSpacing: '-0.02em'
+              }}>
+                <Box className="block mb-2">
+                  <span className="bg-clip-text text-transparent" style={{
+                    backgroundImage: `linear-gradient(90deg, ${darkColors.text.main}, ${darkColors.pop.yellow})`,
+                  }}>YOUR DATA</span>
+                </Box>
+                <Box className="block">
+                  <span className="bg-clip-text text-transparent animate-gradient" style={{
+                    backgroundImage: `linear-gradient(90deg, ${darkColors.pop.yellow}, ${darkColors.pop.purple}, ${darkColors.pop.magenta}, ${darkColors.pop.yellow})`,
+                    backgroundSize: '200% 100%'
+                  }}>IS GOLD</span>
+                </Box>
+              </Text>
+
+              <Text variant="h3" className="text-2xl md:text-3xl max-w-4xl mx-auto leading-relaxed" style={{
+                color: darkColors.text.soft,
+                fontWeight: 300
+              }}>
+                Big Tech made <span style={{ color: darkColors.pop.yellow }}>billions</span> from your clicks.
+                <Box className="block mt-2">
+                  Time to <span className="font-bold" style={{ color: darkColors.text.main }}>flip the script</span> and get your cut.
+                </Box>
+              </Text>
+            </Box>
+
+            {/* Key Features Grid */}
+            <Box className="grid md:grid-cols-3 gap-8 md:gap-12 mb-16">
+              <Box className="relative group">
+                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
+                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
+                  border: `1px solid ${darkColors.pop.yellow}30`,
+                  boxShadow: `0 20px 40px ${darkColors.pop.yellow}10`
+                }}>
+                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
+                    background: `linear-gradient(135deg, ${darkColors.pop.yellow}20, ${darkColors.pop.purple}10)`
+                  }}>
+                    <Lock size={32} style={{ color: darkColors.pop.yellow }} />
+                  </Box>
+                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
+                    Sell Usage Data
+                  </Text>
+                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
+                    Your app usage patterns are valuable. Sell aggregated, anonymized data while maintaining complete privacy.
+                  </Text>
+                </Box>
+              </Box>
+
+              <Box className="relative group">
+                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
+                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
+                  border: `1px solid ${darkColors.pop.purple}30`,
+                  boxShadow: `0 20px 40px ${darkColors.pop.purple}10`
+                }}>
+                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
+                    background: `linear-gradient(135deg, ${darkColors.pop.purple}20, ${darkColors.pop.magenta}10)`
+                  }}>
+                    <Globe size={32} style={{ color: darkColors.pop.purple }} />
+                  </Box>
+                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
+                    Time-Limited Access
+                  </Text>
+                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
+                    Buyers purchase access to aggregated insights for specific time periods. Your data stays secure and valuable.
+                  </Text>
+                </Box>
+              </Box>
+
+              <Box className="relative group">
+                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
+                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
+                  border: `1px solid ${darkColors.pop.magenta}30`,
+                  boxShadow: `0 20px 40px ${darkColors.pop.magenta}10`
+                }}>
+                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
+                    background: `linear-gradient(135deg, ${darkColors.pop.magenta}20, ${darkColors.pop.yellow}10)`
+                  }}>
+                    <Sparkles size={32} style={{ color: darkColors.pop.magenta }} />
+                  </Box>
+                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
+                    Claim Your Revenue
+                  </Text>
+                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
+                    Get your fair share directly. No platform fees, no hidden cuts. 100% of revenue goes to your wallet.
+                  </Text>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* CTA Section */}
+        <Box ref={ctaRef} className="relative py-16 md:py-32 overflow-hidden" style={{
+          background: `linear-gradient(135deg, ${darkColors.pop.purple}, ${darkColors.pop.magenta})`,
+        }}>
+          {/* Prison bars */}
+          <Box className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <Box className="absolute inset-0 flex justify-between">
+              {[...Array(10)].map((_, i) => {
+                // Calculate delay based on distance from center
+                const centerIndex = 4.5;
+                const distanceFromCenter = Math.abs(i - centerIndex);
+                const delay = distanceFromCenter * 150;
+
+                return (
+                  <Box
+                    key={i}
+                    className="transition-transform duration-2000 ease-in-out"
+                    style={{
+                      position: 'relative',
+                      width: '40px',
+                      height: '100%',
+                      background: `linear-gradient(90deg, 
+                        ${darkColors.neutral[900]} 0%, 
+                        ${darkColors.neutral[800]} 15%, 
+                        ${darkColors.neutral[600]} 40%, 
+                        ${darkColors.neutral[500]} 50%, 
+                        ${darkColors.neutral[600]} 60%, 
+                        ${darkColors.neutral[800]} 85%, 
+                        ${darkColors.neutral[900]} 100%)`,
+                      boxShadow: `
+                        inset 0 0 20px rgba(0, 0, 0, 0.8),
+                        0 0 30px rgba(0, 0, 0, 0.6),
+                        -2px 0 4px rgba(255, 255, 255, 0.2),
+                        2px 0 4px rgba(0, 0, 0, 0.4)
+                      `,
+                      transform: barsOpen
+                        ? i < 5
+                          ? `translateX(calc(-100vw - 100px))`
+                          : `translateX(calc(100vw + 100px))`
+                        : 'translateX(0)',
+                      transitionDelay: `${delay}ms`
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </Box>
+
+          <Box className="relative mx-auto px-4 py-16 text-center z-10">
+            <Box className="relative">
+              <Text variant="h1" className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black mb-6 md:mb-8 leading-none transition-all duration-1000" style={{
+                fontFamily: 'ClashDisplay',
+                letterSpacing: '-0.03em',
+                color: darkColors.white,
+                opacity: barsOpen ? 1 : 0.3,
+                transform: barsOpen ? 'scale(1)' : 'scale(0.9)',
+                transitionDelay: '800ms'
+              }}>
+                <Box className="block">
+                  TIME TO
+                </Box>
+                <Box className="block">
+                  BREAK FREE
+                </Box>
+              </Text>
+
+              <Text variant="h3" className="text-2xl md:text-3xl max-w-3xl mx-auto mb-12 leading-relaxed transition-all duration-1000" style={{
+                fontWeight: 400,
+                color: darkColors.white,
+                opacity: barsOpen ? 0.9 : 0,
+                transform: barsOpen ? 'translateY(0)' : 'translateY(20px)',
+                transitionDelay: '1200ms'
+              }}>
+                Your focus is worth more than their algorithms.
+                <Box className="block mt-2">
+                  <span className="font-bold">Take it back.</span>
+                </Box>
+              </Text>
+
+              <Box className="inline-block" style={{
+                opacity: barsOpen ? 1 : 0,
+                transform: barsOpen ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'all 1s ease-out',
+                transitionDelay: '1400ms'
+              }}>
+                <Button
+                  onPress={() => setShowDownloadModal(true)}
+                  title="START YOUR REVOLUTION"
+                  variant="primary"
+                  size="lg"
+                  rightIcon={<ArrowRight size={24} style={{ color: "#FFF" }} />}
+                  style={{
+                    backgroundColor: darkColors.surface.card,
+                    color: darkColors.white
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Footer />
       </Box>
-    </Box>
+
+      {/* Download Modal - Outside main container */}
+      <Modal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+        size="md"
+        closeOnOverlayClick={true}
+        showCloseButton={true}
+      >
+
+            <Text variant="h2" className="text-3xl font-bold mb-6" style={{
+              fontFamily: 'ClashDisplay',
+              color: darkColors.text.main
+            }}>
+              Download Blockit
+            </Text>
+
+            <Box className="space-y-4">
+              {/* iOS */}
+              <Box className="relative flex items-center gap-4 p-4 rounded-xl opacity-80 cursor-not-allowed" style={{
+                backgroundColor: darkColors.surface.card,
+                border: `1px solid ${darkColors.neutral[800]}`
+              }}>
+                <Box className="absolute top-2 right-2 px-2 py-1 rounded-md" style={{
+                  backgroundColor: darkColors.neutral[800],
+                  fontSize: '10px'
+                }}>
+                  <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>COMING SOON</Text>
+                </Box>
+                <Apple size={32} style={{ color: darkColors.secondary[400], opacity: 0.7 }} />
+                <Box className="flex-1">
+                  <Text variant="body" className="font-semibold" style={{ color: darkColors.text.soft }}>iOS App</Text>
+                  <Text variant="caption" className="text-sm" style={{ color: darkColors.text.verySoft }}>Download from App Store</Text>
+                </Box>
+              </Box>
+
+              {/* Android */}
+              <Box className="relative flex items-center gap-4 p-4 rounded-xl opacity-80 cursor-not-allowed" style={{
+                backgroundColor: darkColors.surface.card,
+                border: `1px solid ${darkColors.neutral[800]}`
+              }}>
+                <Box className="absolute top-2 right-2 px-2 py-1 rounded-md" style={{
+                  backgroundColor: darkColors.neutral[800],
+                  fontSize: '10px'
+                }}>
+                  <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>COMING SOON</Text>
+                </Box>
+                <Smartphone size={32} style={{ color: darkColors.primary[400], opacity: 0.7 }} />
+                <Box className="flex-1">
+                  <Text variant="body" className="font-semibold" style={{ color: darkColors.text.soft }}>Android App</Text>
+                  <Text variant="caption" className="text-sm" style={{ color: darkColors.text.verySoft }}>Get it on Google Play</Text>
+                </Box>
+              </Box>
+
+
+              {/* Solana Mobile */}
+              <Box className="relative flex items-center gap-4 p-4 rounded-xl opacity-80 cursor-not-allowed" style={{
+                backgroundColor: darkColors.surface.card,
+                border: `1px solid ${darkColors.neutral[800]}`
+              }}>
+                <Box className="absolute top-2 right-2 px-2 py-1 rounded-md" style={{
+                  backgroundColor: darkColors.neutral[800],
+                  fontSize: '10px'
+                }}>
+                  <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>COMING SOON</Text>
+                </Box>
+                <Smartphone size={32} style={{ color: darkColors.pop.purple, opacity: 0.7 }} />
+                <Box className="flex-1">
+                  <Text variant="body" className="font-semibold" style={{ color: darkColors.text.soft }}>Solana Mobile</Text>
+                  <Text variant="caption" className="text-sm" style={{ color: darkColors.text.verySoft }}>Get on Solana dApp Store</Text>
+                </Box>
+              </Box>
+
+              {/* Chrome */}
+              <Box className="relative flex items-center gap-4 p-4 rounded-xl opacity-80 cursor-not-allowed" style={{
+                backgroundColor: darkColors.surface.card,
+                border: `1px solid ${darkColors.neutral[800]}`
+              }}>
+                <Box className="absolute top-2 right-2 px-2 py-1 rounded-md" style={{
+                  backgroundColor: darkColors.neutral[800],
+                  fontSize: '10px'
+                }}>
+                  <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>COMING SOON</Text>
+                </Box>
+                <Globe size={32} style={{ color: darkColors.pop.indigo, opacity: 0.7 }} />
+                <Box className="flex-1">
+                  <Text variant="body" className="font-semibold" style={{ color: darkColors.text.soft }}>Chrome Extension</Text>
+                  <Text variant="caption" className="text-sm" style={{ color: darkColors.text.verySoft }}>Add to Chrome</Text>
+                </Box>
+              </Box>
+
+              {/* Firefox */}
+              <Box className="relative flex items-center gap-4 p-4 rounded-xl opacity-80 cursor-not-allowed" style={{
+                backgroundColor: darkColors.surface.card,
+                border: `1px solid ${darkColors.neutral[800]}`
+              }}>
+                <Box className="absolute top-2 right-2 px-2 py-1 rounded-md" style={{
+                  backgroundColor: darkColors.neutral[800],
+                  fontSize: '10px'
+                }}>
+                  <Text className="text-xs font-medium" style={{ color: darkColors.text.soft }}>COMING SOON</Text>
+                </Box>
+                <Globe size={32} style={{ color: darkColors.pop.yellow, opacity: 0.7 }} />
+                <Box className="flex-1">
+                  <Text variant="body" className="font-semibold" style={{ color: darkColors.text.soft }}>Firefox Add-on</Text>
+                  <Text variant="caption" className="text-sm" style={{ color: darkColors.text.verySoft }}>Add to Firefox</Text>
+                </Box>
+              </Box>
+            </Box>
+      </Modal>
+    </>
   );
 }

@@ -11,6 +11,7 @@ export * from './theme/context';
 export * from './image/Image';
 export * from './svg/index';
 export * from './drawer';
+export * from './modal';
 export * from './scrollView/ScrollView';
 export * from './textInput/TextInput';
 export * from './numberInput/NumberInput';

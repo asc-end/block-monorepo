@@ -1,9 +1,11 @@
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Box, Button, Pressable, Text, useTheme } from "@blockit/cross-ui-toolkit";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./Home";
 import Error from "./Error";
+import Terms from "./Terms";
+import Privacy from "./Privacy";
 import { sendMessageToExtension } from "../lib/sendMessageToExtension";
 import { createUser, useAuthStore } from "@blockit/ui";
 import { LoseScreen } from "./Lose";
@@ -19,6 +21,16 @@ const router = createBrowserRouter([
     element: <LoseScreen />,
     errorElement: <Error />,
   },
+  {
+    path: "/terms",
+    element: <Terms />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/privacy",
+    element: <Privacy />,
+    errorElement: <Error />,
+  },
 ]);
 
 export function App() {
@@ -29,6 +41,10 @@ export function App() {
   const walletAddress = wallets?.[0]?.address;
   const [isPressed, setIsPressed] = useState(false);
   const [currentFeature, setCurrentFeature] = useState(0);
+  
+  // Check if we're on a public page
+  const publicPaths = ["/", "/terms", "/privacy"];
+  const isPublicPage = publicPaths.includes(window.location.pathname);
 
   const features = [
     {
@@ -114,7 +130,7 @@ export function App() {
     login({ loginMethods: ["email", "farcaster", "github", "twitter", "telegram"] });
   };
 
-  if (!ready) {
+  if (!ready && !isPublicPage) {
     return (
       <Box className="min-h-screen flex items-center justify-center" style={{ backgroundColor: currentColors.background }}>
         <Box className="text-center">
@@ -133,7 +149,7 @@ export function App() {
     );
   }
 
-  if (!authenticated) {
+  if (!authenticated && !isPublicPage) {
     return (
       <Box className="min-h-screen flex flex-row w-full">
         {/* Left Panel - Content */}
@@ -307,25 +323,21 @@ export function App() {
             <Box className="mt-8 text-center">
               <Text variant="caption" style={{ color: currentColors.text.soft }}>
                 By signing in, you agree to our{" "}
-                <a
-                  href="/terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/terms"
                   style={{ color: currentColors.primary[300], textDecoration: 'underline' }}
                   className="hover:opacity-80"
                 >
                   Terms of Service
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a
-                  href="/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/privacy"
                   style={{ color: currentColors.primary[300], textDecoration: 'underline' }}
                   className="hover:opacity-80"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </Text>
             </Box>
           </Box>

@@ -6,3 +6,4 @@ export * from './Raibow';
 export * from './Rays';
 export * from './Star';
 export * from "./SimpleEye";
+export * from "./Melt";
