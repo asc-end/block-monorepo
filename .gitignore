@@ -129,7 +129,14 @@ temp/
 /ios/
 
 # Anchor/Solana artifacts
-target/
+# Ignore everything in target but idl and types
+**/target/debug/*
+**/target/deploy/*
+**/target/release/*
+**/target/tmp/*
+**/target/sbpf-solana-solana/*
+**/target/.rustc_info.json
+
 .anchor/
 /Cargo.lock
 
