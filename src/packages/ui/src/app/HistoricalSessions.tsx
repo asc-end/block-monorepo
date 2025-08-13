@@ -74,7 +74,8 @@ export function HistoricalSessions({ onBack, onViewSession, onNavigateToSuccess 
                     backgroundColor: currentColors.surface.elevated + (session.status == "canceled" ? "B2" : ""),
                     borderWidth: 1,
                     borderColor: currentColors.neutral?.[200] ? currentColors.neutral[200] + "30" : currentColors.border,
-                    paddingVertical: 12,
+                    paddingTop: 12,
+                    paddingBottom: 12,
                     paddingRight: 16,
                     paddingLeft: 12
                 }}

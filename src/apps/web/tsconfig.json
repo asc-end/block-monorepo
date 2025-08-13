@@ -39,6 +39,6 @@
       // "webextension-polyfill" // For browser.runtime
     ]
   },
-  "include": ["src", "../../packages/ui/*", "node_modules/@blockit/ui", "../../packages/ui/index.ts", "../../packages/ui/src/constants"]
-  // "exclude": ["node_modules"]
+  "include": ["src", "../../packages/ui/*", "node_modules/@blockit/ui", "../../packages/ui/index.ts", "../../packages/ui/src/constants"],
+  "exclude": ["node_modules", "**/*.native.tsx", "**/*.native.ts", "**/*.ios.tsx", "**/*.android.tsx"]
 }

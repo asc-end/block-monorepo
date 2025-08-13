@@ -256,7 +256,7 @@ export function LoseScreen() {
                 </Text>
             </Box>
 
-            <style jsx>{`
+            <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes fadeIn {
                     from {
                         opacity: 0;
@@ -282,7 +282,7 @@ export function LoseScreen() {
                 .animate-fadeIn {
                     animation: fadeIn 1s ease-out;
                 }
-            `}</style>
+            `}} />
         </Box>
     );
 }
