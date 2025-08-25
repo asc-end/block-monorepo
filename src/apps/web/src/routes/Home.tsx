@@ -3,12 +3,16 @@ import { Brain, Smartphone, Globe, Apple, Lock, Sparkles, ArrowRight, Clock as C
 import { useState, useEffect, useRef } from "react";
 import { Rays } from "@blockit/ui";
 import { darkColors } from "@blockit/ui";
-import { Header, Footer } from "../components";
+import { Header, Footer, FeatureCard, PlatformBadge, MarketplaceFeatureCard } from "../components";
 
 export default function Home() {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [barsOpen, setBarsOpen] = useState(false);
+  const [focusProgress, setFocusProgress] = useState(0);
+  const [dataProgress, setDataProgress] = useState({ instagram: 0, twitter: 0, youtube: 0 });
   const ctaRef = useRef<HTMLDivElement>(null);
+  const focusSectionRef = useRef<HTMLDivElement>(null);
+  const dataSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -24,6 +28,64 @@ export default function Home() {
 
     if (ctaRef.current) {
       observer.observe(ctaRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Animate focus session progress
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Animate progress bar
+            const timer = setTimeout(() => {
+              setFocusProgress(40);
+            }, 300);
+            return () => clearTimeout(timer);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (focusSectionRef.current) {
+      observer.observe(focusSectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Animate data usage bars
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Stagger the animations
+            const timer1 = setTimeout(() => {
+              setDataProgress(prev => ({ ...prev, instagram: 75 }));
+            }, 200);
+            const timer2 = setTimeout(() => {
+              setDataProgress(prev => ({ ...prev, twitter: 50 }));
+            }, 400);
+            const timer3 = setTimeout(() => {
+              setDataProgress(prev => ({ ...prev, youtube: 35 }));
+            }, 600);
+            return () => {
+              clearTimeout(timer1);
+              clearTimeout(timer2);
+              clearTimeout(timer3);
+            };
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    if (dataSectionRef.current) {
+      observer.observe(dataSectionRef.current);
     }
 
     return () => observer.disconnect();
@@ -86,104 +148,57 @@ export default function Home() {
 
                 {/* Platform availability */}
                 <Box className="flex flex-row gap-4 items-center justify-center pt-4">
-                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
-                    backgroundColor: `${darkColors.surface.card}50`,
-                    border: `1px solid ${darkColors.neutral[700]}50`
-                  }}>
-                    <Globe size={18} style={{ color: darkColors.pop.indigo }} />
-                    <span style={{ color: darkColors.text.soft }}>Chrome</span>
-                  </Box>
-                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
-                    backgroundColor: `${darkColors.surface.card}50`,
-                    border: `1px solid ${darkColors.neutral[700]}50`
-                  }}>
-                    <Globe size={18} style={{ color: darkColors.pop.yellow }} />
-                    <span style={{ color: darkColors.text.soft }}>Firefox</span>
-                  </Box>
-                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
-                    backgroundColor: `${darkColors.surface.card}50`,
-                    border: `1px solid ${darkColors.neutral[700]}50`
-                  }}>
-                    <Apple size={18} style={{ color: darkColors.secondary[400] }} />
-                    <span style={{ color: darkColors.text.soft }}>iOS</span>
-                  </Box>
-                  <Box className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
-                    backgroundColor: `${darkColors.surface.card}50`,
-                    border: `1px solid ${darkColors.neutral[700]}50`
-                  }}>
-                    <Smartphone size={18} style={{ color: darkColors.primary[400] }} />
-                    <span style={{ color: darkColors.text.soft }}>Android</span>
-                  </Box>
-                  <Box className="flex flex-row flex-nowrap items-center gap-2 px-4 py-2 rounded-full transition-all hover:scale-105" style={{
-                    backgroundColor: `${darkColors.surface.card}50`,
-                    border: `1px solid ${darkColors.neutral[700]}50`
-                  }}>
-                    <Smartphone size={18} style={{ color: darkColors.pop.purple }} />
-                    <span style={{ color: darkColors.text.soft }} className=" text-nowrap">Solana Mobile</span>
+                  <PlatformBadge icon={<Globe size={18} />} name="Chrome" iconColor={darkColors.pop.indigo} />
+                  <PlatformBadge icon={<Globe size={18} />} name="Firefox" iconColor={darkColors.pop.yellow} />
+                  <PlatformBadge icon={<Apple size={18} />} name="iOS" iconColor={darkColors.secondary[400]} />
+                  <PlatformBadge icon={<Smartphone size={18} />} name="Android" iconColor={darkColors.primary[400]} />
+                  <Box className="text-nowrap">
+                    <PlatformBadge icon={<Smartphone size={18} />} name="Solana Mobile" iconColor={darkColors.pop.purple} />
                   </Box>
                 </Box>
               </Box>
 
-              {/* Right side - Visual element */}
-              <Box className="relative flex items-center justify-center lg:justify-end">
-                <Box className="relative w-full max-w-lg mx-auto">
-                  {/* Hands visual */}
-                  <Box className="absolute inset-0">
-                    {/* <img src="/onboarding.png" /> */}
-                    {/* Gradient overlay */}
-                    <Box className="absolute inset-0 rounded-full opacity-30 blur-3xl" style={{
-                      background: `radial-gradient(circle, ${darkColors.pop.purple}40, ${darkColors.pop.violet}20, transparent)`
-                    }} />
-                  </Box>
+              {/* Right side - Visual element - Hidden on mobile */}
+              <Box className="hidden lg:block lg:absolute lg:right-0 lg:bottom-0 lg:w-1/2 xl:w-[100%]">
+                <Box className="relative w-full max-w-3xl mx-auto lg:mx-0 lg:ml-auto">
+                  <img 
+                    src="/onboarding.png" 
+                    className="w-full h-auto lg:scale-125 xl:scale-[1.75] 2xl:scale-[2] translate-y-[10%] lg:translate-y-[50%] xl:translate-y-[25%] xl:-translate-x-[25%] 2xl:translate-y-[5%] 2xl:-translate-x-[25%]"
+                    style={{
+                      filter: 'drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3))'
+                    }}
+                  />
+                  {/* Gradient overlay */}
+                  <Box className="absolute inset-0 rounded-full opacity-20 blur-3xl pointer-events-none" style={{
+                    background: `radial-gradient(circle at 50% 50%, ${darkColors.pop.purple}40, ${darkColors.pop.violet}20, transparent)`
+                  }} />
                 </Box>
               </Box>
             </Box>
           </Box>
-          <Box className="absolute left-0 top-0 -right-[500px] -mr-40 hidden lg:block">
-            <img src="/onboarding.png" className="" />
-          </Box>
         </Box>
 
         {/* Focus Sessions Section */}
-        <Box id="focus-sessions" className="relative py-16 md:py-32 overflow-hidden" >
+        <Box ref={focusSectionRef} id="focus-sessions" className="relative py-16 md:py-32 overflow-hidden" >
           <Box className="max-w-7xl mx-auto px-4">
             <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <Box className="relative">
                 <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
                   background: `radial-gradient(circle, ${darkColors.pop.purple}40, transparent)`
                 }} />
-                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
-                  backgroundColor: darkColors.surface.card + '50',
-                  border: `1px solid ${darkColors.neutral[700]}50`
-                }}>
-                  <Box className="flex items-center gap-4 mb-6">
-                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
-                      background: `linear-gradient(135deg, ${darkColors.pop.purple}, ${darkColors.pop.violet})`
-                    }}>
-                      <ClockIcon className="text-white" size={24} />
-                    </Box>
-                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
-                      Focus Sessions
-                    </Text>
-                  </Box>
-                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
-                    Create custom focus sessions tailored to your workflow. Set specific time blocks where distracting apps and websites are automatically blocked, helping you maintain deep focus.
-                  </Text>
-                  <Box className="space-y-4">
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Pomodoro timer with customizable intervals</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.violet }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Schedule recurring focus blocks</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.magenta }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Track focus time and build streaks</Text>
-                    </Box>
-                  </Box>
-                </Box>
+                <FeatureCard
+                  icon={<ClockIcon className="text-white" size={24} />}
+                  title="Focus Sessions"
+                  description="Create custom focus sessions tailored to your workflow. Set specific time blocks where distracting apps and websites are automatically blocked, helping you maintain deep focus."
+                  gradientFrom={darkColors.pop.purple}
+                  gradientTo={darkColors.pop.violet}
+                  features={[
+                    "Pomodoro timer with customizable intervals",
+                    "Schedule recurring focus blocks",
+                    "Track focus time and build streaks"
+                  ]}
+                  featureColors={[darkColors.pop.purple, darkColors.pop.violet, darkColors.pop.magenta]}
+                />
               </Box>
               <Box className="relative">
                 <Box className="relative animate-float">
@@ -236,8 +251,8 @@ export default function Home() {
                       <Box className="w-full rounded-full h-3 overflow-hidden" style={{
                         backgroundColor: darkColors.neutral[800]
                       }}>
-                        <Box className="h-full rounded-full transition-all duration-1000" style={{
-                          width: '40%',
+                        <Box className="h-full rounded-full transition-all duration-1000 ease-out" style={{
+                          width: `${focusProgress}%`,
                           background: `linear-gradient(90deg, ${darkColors.pop.purple}, ${darkColors.pop.violet})`,
                           boxShadow: `0 0 10px ${darkColors.pop.purple}40`
                         }} />
@@ -286,38 +301,19 @@ export default function Home() {
                 <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
                   background: `radial-gradient(circle, ${darkColors.pop.yellow}40, transparent)`
                 }} />
-                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
-                  backgroundColor: darkColors.surface.card + '50',
-                  border: `1px solid ${darkColors.neutral[700]}50`
-                }}>
-                  <Box className="flex items-center gap-4 mb-6">
-                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
-                      background: `linear-gradient(135deg, ${darkColors.pop.yellow}, ${darkColors.pop.magenta})`
-                    }}>
-                      <Lock className="text-white" size={24} />
-                    </Box>
-                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
-                      Uncheatable Stakes
-                    </Text>
-                  </Box>
-                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
-                    Put your money where your goals are. Stake SOL on your commitments - one stake per challenge. Complete it and get 100% back. Fail, and lose it all.
-                  </Text>
-                  <Box className="space-y-4">
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.yellow }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>100% return on success</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.magenta }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>0% return on failure</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Automatic forfeit on cheating</Text>
-                    </Box>
-                  </Box>
-                </Box>
+                <FeatureCard
+                  icon={<Lock className="text-white" size={24} />}
+                  title="Uncheatable Stakes"
+                  description="Put your money where your goals are. Stake SOL on your commitments - one stake per challenge. Complete it and get 100% back. Fail, and lose it all."
+                  gradientFrom={darkColors.pop.yellow}
+                  gradientTo={darkColors.pop.magenta}
+                  features={[
+                    "100% return on success",
+                    "0% return on failure",
+                    "Automatic forfeit on cheating"
+                  ]}
+                  featureColors={[darkColors.pop.yellow, darkColors.pop.magenta, darkColors.pop.purple]}
+                />
               </Box>
             </Box>
           </Box>
@@ -331,38 +327,19 @@ export default function Home() {
                 <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
                   background: `radial-gradient(circle, ${darkColors.primary[500]}40, transparent)`
                 }} />
-                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
-                  backgroundColor: darkColors.surface.card + '50',
-                  border: `1px solid ${darkColors.neutral[700]}50`
-                }}>
-                  <Box className="flex items-center gap-4 mb-6">
-                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
-                      background: `linear-gradient(135deg, ${darkColors.primary[500]}, ${darkColors.primary[600]}`
-                    }}>
-                      <Globe className="text-white" size={24} />
-                    </Box>
-                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
-                      Cross-Platform
-                    </Text>
-                  </Box>
-                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
-                    One account, all your devices. Blockit works seamlessly across iOS, Android, Solana Mobile, Chrome, Firefox, and web, ensuring you stay focused no matter which device you're using.
-                  </Text>
-                  <Box className="space-y-4">
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.primary[500] }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Real-time sync across devices</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.primary[600] }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Native mobile app blocking</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.indigo }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Browser extension for web blocking</Text>
-                    </Box>
-                  </Box>
-                </Box>
+                <FeatureCard
+                  icon={<Globe className="text-white" size={24} />}
+                  title="Cross-Platform"
+                  description="One account, all your devices. Blockit works seamlessly across iOS, Android, Solana Mobile, Chrome, Firefox, and web, ensuring you stay focused no matter which device you're using."
+                  gradientFrom={darkColors.primary[500]}
+                  gradientTo={darkColors.primary[600]}
+                  features={[
+                    "Real-time sync across devices",
+                    "Native mobile app blocking",
+                    "Browser extension for web blocking"
+                  ]}
+                  featureColors={[darkColors.primary[500], darkColors.primary[600], darkColors.pop.indigo]}
+                />
               </Box>
               <Box className="relative">
                 <Box className="relative">
@@ -392,7 +369,7 @@ export default function Home() {
         </Box>
 
         {/* Digital Life Insights Section */}
-        <Box id="insights" className="relative py-16 md:py-32">
+        <Box ref={dataSectionRef} id="insights" className="relative py-16 md:py-32">
           <Box className="max-w-7xl mx-auto px-4">
             <Box className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <Box className="order-2 lg:order-1 relative">
@@ -423,8 +400,8 @@ export default function Home() {
                         <Box className="w-full rounded-full h-2 overflow-hidden" style={{
                           backgroundColor: darkColors.neutral[900]
                         }}>
-                          <Box className="h-full rounded-full relative" style={{
-                            width: '75%',
+                          <Box className="h-full rounded-full relative transition-all duration-1000 ease-out" style={{
+                            width: `${dataProgress.instagram}%`,
                             backgroundColor: darkColors.pop.magenta
                           }}>
                             <Box className="absolute inset-0 flex">
@@ -447,9 +424,10 @@ export default function Home() {
                         <Box className="w-full rounded-full h-2 overflow-hidden" style={{
                           backgroundColor: darkColors.neutral[900]
                         }}>
-                          <Box className="h-full rounded-full" style={{
-                            width: '50%',
-                            backgroundColor: darkColors.pop.purple
+                          <Box className="h-full rounded-full transition-all duration-1000 ease-out" style={{
+                            width: `${dataProgress.twitter}%`,
+                            backgroundColor: darkColors.pop.purple,
+                            transitionDelay: '200ms'
                           }} />
                         </Box>
                       </Box>
@@ -467,9 +445,10 @@ export default function Home() {
                         <Box className="w-full rounded-full h-2 overflow-hidden" style={{
                           backgroundColor: darkColors.neutral[900]
                         }}>
-                          <Box className="h-full rounded-full relative" style={{
-                            width: '35%',
-                            backgroundColor: darkColors.pop.indigo
+                          <Box className="h-full rounded-full relative transition-all duration-1000 ease-out" style={{
+                            width: `${dataProgress.youtube}%`,
+                            backgroundColor: darkColors.pop.indigo,
+                            transitionDelay: '400ms'
                           }}>
                             <Box className="absolute inset-0 flex">
                               <Box className="h-full" style={{ width: '70%', backgroundColor: darkColors.pop.indigo, opacity: 0.3 }} />
@@ -491,38 +470,19 @@ export default function Home() {
                 <Box className="absolute -inset-20 opacity-20 blur-3xl" style={{
                   background: `radial-gradient(circle, ${darkColors.pop.indigo}40, transparent)`
                 }} />
-                <Box className="relative p-6 md:p-8 rounded-3xl" style={{
-                  backgroundColor: darkColors.surface.card + '50',
-                  border: `1px solid ${darkColors.neutral[700]}50`
-                }}>
-                  <Box className="flex items-center gap-4 mb-6">
-                    <Box className="w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center" style={{
-                      background: `linear-gradient(135deg, ${darkColors.pop.indigo}, ${darkColors.secondary[500]}`
-                    }}>
-                      <Brain className="text-white" size={24} />
-                    </Box>
-                    <Text variant="h3" className="text-2xl md:text-3xl font-bold" style={{ color: darkColors.text.main }}>
-                      Digital Life Insights
-                    </Text>
-                  </Box>
-                  <Text variant="body" className="text-lg mb-6 leading-relaxed" style={{ color: darkColors.text.soft }}>
-                    Understand your digital habits with detailed analytics. Track time spent on apps and websites, identify patterns, and make informed decisions about your digital life.
-                  </Text>
-                  <Box className="space-y-4">
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.indigo }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Weekly and monthly reports</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.secondary[500] }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Usage trends and patterns</Text>
-                    </Box>
-                    <Box className="flex items-center gap-3">
-                      <Box className="w-2 h-2 rounded-full" style={{ backgroundColor: darkColors.pop.purple }} />
-                      <Text variant="body" style={{ color: darkColors.text.main }}>Export data for deeper analysis</Text>
-                    </Box>
-                  </Box>
-                </Box>
+                <FeatureCard
+                  icon={<Brain className="text-white" size={24} />}
+                  title="Digital Life Insights"
+                  description="Understand your digital habits with detailed analytics. Track time spent on apps and websites, identify patterns, and make informed decisions about your digital life."
+                  gradientFrom={darkColors.pop.indigo}
+                  gradientTo={darkColors.secondary[500]}
+                  features={[
+                    "Weekly and monthly reports",
+                    "Usage trends and patterns",
+                    "Export data for deeper analysis"
+                  ]}
+                  featureColors={[darkColors.pop.indigo, darkColors.secondary[500], darkColors.pop.purple]}
+                />
               </Box>
             </Box>
           </Box>
@@ -582,65 +542,33 @@ export default function Home() {
 
             {/* Key Features Grid */}
             <Box className="grid md:grid-cols-3 gap-8 md:gap-12 mb-16">
-              <Box className="relative group">
-                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
-                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
-                  border: `1px solid ${darkColors.pop.yellow}30`,
-                  boxShadow: `0 20px 40px ${darkColors.pop.yellow}10`
-                }}>
-                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
-                    background: `linear-gradient(135deg, ${darkColors.pop.yellow}20, ${darkColors.pop.purple}10)`
-                  }}>
-                    <Lock size={32} style={{ color: darkColors.pop.yellow }} />
-                  </Box>
-                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
-                    Sell Usage Data
-                  </Text>
-                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
-                    Your app usage patterns are valuable. Sell aggregated, anonymized data while maintaining complete privacy.
-                  </Text>
-                </Box>
-              </Box>
-
-              <Box className="relative group">
-                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
-                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
-                  border: `1px solid ${darkColors.pop.purple}30`,
-                  boxShadow: `0 20px 40px ${darkColors.pop.purple}10`
-                }}>
-                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
-                    background: `linear-gradient(135deg, ${darkColors.pop.purple}20, ${darkColors.pop.magenta}10)`
-                  }}>
-                    <Globe size={32} style={{ color: darkColors.pop.purple }} />
-                  </Box>
-                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
-                    Time-Limited Access
-                  </Text>
-                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
-                    Buyers purchase access to aggregated insights for specific time periods. Your data stays secure and valuable.
-                  </Text>
-                </Box>
-              </Box>
-
-              <Box className="relative group">
-                <Box className="p-6 md:p-8 rounded-2xl backdrop-blur-sm transform transition-all duration-300 hover:scale-105" style={{
-                  background: `linear-gradient(135deg, ${darkColors.surface.elevated}80, ${darkColors.surface.card}50)`,
-                  border: `1px solid ${darkColors.pop.magenta}30`,
-                  boxShadow: `0 20px 40px ${darkColors.pop.magenta}10`
-                }}>
-                  <Box className="w-16 h-16 rounded-xl mb-6 flex items-center justify-center" style={{
-                    background: `linear-gradient(135deg, ${darkColors.pop.magenta}20, ${darkColors.pop.yellow}10)`
-                  }}>
-                    <Sparkles size={32} style={{ color: darkColors.pop.magenta }} />
-                  </Box>
-                  <Text variant="h3" className="text-2xl font-bold mb-3" style={{ color: darkColors.text.main }}>
-                    Claim Your Revenue
-                  </Text>
-                  <Text variant="body" className="text-base" style={{ color: darkColors.text.soft }}>
-                    Get your fair share directly. No platform fees, no hidden cuts. 100% of revenue goes to your wallet.
-                  </Text>
-                </Box>
-              </Box>
+              <MarketplaceFeatureCard
+                icon={<Lock size={32} />}
+                title="Sell Usage Data"
+                description="Your app usage patterns are valuable. Sell aggregated, anonymized data while maintaining complete privacy."
+                gradientFrom={darkColors.pop.yellow}
+                gradientTo={darkColors.pop.purple}
+                borderColor={darkColors.pop.yellow}
+                iconColor={darkColors.pop.yellow}
+              />
+              <MarketplaceFeatureCard
+                icon={<Globe size={32} />}
+                title="Time-Limited Access"
+                description="Buyers purchase access to aggregated insights for specific time periods. Your data stays secure and valuable."
+                gradientFrom={darkColors.pop.purple}
+                gradientTo={darkColors.pop.magenta}
+                borderColor={darkColors.pop.purple}
+                iconColor={darkColors.pop.purple}
+              />
+              <MarketplaceFeatureCard
+                icon={<Sparkles size={32} />}
+                title="Claim Your Revenue"
+                description="Get your fair share directly. No platform fees, no hidden cuts. 100% of revenue goes to your wallet."
+                gradientFrom={darkColors.pop.magenta}
+                gradientTo={darkColors.pop.yellow}
+                borderColor={darkColors.pop.magenta}
+                iconColor={darkColors.pop.magenta}
+              />
             </Box>
           </Box>
         </Box>

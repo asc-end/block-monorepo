@@ -6,9 +6,11 @@ import Home from "./Home";
 import Error from "./Error";
 import Terms from "./Terms";
 import Privacy from "./Privacy";
+import License from "./License";
 import { sendMessageToExtension } from "../lib/sendMessageToExtension";
 import { createUser, useAuthStore } from "@blockit/ui";
 import { LoseScreen } from "./Lose";
+import { Connect } from "./Connect";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,16 @@ const router = createBrowserRouter([
     element: <Privacy />,
     errorElement: <Error />,
   },
+  {
+    path: "/connect",
+    element: <Connect />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/license",
+    element: <License />,
+    errorElement: <Error />,
+  },
 ]);
 
 export function App() {
@@ -43,7 +55,7 @@ export function App() {
   const [currentFeature, setCurrentFeature] = useState(0);
   
   // Check if we're on a public page
-  const publicPaths = ["/", "/terms", "/privacy"];
+  const publicPaths = ["/", "/terms", "/privacy", "/connect", "/license"];
   const isPublicPage = publicPaths.includes(window.location.pathname);
 
   const features = [
