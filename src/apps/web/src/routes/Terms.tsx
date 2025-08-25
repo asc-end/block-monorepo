@@ -106,10 +106,10 @@ export default function Terms() {
                 • All blockchain transactions are irreversible
               </Text>
               <Text variant="body" className="leading-relaxed" style={{ color: darkColors.text.soft }}>
-                • You understand that staked SOL may be forfeited if you fail to meet your commitments
+                • You understand that staked SOL will be forfeited if you fail to meet your commitments
               </Text>
               <Text variant="body" className="leading-relaxed" style={{ color: darkColors.text.soft }}>
-                • We charge a 10% protocol fee on forfeited stakes
+                • All forfeited stakes are retained by Blockit
               </Text>
               <Text variant="body" className="leading-relaxed" style={{ color: darkColors.text.soft }}>
                 • You are responsible for all gas fees and transaction costs
