@@ -1,6 +1,7 @@
 import { Stack, router } from 'expo-router';
 import { Box, useTheme, Pressable, Text } from '@blockit/cross-ui-toolkit';
 import { Ionicons } from '@expo/vector-icons';
+import { Linking } from 'react-native';
 
 export default function HomeLayout() {
   const { currentColors } = useTheme();
@@ -34,10 +35,13 @@ export default function HomeLayout() {
             ),
             headerRight: () => (
               <Pressable 
-                onPress={() => router.push("/sell-data")}
+                onPress={() => {
+                  // Open Discord link in external browser
+                  Linking.openURL('https://discord.gg/mMv7rCqA');
+                }}
                 className="mr-4"
               >
-                <Text style={{ color: currentColors.primary[500], fontSize: 14 }}>Sell my data ✨</Text>
+                <Text style={{ color: currentColors.primary[500], fontSize: 14 }}>Join the Community</Text>
               </Pressable>
             ),
           }}
