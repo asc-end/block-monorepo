@@ -19,3 +19,4 @@ export * from './toggle';
 export * from './gradient';
 export * from './gradient/Gradient';
 export * from './animated';
+export * from './blur';

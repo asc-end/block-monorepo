@@ -1,12 +1,15 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
-const path = require("path"); // Import the path module
+const path = require("path");
 
 // Find the project root directory
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(__dirname, "../..");
 
 const config = getDefaultConfig(projectRoot);
+
+// Add .riv and .mp3 to assetExts
+config.resolver.assetExts.push('riv', 'mp3');
 
 // Add monorepo support
 config.watchFolders = [
@@ -21,8 +24,7 @@ config.resolver.nodeModulesPaths = [
 ];
 
 config.resolver.unstable_enableSymlinks = true;
-config.resolver.unstable_enablePackageExports = true; // Important for newer packages
-
+config.resolver.unstable_enablePackageExports = true;
 
 const resolveRequestWithPackageExports = (context, moduleName, platform) => {
   // Package exports in `isows` are incorrect, so we need to disable them
@@ -57,14 +59,10 @@ config.resolver.resolveRequest = resolveRequestWithPackageExports;
 
 config.resolver.extraNodeModules = {
   ...config.resolver.extraNodeModules,
-  'crypto': require.resolve('expo-crypto'), // <--- THIS IS KEY FOR JOSE
-  'stream': require.resolve('readable-stream'), // Often needed with crypto stuff
-  'buffer': require.resolve('buffer/'), // Ensure buffer is correctly polyfilled
-  'react-dom': require.resolve('react-native'), // Alias react-dom to react-native
-  // If other Node.js modules are requested by jose or its dependencies, add them here
-  // e.g., 'util': require.resolve('util/'),
-  // 'assert': require.resolve('assert/'),
-  // 'fs': require.resolve('react-native-level-fs'), // If you ever get fs errors
+  'crypto': require.resolve('expo-crypto'),
+  'stream': require.resolve('readable-stream'),
+  'buffer': require.resolve('buffer/'),
+  'react-dom': require.resolve('react-native'),
 };
 
 // Export the config with NativeWind

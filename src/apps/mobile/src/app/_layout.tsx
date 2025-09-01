@@ -70,7 +70,7 @@ function AppContent() {
   const privyClient = usePrivyClient();
   const { syncNow } = useAppUsageSync();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
-  const { setToken, token } = useAuthStore();
+  const { setToken, token, setTokenRefreshFunction } = useAuthStore();
   const { walletAddress } = useSolana()
 
   const getAccessToken = async () => {
@@ -126,6 +126,9 @@ function AppContent() {
             setToken(token);
             console.log('Token set in auth store');
           }
+          
+          // Set the token refresh function so the auth store can refresh tokens
+          setTokenRefreshFunction(getAccessToken);
         } catch (error) {
           console.error('Failed to set auth token:', error);
         }
@@ -133,7 +136,7 @@ function AppContent() {
     };
 
     setAuthToken();
-  }, [user, privyClient, setToken]);
+  }, [user, privyClient, setToken, setTokenRefreshFunction]);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -153,14 +156,16 @@ function AppContent() {
 
 
   useEffect(() => {
-    if (hasCompletedOnboarding == null || !isReady) {
-      return;
+    console.log('Layout effect - isReady:', isReady, 'hasCompletedOnboarding:', hasCompletedOnboarding);
+    
+    // Hide splash screen as soon as Privy is ready
+    if (isReady) {
+      SplashScreen.hideAsync();
     }
-
-    SplashScreen.hideAsync();
   }, [hasCompletedOnboarding, isReady]);
+  
   if (!isReady) {
-    // if (!isReady || hasCompletedOnboarding === null) {
+    // Return null to keep showing the splash screen while Privy loads
     return null;
   }
 

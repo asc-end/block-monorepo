@@ -146,24 +146,42 @@ export function useAuthorization() {
   //   [fetchQuery.data?.authToken, handleAuthorizationResult, cluster.id],
   // )
 
-  async function authorizeSession(wallet: AuthorizeAPI){
+  async function authorizeSession(wallet: AuthorizeAPI, forceNewAuth = false){
+    console.log("Authorizing session", process.env.EXPO_PUBLIC_NETWORK, SolanaAppConfig.clusters)
     const config = {
       identity,
-      chain: SolanaAppConfig.clusters["devnet"].id,
+      chain: SolanaAppConfig.clusters[process.env.EXPO_PUBLIC_NETWORK].id,
       // chain: SolanaAppConfig.clusters["mainnet-beta"].id,
-      auth_token: fetchQuery.data?.authToken,
+      auth_token: forceNewAuth ? undefined : fetchQuery.data?.authToken,
     }
-    const authorizationResult = await wallet.authorize(config)
-    return (await handleAuthorizationResult(authorizationResult)).selectedAccount
+    
+    try {
+      const authorizationResult = await wallet.authorize(config)
+      return (await handleAuthorizationResult(authorizationResult)).selectedAccount
+    } catch (error: any) {
+      // If auth token is invalid, clear it and retry without it
+      if (error.message?.includes('invalid') || error.message?.includes('expired') || error.message?.includes('not valid')) {
+        console.log("Auth token invalid, retrying without token")
+        await persistMutation.mutateAsync(null)
+        const retryConfig = {
+          identity,
+          chain: SolanaAppConfig.clusters["devnet"].id,
+          // Don't include auth_token in retry
+        }
+        const authorizationResult = await wallet.authorize(retryConfig)
+        return (await handleAuthorizationResult(authorizationResult)).selectedAccount
+      }
+      throw error
+    }
   }
 
   const authorizeSessionWithSignIn = useCallback(
     async (wallet: AuthorizeAPI, signInPayload: SignInPayload) => {
       console.log("Authorizing session with sign in payload", signInPayload)
-      console.log("Identity", SolanaAppConfig.clusters['mainnet-beta'].id)
+      console.log("Identity", SolanaAppConfig.clusters[process.env.EXPO_PUBLIC_NETWORK].id)
       const authorizationResult = await wallet.authorize({
         identity,
-        chain:SolanaAppConfig.clusters['mainnet-beta'].id,
+        chain:SolanaAppConfig.clusters[process.env.EXPO_PUBLIC_NETWORK].id,
         auth_token: fetchQuery.data?.authToken,
         sign_in_payload: signInPayload,
       }).catch((error) => {

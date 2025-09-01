@@ -5,7 +5,7 @@ import { SolanaConnectButton } from '@/components/connection/SolanaConnectButton
 export default function Connect() {
   const { sendCode, loginWithCode } = useLoginWithEmail();
   const { login, state } = useLoginWithOAuth();
-
+  
   return (
     <Login
       useLoginWithEmail={() => ({ sendCode, loginWithCode })}

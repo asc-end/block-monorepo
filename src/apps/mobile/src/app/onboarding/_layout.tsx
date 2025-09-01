@@ -5,10 +5,10 @@ export default function OnboardingLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="permissions" />
     </Stack>
   );
 }

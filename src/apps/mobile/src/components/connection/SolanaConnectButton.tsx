@@ -2,12 +2,12 @@ import { SolanaAppConfig } from "@/constants/SolanaAppConfig";
 import { useAuthorization } from "@/hooks/solana/useMwaAuthorization";
 import { Pressable, Text, useTheme } from "@blockit/cross-ui-toolkit";
 import { SolIcon } from "@blockit/ui";
-import { PrivyUser, useLoginWithSiws } from "@privy-io/expo";
-import { Base64EncodedAddress, SignInPayload } from "@solana-mobile/mobile-wallet-adapter-protocol";
+import { useLoginWithSiws } from "@privy-io/expo";
+import { Base64EncodedAddress } from "@solana-mobile/mobile-wallet-adapter-protocol";
 import { transact, Web3MobileWallet } from "@solana-mobile/mobile-wallet-adapter-protocol-web3js";
 import { PublicKey } from "@solana/web3.js";
 import { WalletIcon } from '@wallet-standard/core'
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export type Account = Readonly<{
     address: Base64EncodedAddress
@@ -17,135 +17,110 @@ export type Account = Readonly<{
     publicKey: PublicKey
 }>
 
-const signInPayload: SignInPayload = {
-    domain: SolanaAppConfig.domain,
-    uri: SolanaAppConfig.uri,
-    version: '1',
-    statement: 'Sign into React Native Sample App',
-    // timestamp: new Date().toISOString(),
-    // resources: 
-}
 
 
 export function SolanaConnectButton() {
     const { currentColors } = useTheme();
-    const { authorizeSessionWithSignIn, authorizeSession, deauthorizeSessions } = useAuthorization()
-    const { login , generateMessage} = useLoginWithSiws();
+    const { authorizeSession } = useAuthorization()
+    const { login, generateMessage } = useLoginWithSiws();
+    const [isLoading, setIsLoading] = useState(false);
+    const [authStep, setAuthStep] = useState<'connect' | 'sign'>('connect');
+    const [walletAddress, setWalletAddress] = useState<string | null>(null);
+    const [message, setMessage] = useState<{ message: string } | null>(null);
 
 
-    // For when user has not connected to both MWA or Privy
-    const privyMwaSignIn = useCallback(
-        async (): Promise<{ mwaResult: Account; privyUser: PrivyUser }> => {
-            console.log("Privy MWA Sign In")
-            try {
-                const message = await generateMessage({
-                    // wallet: { address: "3BeNZiw5j7husftD5W8Er9xYHN7xa9P36YJt3HfGRdky" },
-                    // wallet: { address: "8N97qfq2ASQ14Rs4oTD63wPVAKfr5ZDLQoot66AdkNjc" },
-                    wallet: { address: "CpRc1FhGyaFFfH8mt8Wt12RGWdj614ZnLypvTvNMRPtA" },
-                    // 
-                    from: { domain: SolanaAppConfig.domain, uri: SolanaAppConfig.uri },
-                })
-
-                const { signatureBase64} =  await transact(async (wallet: Web3MobileWallet) => {
-                    console.log("Authorizing session with sign in payload")
-
-                    const authResult = await authorizeSession(wallet)
-                    // const authResult = await authorizeSessionWithSignIn(wallet, signInPayload)
-
-                    console.log("Fetching privy siws message", authResult)
-                    console.log("Wallet address", SolanaAppConfig.domain, SolanaAppConfig.uri)
+    // Step 1: Connect wallet and get address
+    const connectWallet = useCallback(async () => {
+        setIsLoading(true);
+        
+        try {
+            const result = await transact(async (wallet: Web3MobileWallet) => {
+                const authResult = await authorizeSession(wallet, true);
+                return authResult;
+            });
             
-                    console.log("Privy SIWS message", message)
-                    const encodedPrivySiwsMessage = new TextEncoder().encode(message.message);
-                    console.log("Waiting for sign message")
-                    const [signatureBytes] = await wallet.signMessages({ addresses: [authResult.address], payloads: [encodedPrivySiwsMessage] })
-                    const signatureBase64 = Buffer.from(signatureBytes).toString('base64');
-
-                    console.log("Logging in with Privy SIWS")
-       
-                    console.log("Sign in with Privy success")
-
-                    return { mwaResult: authResult, privyUser: user, signatureBase64 }
-                    // return { mwaResult: authResult, privyUser: null }
-                })
-
+            if (result) {
+                const address = result.publicKey.toBase58();
+                setWalletAddress(address);
+                
+                // Generate message outside of transact
+                const privyMessage = await generateMessage({
+                    wallet: { address },
+                    from: { domain: SolanaAppConfig.domain, uri: SolanaAppConfig.uri },
+                });
+                
+                setMessage(privyMessage);
+                setAuthStep('sign');
+                console.log("Message generated:", privyMessage);
+            }
+        } catch (error) {
+            console.error("Error connecting wallet:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [authorizeSession, generateMessage]);
+    
+    // Step 2: Sign message and login
+    const signMessageAndLogin = useCallback(async () => {
+        if (!walletAddress || !message) {
+            console.error("No wallet address or message available");
+            return;
+        }
+        
+        setIsLoading(true);
+        
+        try {
+            const result = await transact(async (wallet: Web3MobileWallet) => {
+                // Re-authorize if needed (session might have expired)
+                const authResult = await authorizeSession(wallet, true);
+                
+                const encodedPrivySiwsMessage = new TextEncoder().encode(message.message);
+                
+                const [signatureBytes] = await wallet.signMessages({ 
+                    addresses: [authResult.address], 
+                    payloads: [encodedPrivySiwsMessage] 
+                });
+                
+                const signatureBase64 = Buffer.from(signatureBytes).toString('base64');
+                return signatureBase64;
+            });
+            
+            if (result) {
                 const user = await login({
-                    signature: signatureBase64,
+                    signature: result,
                     message: message.message,
                     disableSignup: false,
                 });
-            } catch (error) {
-                console.log("Error signing in with Privy", error)
-                return { mwaResult: null, privyUser: null }
+                
+                setWalletAddress(null);
+                setMessage(null);
             }
-        },
-        [authorizeSession, generateMessage, login]
-    )
-
-    // const privyMwaSignIn = useCallback(
-    //     async (): Promise<{ mwaResult: Account; privyUser: PrivyUser }> => {
-    //         return await transact(async (wallet) => {
-    //             const authResult = await authorizeSession(wallet)
-
-    //             console.log("Fetching privy siws message", authResult)
-    //             console.log("Wallet address", SolanaAppConfig.domain, SolanaAppConfig.uri)
-    //             return generateMessage({
-    //                 wallet: { address: authResult.publicKey.toBase58() },
-    //                 from: { domain: SolanaAppConfig.domain, uri: SolanaAppConfig.uri },
-    //             }).then(async (message) => {
-    //                 console.log("Privy SIWS message", message)
-    //                 const encodedPrivySiwsMessage = new TextEncoder().encode(message.message);
-    //                 console.log("Waiting for sign message")
-    //                 const [signatureBytes] = await wallet.signMessages({ addresses: [authResult.address], payloads: [encodedPrivySiwsMessage] })
-    //                 const signatureBase64 = Buffer.from(signatureBytes).toString('base64');
-
-    //                 console.log("Logging in with Privy SIWS")
-    //                 const user = await login({
-    //                     signature: signatureBase64,
-    //                     message: message.message,
-    //                     disableSignup: false,
-    //                 });
-    //                 console.log("Sign in with Privy success")
-
-    //                 return { mwaResult: authResult, privyUser: user }
-    //             }).catch((error) => {
-    //                 console.log("Error generating message", error)
-    //                 return null
-    //             })
+        } catch (error) {
+            console.error("Error signing message:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [walletAddress, message, authorizeSession, login]);
 
 
-    //         })
-    //     },
-    //     [authorizeSessionWithSignIn],
-    // )
-
-    const connect = useCallback(async (): Promise<Account> => {
-        return await transact(async (wallet) => {
-            return await authorizeSession(wallet)
-        })
-    }, [authorizeSession])
-
-    const signIn = useCallback(
-        async (signInPayload: SignInPayload): Promise<Account> => {
-            return await transact(async (wallet) => {
-                return await authorizeSessionWithSignIn(wallet, signInPayload)
-            })
-        },
-        [authorizeSessionWithSignIn],
-    )
-    const disconnect = useCallback(async (): Promise<void> => {
-        await deauthorizeSessions()
-    }, [deauthorizeSessions])
 
     return (
         <Pressable
-            onPress={privyMwaSignIn}
+            onPress={authStep === 'connect' ? connectWallet : signMessageAndLogin}
+            disabled={isLoading}
             className="w-full gap-2 px-8 py-3 rounded-2xl shadow-lg active:opacity-90 flex flex-row items-center justify-center"
-            style={{ backgroundColor: currentColors.primary[500] }}
+            style={{
+                backgroundColor: authStep === 'sign' ? currentColors.success.main : currentColors.primary[500],
+                opacity: isLoading ? 0.7 : 1
+            }}
         >
-            <SolIcon size={20} color="white" />
-            <Text variant="h3">
-                Connect with Solana
+            {!isLoading && <SolIcon size={20} color="white" />}
+            <Text variant="h3" style={{ color: 'white' }}>
+                {isLoading 
+                    ? (authStep === 'connect' ? 'Connecting...' : 'Signing...') 
+                    : authStep === 'connect' 
+                        ? 'Connect with Solana' 
+                        : 'Sign Message to Login'}
             </Text>
         </Pressable>
     );

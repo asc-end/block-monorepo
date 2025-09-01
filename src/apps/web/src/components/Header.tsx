@@ -3,11 +3,7 @@ import { darkColors } from "@blockit/ui";
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-interface HeaderProps {
-  showDownloadModal?: () => void;
-}
-
-export function Header({ showDownloadModal }: HeaderProps) {
+export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -69,22 +65,13 @@ export function Header({ showDownloadModal }: HeaderProps) {
 
         {/* CTA Button */}
         <Box className="w-auto">
-          {showDownloadModal ? (
+          <a href="https://discord.gg/mMv7rCqA" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
             <Button
-              onPress={showDownloadModal}
-              title="Get Started"
+              title="Join the Community"
               variant="primary"
               size="md"
             />
-          ) : (
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <Button
-                title="Get Started"
-                variant="primary"
-                size="md"
-              />
-            </Link>
-          )}
+          </a>
         </Box>
       </Box>
     </Box>
